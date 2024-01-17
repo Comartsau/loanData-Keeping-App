@@ -5,6 +5,7 @@ import HomeAdmin from '../compoents/admin/layouts/HomeAdmin'
 import Customer from "../compoents/admin/pages/Customer";
 import Process from "../compoents/admin/pages/Process";
 import Report from "../compoents/admin/pages/Report";
+import About from '../compoents/admin/pages/About'
 
 
 
@@ -20,6 +21,7 @@ const CheckRouter = () => {
             <Route index element={<Customer />} />
             <Route path="/admin/process" element={<Process />} />
             <Route path="/admin/report" element={<Report />} />
+            <Route path="/admin/about" element={<About />} />
           </Route>
           <Route path="/" element={<Navigate to="/admin" />} />
           <Route path="*" element={<Navigate to="/admin" />} />
