@@ -20,7 +20,7 @@ import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle } from "react-icons/bs";
 import { IoTrashBin } from "react-icons/io5";
 
-const Customer = () => {
+const Location = () => {
   //----------  Data Table --------------------//
   const [noData, setNoData] = useState(false);
   const [listData, setListData] = useState([
@@ -56,7 +56,7 @@ const Customer = () => {
   const totalPages = Math.ceil(listData.length / itemsPerPage);
 
   //------------- modal Add Product -----------------------//
-  const [newCustomer ,setNewCustomer] = useState([])
+  const [newLocation, setNewLocation] = useState([]);
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [dataAdd, setDataAdd] = useState([]);
 
@@ -65,11 +65,8 @@ const Customer = () => {
     setDataAdd(data);
   };
 
-  // console.log(newCustomer)
-
-
   //------------- modal Edit Product -----------------------//
-  const [editCustomer ,setEditCustomer] = useState([])
+  const [editLocation, setEditLocation] = useState([]);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [dataEdit, setDataEdit] = useState([]);
 
@@ -96,14 +93,14 @@ const Customer = () => {
         {/* <p>ข้อมูลผู้บริจาค</p> */}
         <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
           <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
-            <Typography className=" font-bold ">ข้อมูลลูกค้า:</Typography>
+            <Typography className=" font-bold ">ข้อมูลสถานที่:</Typography>
           </div>
           <div className="w-full md:w-[50%] flex   px-0 md:px-10">
             <div className="w-full flex flex-col md:flex-row justify-center md:justify-end items-center gap-5">
               <div>
                 <Input
                   type="text"
-                  label="ค้นหา ชื่อลูกค้า"
+                  label="ค้นหา สถานที่"
                   //   placeholder="ค้นหา ชื่อลูกค้า"
                   color="blue-gray"
                   value={searchQuery}
@@ -122,7 +119,7 @@ const Customer = () => {
                   <span className="mr-2 text-xl">
                     <BsPlusCircle />
                   </span>
-                  เพิ่มลูกค้า
+                  เพิ่มสถานที่
                 </Button>
               </div>
             </div>
@@ -149,7 +146,7 @@ const Customer = () => {
                       color="blue-gray"
                       className="font-bold leading-none opacity-70"
                     >
-                      ชื่อ-สกุล
+                      ชื่อสถานที่
                     </Typography>
                   </th>
                   <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
@@ -167,7 +164,7 @@ const Customer = () => {
                       color="blue-gray"
                       className="font-bold leading-none opacity-70"
                     >
-                      ที่อยู่
+                      ที่อยู่สำนักงาน
                     </Typography>
                   </th>
                   <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1  ">
@@ -307,11 +304,11 @@ const Customer = () => {
         </Card>
       </div>
 
-      {/* modal Add Customer */}
+      {/* modal Add Location */}
 
       <Dialog open={openModalAdd} size="xs" handler={handleModalAdd}>
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">เพิ่มข้อมูลลูกค้า</Typography>
+          <Typography variant="h5">เพิ่มข้อมูลสถานที่</Typography>
         </DialogHeader>
         <DialogBody divider className=" overflow-auto ">
           <div className=" w-full flex flex-col justify-center  gap-4 ">
@@ -319,13 +316,13 @@ const Customer = () => {
               <div className="flex   mt-3">
                 <Input
                   type="text"
-                  label="ชื่อลูกค้า"
+                  label="ชื่อสถานที่"
                   maxLength="50"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
+                    setNewLocation({
+                      ...newLocation,
                       name: e.target.value,
                     })
                   }
@@ -339,8 +336,8 @@ const Customer = () => {
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
+                    setNewLocation({
+                      ...newLocation,
                       tel: e.target.value,
                     })
                   }
@@ -348,13 +345,13 @@ const Customer = () => {
               </div>
               <div className="flex   mt-3">
                 <Textarea
-                  label="ที่อยู่"
+                  label="ที่อยู่สำนักงาน"
                   maxLength="100"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
+                    setNewLocation({
+                      ...newLocation,
                       address: e.target.value,
                     })
                   }
@@ -391,12 +388,11 @@ const Customer = () => {
         </DialogFooter>
       </Dialog>
 
-
       {/* modal Edit Customer */}
 
       <Dialog open={openModalEdit} size="xs" handler={handleModalEdit}>
         <DialogHeader className="bg-yellow-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">แก้ไขข้อมูลลูกค้า</Typography>
+          <Typography variant="h5">แก้ไขข้อมูลสถานที่</Typography>
         </DialogHeader>
         <DialogBody divider className=" overflow-auto ">
           <div className=" w-full flex flex-col justify-center  gap-4 ">
@@ -404,14 +400,14 @@ const Customer = () => {
               <div className="flex   mt-3">
                 <Input
                   type="text"
-                  label="ชื่อลูกค้า"
+                  label="ชื่อสถานที่"
                   maxLength="50"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
                   value={dataEdit.name}
                   onChange={(e) =>
-                    setEditCustomer({
-                      ...editCustomer,
+                    setEditLocation({
+                      ...editLocation,
                       name: e.target.value,
                     })
                   }
@@ -426,8 +422,8 @@ const Customer = () => {
                   style={{ backgroundColor: "#F4F4F4" }}
                   value={dataEdit.tel}
                   onChange={(e) =>
-                    setEditCustomer({
-                      ...editCustomer,
+                    setEditLocation({
+                      ...editLocation,
                       tel: e.target.value,
                     })
                   }
@@ -435,14 +431,14 @@ const Customer = () => {
               </div>
               <div className="flex   mt-3">
                 <Textarea
-                  label="ที่อยู่"
+                  label="ที่อยู่สถานที่"
                   maxLength="100"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
                   value={dataEdit.address}
                   onChange={(e) =>
-                    setEditCustomer({
-                      ...editCustomer,
+                    setEditLocation({
+                      ...editLocation,
                       address: e.target.value,
                     })
                   }
@@ -483,12 +479,12 @@ const Customer = () => {
 
       <Dialog open={openModalDelete} size="sm" handler={handleModalDelete}>
         <DialogHeader className="bg-red-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">ลบสินค้า</Typography>
+          <Typography variant="h5">ลบสถานที่</Typography>
         </DialogHeader>
         <DialogBody divider className=" overflow-auto ">
           <div className="flex flex-col w-full justify-center gap-3 ">
             <Typography variant="h5" className="text-center">
-              ต้องการลบ ใบกำกับภาษี: {dataDelete?.code || ""}{" "}
+              ต้องการลบ สถานที่: {dataDelete?.code || ""}{" "}
             </Typography>
             <Typography variant="h5" className="text-center">
               จริงหรือไม่?{" "}
@@ -524,4 +520,4 @@ const Customer = () => {
   );
 };
 
-export default Customer;
+export default Location;

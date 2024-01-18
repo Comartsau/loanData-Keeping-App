@@ -1,6 +1,7 @@
 import { Card, Button } from "@material-tailwind/react";
 import { useState } from "react";
 import Customer from "./Customer";
+import Location from "./Location";
 
 function Database() {
   const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
@@ -47,14 +48,12 @@ function Database() {
           </div>
           {activeCustomerMenu === "menu1" && (
             <div className="w-full mt-5 ">
-              {/* <hr className="  h-1 mt-5 bg-gray-200" /> */}
               <Customer />
             </div>
           )}
           {activeCustomerMenu === "menu2" && (
-            <div>
-              <hr className=" mt-5 border border-gray-500" />
-              {/* <TaxInvoiceShort /> */}
+            <div className="w-full mt-5 ">
+              <Location />
             </div>
           )}
         </div>
