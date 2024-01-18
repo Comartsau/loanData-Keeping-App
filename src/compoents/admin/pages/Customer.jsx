@@ -34,9 +34,9 @@ const Customer = () => {
       <div className="flex flex-col w-full">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
         <div className="flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
-          <div className="flex   px-0 md:mx-10 ">
-            <div className="flex flex-col gap-3 mt-5 md:mt-0 ">
-              <Typography className=" font-bold">
+          <div className="w-full flex   px-0 md:mx-10 ">
+            <div className=" flex flex-col gap-3 mt-5 md:mt-0 ">
+              <Typography className=" font-bold ">
                 ข้อมูลลูกค้า:
               </Typography>
             </div>
