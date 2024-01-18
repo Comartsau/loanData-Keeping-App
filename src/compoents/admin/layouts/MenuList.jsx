@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 import { GoWorkflow } from "react-icons/go";
 
-const MenuList = ({ darkTheme, toogleTheme }) => {
+const MenuList = ({ darkTheme, toggleTheme }) => {
   const iconStyle = { fontSize: "26px", marginRight: "5px" };
 
   return (
@@ -24,15 +24,6 @@ const MenuList = ({ darkTheme, toogleTheme }) => {
         <Menu.Item key="report" icon={<TbReportAnalytics style={iconStyle} />}>
           <Link to="/admin/report">รายงาน</Link>
         </Menu.Item>
-
-        {/* <Menu.SubMenu key="subtasks" title="Task" icon={<TbReportAnalytics />}>
-          <Menu.Item key="task-1" icon={<TbReportAnalytics />}>
-            1
-          </Menu.Item>
-          <Menu.Item key="task-2" icon={<TbReportAnalytics />}>
-            2
-          </Menu.Item>
-        </Menu.SubMenu> */}
       </Menu>
     </div>
   );

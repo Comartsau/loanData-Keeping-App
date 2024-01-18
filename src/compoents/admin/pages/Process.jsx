@@ -1,8 +1,11 @@
 import React from 'react'
+import {Input} from '@material-tailwind/react'
 
 const Process = () => {
   return (
-    <div>Process</div>
+    <div>
+      <Input label='ค้นหาชื่อ' type="text" />
+    </div>
   )
 }
 

@@ -25,7 +25,7 @@ const items = [
 ];
 
 export function HomeAdmin() {
-  const [darkTheme, setDarkTheme] = useState(true);
+  const [darkTheme, setDarkTheme] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleTheme = () => {
@@ -45,7 +45,7 @@ export function HomeAdmin() {
         theme={darkTheme ? "dark" : "light"}
         className="sidebar"
       >
-        <Logo />
+        <Logo darkTheme={darkTheme} toggleTheme={toggleTheme} />
         <MenuList darkTheme={darkTheme} toggleTheme={toggleTheme} />
         <ThemeButton darkTheme={darkTheme} toggleTheme={toggleTheme} />
       </Sider>
@@ -71,7 +71,7 @@ export function HomeAdmin() {
             </Dropdown>
           </div>
         </Header>
-        <Content style={{ padding: "20px" }}>
+        <Content style={{ padding: "15px" }}>
           <Outlet />
         </Content>
       </Layout>
