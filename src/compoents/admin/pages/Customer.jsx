@@ -5,15 +5,41 @@ import {
   Typography,
   IconButton,
   CardFooter,
+  Dialog,
+  DialogBody,
+  DialogHeader,
+  DialogFooter,
+  Textarea,
 } from "@material-tailwind/react";
 
 // import {Input} from 'antd'
 import { useState } from "react";
 
+import { FaRegEdit, FaRegSave } from "react-icons/fa";
+import { AiOutlineStop } from "react-icons/ai";
+import { BsPlusCircle } from "react-icons/bs";
+import { IoTrashBin } from "react-icons/io5";
+
 const Customer = () => {
   //----------  Data Table --------------------//
   const [noData, setNoData] = useState(false);
-  const [listData, setListData] = useState([]);
+  const [listData, setListData] = useState([
+    {
+      name: "aaa",
+      tel: 1234567890,
+      address: "123/45 หมู่ 3 ต.ในเมือง อ.เมือง จ.ขอนแก่น",
+    },
+    {
+      name: "bbb",
+      tel: 1234567890,
+      address: "123/45 หมู่ 3 ต.ในเมือง อ.เมือง จ.ขอนแก่น",
+    },
+    {
+      name: "ccc",
+      tel: 1234567890,
+      address: "123/45 หมู่ 3 ต.ในเมือง อ.เมือง จ.ขอนแก่น",
+    },
+  ]);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -29,37 +55,73 @@ const Customer = () => {
 
   const totalPages = Math.ceil(listData.length / itemsPerPage);
 
+  //------------- modal Add Product -----------------------//
+  const [newCustomer ,setNewCustomer] = useState([])
+  const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [dataAdd, setDataAdd] = useState([]);
+
+  const handleModalAdd = (data) => {
+    setOpenModalAdd(!openModalAdd);
+    setDataAdd(data);
+  };
+
+  // console.log(newCustomer)
+
+  //------------- modal Delete Product -----------------------//
+
+  const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [dataDelete, setDataDelete] = useState([]);
+
+  const handleModalDelete = (data) => {
+    setOpenModalDelete(!openModalDelete);
+    setDataDelete(data);
+  };
+
   return (
-    <div className=" h-[70vh] pt-5 ">
+    <div className=" h-[70vh]  ">
       <div className="flex flex-col w-full">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
-        <div className="flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
-          <div className="w-full flex   px-0 md:mx-10 ">
-            <div className=" flex flex-col gap-3 mt-5 md:mt-0 ">
-              <Typography className=" font-bold ">
-                ข้อมูลลูกค้า:
-              </Typography>
-            </div>
+        <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
+          <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
+            <Typography className=" font-bold ">ข้อมูลลูกค้า:</Typography>
           </div>
-          <div className="flex justify-center px-0 md:px-10">
-            <Input
-              type="text"
-              label="ค้นหา ชื่อลูกค้า"
-              //   placeholder="ค้นหา ชื่อลูกค้า"
-              color="blue-gray"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ backgroundColor: "#F4F4F4" }}
-            />
+          <div className="w-full md:w-[50%] flex   px-0 md:px-10">
+            <div className="w-full flex flex-col md:flex-row justify-center md:justify-end items-center gap-5">
+              <div>
+                <Input
+                  type="text"
+                  label="ค้นหา ชื่อลูกค้า"
+                  //   placeholder="ค้นหา ชื่อลูกค้า"
+                  color="blue-gray"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ backgroundColor: "#F4F4F4" }}
+                />
+              </div>
+              <div>
+                <Button
+                  size="sm"
+                  variant="gradient"
+                  color="green"
+                  className="text-base flex justify-center  items-center   bg-green-500"
+                  onClick={handleModalAdd}
+                >
+                  <span className="mr-2 text-xl">
+                    <BsPlusCircle />
+                  </span>
+                  เพิ่มลูกค้า
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
         {/* ------------ table  ----------------------------------------- */}
         <Card className="mt-5  border-2 overflow-auto ">
-          <div className="p-3">
+          <div>
             <table className="w-full min-w-max  ">
               <thead>
                 <tr>
-                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1">
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4  w-1">
                     <Typography
                       variant="small"
                       color="blue-gray"
@@ -74,25 +136,34 @@ const Customer = () => {
                       color="blue-gray"
                       className="font-bold leading-none opacity-70"
                     >
-                      ใบกำกับภาษี
+                      ชื่อ-สกุล
                     </Typography>
                   </th>
-                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1">
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
                     <Typography
                       variant="small"
                       color="blue-gray"
                       className="font-bold leading-none opacity-70"
                     >
-                      ดู
+                      เบอร์โทรศัพท์
                     </Typography>
                   </th>
-                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1">
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
                     <Typography
                       variant="small"
                       color="blue-gray"
                       className="font-bold leading-none opacity-70"
                     >
-                      ลบ
+                      ที่อยู่
+                    </Typography>
+                  </th>
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1  ">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-bold leading-none opacity-70"
+                    >
+                      แก้ไข/ลบ
                     </Typography>
                   </th>
                 </tr>
@@ -100,10 +171,7 @@ const Customer = () => {
               {noData ? (
                 <tbody>
                   <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
+                    <td colSpan={5} className=" text-center pt-5 ">
                       <Typography>...ไม่พบข้อมูล...</Typography>
                     </td>
                   </tr>
@@ -137,34 +205,49 @@ const Customer = () => {
                               color="blue-gray"
                               className="font-normal "
                             >
-                              {data?.code || ""}
+                              {data.name || ""}
                             </Typography>
                           </div>
                         </td>
                         <td className={classes}>
-                          <div className="flex justify-center">
+                          <div className="flex items-center justify-center">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal "
+                            >
+                              {data.tel || ""}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center justify-center ">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal "
+                            >
+                              {data?.address || ""}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex justify-center  px-3 gap-2">
+                            <IconButton
+                              variant="outlined"
+                              size="sm"
+                              onClick={() => handleModalEdit(data)}
+                            >
+                              <FaRegEdit className="h-5 w-5  text-yellow-700 " />
+                            </IconButton>
+
                             <IconButton
                               variant="outlined"
                               color="blue"
                               size="sm"
-                              className="ml-3 "
-                              //   onClick={() => handleModalView(data)}
+                              onClick={() => handleModalDelete(data)}
                             >
-                              {/* <BsFillEyeFill className="h-5 w-5  text-light-blue-700 " /> */}
-                            </IconButton>
-                          </div>
-                        </td>
-
-                        <td className={classes}>
-                          <div className="flex justify-center ">
-                            <IconButton
-                              variant="outlined"
-                              size="sm"
-                              color="red"
-                              className="rounded-full"
-                              //   onClick={() => handleModalDelete(data)}
-                            >
-                              {/* <AiFillDelete color="red" className="h-5 w-5" /> */}
+                              <IoTrashBin className="h-5 w-5  text-red-700 " />
                             </IconButton>
                           </div>
                         </td>
@@ -179,8 +262,8 @@ const Customer = () => {
             <Button
               variant="outlined"
               size="sm"
-              //   disabled={currentPage === 1}
-              //   onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
             >
               ก่อนหน้า
             </Button>
@@ -192,7 +275,7 @@ const Customer = () => {
                   size="sm"
                   onClick={() => setCurrentPage(i + 1)}
                   className={
-                    currentPage === i + 1 ? "bg-blue-500 text-white" : ""
+                    currentPage === i + 1 ? "bg-purple-400 text-white" : ""
                   }
                 >
                   {i + 1}
@@ -210,6 +293,132 @@ const Customer = () => {
           </CardFooter>
         </Card>
       </div>
+
+      {/* modal Add Customer */}
+
+      <Dialog open={openModalAdd} size="xs" handler={handleModalAdd}>
+        <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
+          <Typography variant="h5">เพิ่มข้อมูลลูกค้า</Typography>
+        </DialogHeader>
+        <DialogBody divider className=" overflow-auto ">
+          <div className=" w-full flex flex-col justify-center  gap-4 ">
+            <div className="w-full flex flex-col justify-center gap-4  ">
+              <div className="flex   mt-3">
+                <Input
+                  type="text"
+                  label="ชื่อลูกค้า"
+                  maxLength="50"
+                  color="blue-gray"
+                  style={{ backgroundColor: "#F4F4F4" }}
+                  onChange={(e) =>
+                    setNewCustomer({
+                      ...newCustomer,
+                      name: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="flex  mt-3">
+                <Input
+                  type="text"
+                  label="เบอร์โทรศัพท์"
+                  maxLength="10"
+                  color="blue-gray"
+                  style={{ backgroundColor: "#F4F4F4" }}
+                  onChange={(e) =>
+                    setNewCustomer({
+                      ...newCustomer,
+                      tel: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="flex   mt-3">
+                <Textarea
+                  label="ที่อยู่"
+                  maxLength="100"
+                  color="blue-gray"
+                  style={{ backgroundColor: "#F4F4F4" }}
+                  onChange={(e) =>
+                    setNewCustomer({
+                      ...newCustomer,
+                      address: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            variant="text"
+            color="red"
+            size="sm"
+            onClick={handleModalAdd}
+            className="flex mr-1 text-base"
+          >
+            <span className="text-xl mr-2">
+              <AiOutlineStop />
+            </span>
+            ยกเลิก
+          </Button>
+          <Button
+            size="sm"
+            variant="gradient"
+            color="green"
+            // onClick={handleAddProduct}
+            className="flex text-base mr-1"
+          >
+            <span className="mr-2 text-xl">
+              <FaRegSave />
+            </span>
+            บันทึก
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      {/* modal Delete Customer */}
+
+      <Dialog open={openModalDelete} size="sm" handler={handleModalDelete}>
+        <DialogHeader className="bg-red-700 py-3  px-3  justify-center text-lg text-white opacity-80">
+          <Typography variant="h5">ลบสินค้า</Typography>
+        </DialogHeader>
+        <DialogBody divider className=" overflow-auto ">
+          <div className="flex flex-col w-full justify-center gap-3 ">
+            <Typography variant="h5" className="text-center">
+              ต้องการลบ ใบกำกับภาษี: {dataDelete?.code || ""}{" "}
+            </Typography>
+            <Typography variant="h5" className="text-center">
+              จริงหรือไม่?{" "}
+            </Typography>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <div className=" flex w-full justify-center  gap-5 ">
+            <Button
+              variant="gradient"
+              color="red"
+              size="sm"
+              // onClick={() => handleDelete(String(dataDelete?.id))}
+              className="flex mr-1 text-base"
+            >
+              <span className="text-xl mr-2">{/* <FaCheckCircle /> */}</span>
+              ตกลง
+            </Button>
+            <Button
+              variant="gradient"
+              color="blue-gray"
+              size="sm"
+              onClick={handleModalDelete}
+              className="flex mr-1 text-base"
+            >
+              <span className="text-xl mr-2">{/* <AiOutlineStop /> */}</span>
+              ยกเลิก
+            </Button>
+          </div>
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };

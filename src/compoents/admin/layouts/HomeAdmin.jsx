@@ -10,6 +10,7 @@ import Logo from "./Logo";
 import MenuList from "./MenuList";
 import ThemeButton from "./ThemeButton";
 import { Outlet, Link } from "react-router-dom";
+import { Typography } from "@material-tailwind/react";
 
 const { Header, Sider, Content } = Layout;
 
@@ -34,7 +35,7 @@ export function HomeAdmin() {
 
   const {
     token: { colorBgContainer },
-  } = theme.useToken();
+  } = theme.useToken(); 
 
   return (
     <Layout>
@@ -49,8 +50,8 @@ export function HomeAdmin() {
         <MenuList darkTheme={darkTheme} toggleTheme={toggleTheme} />
         <ThemeButton darkTheme={darkTheme} toggleTheme={toggleTheme} />
       </Sider>
-      <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }}>
+      <Layout >
+        <Header  style={{ padding: 0,  background: colorBgContainer  }}  >
           <div className="flex h-[100%] justify-between items-center pr-10">
             <Button
               type="text"
@@ -58,6 +59,7 @@ export function HomeAdmin() {
               onClick={() => setCollapsed(!collapsed)}
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             ></Button>
+            {/* <Typography>ระบบเก็บข้อมูล</Typography> */}
             <Dropdown
               menu={{
                 items,
@@ -70,6 +72,7 @@ export function HomeAdmin() {
               </Avatar>
             </Dropdown>
           </div>
+          
         </Header>
         <Content style={{ padding: "15px" }}>
           <Outlet />
