@@ -7,12 +7,12 @@ import Login from './auth/Login'
 
 function App() {
 
-  const token = "q1we";
+  let Token = localStorage.getItem("Token");
  
 
   return (
     <div>
-    {token ? (
+    {Token ? (
       <CheckRouter />
     ) : (
       <Routes>

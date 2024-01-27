@@ -12,36 +12,37 @@ import {
   Textarea,
 } from "@material-tailwind/react";
 
-// import {Input} from 'antd'
-import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import { useEffect, useState } from "react";
 
 import { FaRegEdit, FaRegSave, FaCheckCircle } from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle } from "react-icons/bs";
 import { IoTrashBin } from "react-icons/io5";
 
+import { getCustomer, addCustomer, editCustomer, deleteCustomer } from "../../../api/customerApi";
+
 const Customer = () => {
   //----------  Data Table --------------------//
-  const [noData, setNoData] = useState(false);
-  const [listData, setListData] = useState([
-    {
-      name: "aaa",
-      tel: 1234567890,
-      address: "123/45 หมู่ 3 ต.ในเมือง อ.เมือง จ.ขอนแก่น",
-    },
-    {
-      name: "bbb",
-      tel: 1234567890,
-      address: "123/45 หมู่ 3 ต.ในเมือง อ.เมือง จ.ขอนแก่น",
-    },
-    {
-      name: "ccc",
-      tel: 1234567890,
-      address: "123/45 หมู่ 3 ต.ในเมือง อ.เมือง จ.ขอนแก่น",
-    },
-  ]);
+  const [listData, setListData] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchCustomer = async () => {
+    try {
+      const response = await getCustomer(searchQuery);
+      setListData(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,10 +54,10 @@ const Customer = () => {
     ? listData.slice(startIndex, endIndex)
     : [];
 
-  const totalPages = Math.ceil(listData.length / itemsPerPage);
+  const totalPages = Math.ceil(listData?.length / itemsPerPage);
 
   //------------- modal Add Product -----------------------//
-  const [newCustomer ,setNewCustomer] = useState([])
+  const [newCustomer, setNewCustomer] = useState([]);
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [dataAdd, setDataAdd] = useState([]);
 
@@ -65,11 +66,25 @@ const Customer = () => {
     setDataAdd(data);
   };
 
-  // console.log(newCustomer)
+  const handleAddCustomer = async () => {
+    try {
+      let data = {
+        name: newCustomer.name,
+        tell: newCustomer.tell,
+        address: newCustomer.address,
+      };
 
+      const response = await addCustomer(data);
+      // console.log(response);
+      setOpenModalAdd(false);
+      fetchCustomer();
+      toast.success("เพิ่มข้อมูล สินค้า สำเร็จ");
+    } catch (error) {
+      toast.error(error);
+    }
+  };
 
   //------------- modal Edit Product -----------------------//
-  const [editCustomer ,setEditCustomer] = useState([])
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [dataEdit, setDataEdit] = useState([]);
 
@@ -78,7 +93,23 @@ const Customer = () => {
     setDataEdit(data);
   };
 
-  // console.log(newCustomer)
+  const handleEditCustomer = async () => {
+    try {
+      let data = {
+        id: dataEdit.id,
+        name: dataEdit.name,
+        tell: dataEdit.tell,
+        address: dataEdit.address,
+      };
+      const response = await editCustomer(data);
+      // console.log(response);
+      setOpenModalEdit(false);
+      fetchCustomer();
+      toast.success("แก้ไขข้อมูล สินค้า สำเร็จ");
+    } catch (error) {
+      toast.error(error);
+    }
+  };
 
   //------------- modal Delete Product -----------------------//
 
@@ -90,8 +121,20 @@ const Customer = () => {
     setDataDelete(data);
   };
 
+  const handleDeleteCustomer = async (id) => {
+    try {
+      const response = await deleteCustomer(id);
+      setOpenModalDelete(false);
+      fetchCustomer();
+      toast.success("ลบข้อมูล สินค้า สำเร็จ");
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
   return (
     <div className=" h-[70vh]  ">
+      <ToastContainer className="mt-10" autoClose={800} theme="colored" />
       <div className="flex flex-col w-full">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
         <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
@@ -181,7 +224,7 @@ const Customer = () => {
                   </th>
                 </tr>
               </thead>
-              {noData ? (
+              {listData?.length == 0 ? (
                 <tbody>
                   <tr>
                     <td colSpan={5} className=" text-center pt-5 ">
@@ -218,7 +261,7 @@ const Customer = () => {
                               color="blue-gray"
                               className="font-normal "
                             >
-                              {data.name || ""}
+                              {data?.name || ""}
                             </Typography>
                           </div>
                         </td>
@@ -229,7 +272,7 @@ const Customer = () => {
                               color="blue-gray"
                               className="font-normal "
                             >
-                              {data.tel || ""}
+                              {data?.tell || ""}
                             </Typography>
                           </div>
                         </td>
@@ -341,7 +384,7 @@ const Customer = () => {
                   onChange={(e) =>
                     setNewCustomer({
                       ...newCustomer,
-                      tel: e.target.value,
+                      tell: e.target.value,
                     })
                   }
                 />
@@ -379,8 +422,8 @@ const Customer = () => {
           <Button
             size="sm"
             variant="gradient"
-            color="green"
-            // onClick={handleAddProduct}
+            color="purple"
+            onClick={handleAddCustomer}
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
@@ -390,7 +433,6 @@ const Customer = () => {
           </Button>
         </DialogFooter>
       </Dialog>
-
 
       {/* modal Edit Customer */}
 
@@ -410,8 +452,8 @@ const Customer = () => {
                   style={{ backgroundColor: "#F4F4F4" }}
                   value={dataEdit.name}
                   onChange={(e) =>
-                    setEditCustomer({
-                      ...editCustomer,
+                    setDataEdit({
+                      ...dataEdit,
                       name: e.target.value,
                     })
                   }
@@ -424,11 +466,11 @@ const Customer = () => {
                   maxLength="10"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
-                  value={dataEdit.tel}
+                  value={dataEdit.tell}
                   onChange={(e) =>
-                    setEditCustomer({
-                      ...editCustomer,
-                      tel: e.target.value,
+                    setDataEdit({
+                      ...dataEdit,
+                      tell: e.target.value,
                     })
                   }
                 />
@@ -441,8 +483,8 @@ const Customer = () => {
                   style={{ backgroundColor: "#F4F4F4" }}
                   value={dataEdit.address}
                   onChange={(e) =>
-                    setEditCustomer({
-                      ...editCustomer,
+                    setDataEdit({
+                      ...dataEdit,
                       address: e.target.value,
                     })
                   }
@@ -467,8 +509,8 @@ const Customer = () => {
           <Button
             size="sm"
             variant="gradient"
-            color="green"
-            // onClick={handleEditProduct}
+            color="purple"
+            onClick={handleEditCustomer}
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
@@ -483,12 +525,12 @@ const Customer = () => {
 
       <Dialog open={openModalDelete} size="sm" handler={handleModalDelete}>
         <DialogHeader className="bg-red-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">ลบสินค้า</Typography>
+          <Typography variant="h5">ลบลูกค้า</Typography>
         </DialogHeader>
         <DialogBody divider className=" overflow-auto ">
           <div className="flex flex-col w-full justify-center gap-3 ">
             <Typography variant="h5" className="text-center">
-              ต้องการลบ ใบกำกับภาษี: {dataDelete?.code || ""}{" "}
+              ต้องการลบ: {dataDelete?.name || ""}{" "}
             </Typography>
             <Typography variant="h5" className="text-center">
               จริงหรือไม่?{" "}
@@ -501,10 +543,12 @@ const Customer = () => {
               variant="gradient"
               color="red"
               size="sm"
-              // onClick={() => handleDelete(String(dataDelete?.id))}
+              onClick={() => handleDeleteCustomer(dataDelete?.id)}
               className="flex mr-1 text-base"
             >
-              <span className="text-xl mr-2"><FaCheckCircle /></span>
+              <span className="text-xl mr-2">
+                <FaCheckCircle />
+              </span>
               ตกลง
             </Button>
             <Button
@@ -514,7 +558,9 @@ const Customer = () => {
               onClick={handleModalDelete}
               className="flex mr-1 text-base"
             >
-              <span className="text-xl mr-2"><AiOutlineStop /></span>
+              <span className="text-xl mr-2">
+                <AiOutlineStop />
+              </span>
               ยกเลิก
             </Button>
           </div>

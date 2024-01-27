@@ -33,53 +33,53 @@ import {
       }));
     };
   
-    const handleSignIn = async () => { 
-    //   const data = {
-    //     username: sendDataLogin.username,
-    //     password: sendDataLogin.password,
-    //   };
-
-      if (sendDataLogin.username == "admin"  && sendDataLogin.password == "admin") {
-            navigate("/Home")
-      }else {
-            navigate("/")
-      }
-
-    };
-
-    //------- API ----------------------//
-  
     // const handleSignIn = async () => { 
     //   const data = {
     //     username: sendDataLogin.username,
     //     password: sendDataLogin.password,
     //   };
-    //   try {
-    //     const res = await axios.post(
-    //       `${import.meta.env.VITE_APP_API}/login`,
-    //       data
-    //     );
-    //     if (res.data.token) {
-    //       localStorage.setItem("Token", res.data.token);
-    //       toast.success("เข้าสู่ระบบสำเร็จ ");
-    //         const token = res.data.token;
-    //         let decoded = jwtDecode(token);
-    //         // const companyLogin = JSON.stringify(decoded);
-    //         // localStorage.setItem('companyLogin', companyLogin);
-    //       if (decoded.level === "1") {
-    //         localStorage.setItem("Status", "admin");
-    //         setTimeout(() => {
-    //           navigate("/admin");
-    //           window.location.reload();
-    //         }, 1000);
-    //       } 
-    //     } else {
-    //       toast.error(res?.data?.error);
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
+
+    //   if (sendDataLogin.username == "admin"  && sendDataLogin.password == "admin") {
+    //         navigate("/Home")
+    //   }else {
+    //         navigate("/")
     //   }
+
     // };
+
+    //------- API ----------------------//
+  
+    const handleSignIn = async () => { 
+      const data = {
+        username: sendDataLogin.username,
+        password: sendDataLogin.password,
+      };
+
+      try {
+        const res = await axios.post(
+          `${import.meta.env.VITE_APP_API}/api/login`,
+          data
+        );
+        if (res.data.token) {
+          localStorage.setItem("Token", res.data.token);
+          toast.success("เข้าสู่ระบบสำเร็จ ");
+            const token = res.data.token;
+            let decoded = jwtDecode(token);
+            console.log(decoded.username) 
+          if (decoded.status == "0") {
+            localStorage.setItem("User", decoded.username);
+            setTimeout(() => {
+              navigate("/admin");
+              window.location.reload();
+            }, 1000);
+          } 
+        } else {
+          toast.error(res?.data?.error);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
   
   
     return (

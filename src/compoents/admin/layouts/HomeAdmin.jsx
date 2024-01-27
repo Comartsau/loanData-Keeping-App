@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Layout, theme, Dropdown, Avatar } from "antd";
 import {
   MenuUnfoldOutlined,
@@ -10,9 +10,21 @@ import Logo from "./Logo";
 import MenuList from "./MenuList";
 import ThemeButton from "./ThemeButton";
 import { Outlet, Link } from "react-router-dom";
-import { Typography } from "@material-tailwind/react";
+
+import { useRecoilState } from "recoil";
+import { locationStore } from "../../../store/Store";
+
+import { getLocation } from "../../../api/locationApi";
 
 const { Header, Sider, Content } = Layout;
+
+const handleLogout = () => {
+  // ลบข้อมูลใน localStorage
+  localStorage.clear();
+
+  // โหลดหน้าใหม่
+  window.location.reload();
+};
 
 const items = [
   {
@@ -21,7 +33,7 @@ const items = [
   },
   {
     key: "2",
-    label: <Link to="/login">ออกจากระบบ</Link>,
+    label: <span onClick={handleLogout}>ออกจากระบบ</span>,
   },
 ];
 
@@ -35,7 +47,23 @@ export function HomeAdmin() {
 
   const {
     token: { colorBgContainer },
-  } = theme.useToken(); 
+  } = theme.useToken();
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dataLocationStore,setDataLocationStore] = useRecoilState(locationStore)
+
+  const fetchLocation = async () => {
+    try {
+      const response = await getLocation(searchQuery);
+      setDataLocationStore(response)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(()=>{
+    fetchLocation()
+  },[])
 
   return (
     <Layout>
@@ -50,8 +78,8 @@ export function HomeAdmin() {
         <MenuList darkTheme={darkTheme} toggleTheme={toggleTheme} />
         <ThemeButton darkTheme={darkTheme} toggleTheme={toggleTheme} />
       </Sider>
-      <Layout >
-        <Header  style={{ padding: 0,  background: colorBgContainer  }}  >
+      <Layout>
+        <Header style={{ padding: 0, background: colorBgContainer }}>
           <div className="flex h-[100%] justify-between items-center pr-10">
             <Button
               type="text"
@@ -67,12 +95,9 @@ export function HomeAdmin() {
               placement="bottom"
               arrow
             >
-              <Avatar icon={<UserOutlined />}>
-                <Button>bottom</Button>
-              </Avatar>
+              <Avatar icon={<UserOutlined />}></Avatar>
             </Dropdown>
           </div>
-          
         </Header>
         <Content style={{ padding: "15px" }}>
           <Outlet />

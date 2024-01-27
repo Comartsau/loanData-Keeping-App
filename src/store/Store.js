@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 
-export const openDrawer = atom({
-    key:'keyOpenDrawer',
-    default: true,
+export const locationStore = atom({
+    key:'keyLocation',
+    default: [],
 })

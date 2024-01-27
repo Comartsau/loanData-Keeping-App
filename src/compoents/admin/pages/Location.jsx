@@ -12,36 +12,49 @@ import {
   Textarea,
 } from "@material-tailwind/react";
 
-// import {Input} from 'antd'
-import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import { useState, useEffect } from "react";
 
 import { FaRegEdit, FaRegSave, FaCheckCircle } from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle } from "react-icons/bs";
 import { IoTrashBin } from "react-icons/io5";
 
+import {
+  getLocation,
+  addLocation,
+  editLocation,
+  deleteLocation,
+} from "../../../api/locationApi";
+
+import { useRecoilState } from "recoil";
+
+import { locationStore } from "../../../store/Store";
+
 const Location = () => {
   //----------  Data Table --------------------//
-  const [noData, setNoData] = useState(false);
-  const [listData, setListData] = useState([
-    {
-      name: "aaa",
-      tel: 1234567890,
-      address: "123/45 หมู่ 3 ต.ในเมือง อ.เมือง จ.ขอนแก่น",
-    },
-    {
-      name: "bbb",
-      tel: 1234567890,
-      address: "123/45 หมู่ 3 ต.ในเมือง อ.เมือง จ.ขอนแก่น",
-    },
-    {
-      name: "ccc",
-      tel: 1234567890,
-      address: "123/45 หมู่ 3 ต.ในเมือง อ.เมือง จ.ขอนแก่น",
-    },
-  ]);
+
+  const [listData, setListData] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [dataLocationStore,setDataLocationStore] = useRecoilState(locationStore)
+
+  const fetchLocation = async () => {
+    try {
+      const response = await getLocation(searchQuery);
+      setListData(response);
+      setDataLocationStore(response)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,7 +66,7 @@ const Location = () => {
     ? listData.slice(startIndex, endIndex)
     : [];
 
-  const totalPages = Math.ceil(listData.length / itemsPerPage);
+  const totalPages = Math.ceil(listData?.length / itemsPerPage);
 
   //------------- modal Add Product -----------------------//
   const [newLocation, setNewLocation] = useState([]);
@@ -65,8 +78,25 @@ const Location = () => {
     setDataAdd(data);
   };
 
+  const handleAddLocation = async () => {
+    try {
+      let data = {
+        name: newLocation.name,
+        tell: newLocation.tell,
+        address: newLocation.address,
+      };
+
+      const response = await addLocation(data);
+      // console.log(response);
+      setOpenModalAdd(false);
+      fetchLocation();
+      toast.success("เพิ่มข้อมูล สินค้า สำเร็จ");
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
   //------------- modal Edit Product -----------------------//
-  const [editLocation, setEditLocation] = useState([]);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [dataEdit, setDataEdit] = useState([]);
 
@@ -75,7 +105,23 @@ const Location = () => {
     setDataEdit(data);
   };
 
-  // console.log(newCustomer)
+  const handleEditLocation = async () => {
+    try {
+      let data = {
+        id: dataEdit.id,
+        name: dataEdit.name,
+        tell: dataEdit.tell,
+        address: dataEdit.address,
+      };
+      const response = await editLocation(data);
+      // console.log(response);
+      setOpenModalEdit(false);
+      fetchLocation();
+      toast.success("แก้ไขข้อมูล สินค้า สำเร็จ");
+    } catch (error) {
+      toast.error(error);
+    }
+  };
 
   //------------- modal Delete Product -----------------------//
 
@@ -87,8 +133,20 @@ const Location = () => {
     setDataDelete(data);
   };
 
+  const handleDeleteLocation = async (id) => {
+    try {
+      const response = await deleteLocation(id);
+      setOpenModalDelete(false);
+      fetchLocation();
+      toast.success("ลบข้อมูล สินค้า สำเร็จ");
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
   return (
     <div className=" h-[70vh]  ">
+      <ToastContainer className="mt-10" autoClose={800} theme="colored" />
       <div className="flex flex-col w-full">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
         <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
@@ -178,7 +236,7 @@ const Location = () => {
                   </th>
                 </tr>
               </thead>
-              {noData ? (
+              {listData?.length == 0 ? (
                 <tbody>
                   <tr>
                     <td colSpan={5} className=" text-center pt-5 ">
@@ -215,7 +273,7 @@ const Location = () => {
                               color="blue-gray"
                               className="font-normal "
                             >
-                              {data.name || ""}
+                              {data?.name || ""}
                             </Typography>
                           </div>
                         </td>
@@ -226,7 +284,7 @@ const Location = () => {
                               color="blue-gray"
                               className="font-normal "
                             >
-                              {data.tel || ""}
+                              {data?.tell || ""}
                             </Typography>
                           </div>
                         </td>
@@ -338,7 +396,7 @@ const Location = () => {
                   onChange={(e) =>
                     setNewLocation({
                       ...newLocation,
-                      tel: e.target.value,
+                      tell: e.target.value,
                     })
                   }
                 />
@@ -376,8 +434,8 @@ const Location = () => {
           <Button
             size="sm"
             variant="gradient"
-            color="green"
-            // onClick={handleAddProduct}
+            color="purple"
+            onClick={handleAddLocation}
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
@@ -388,7 +446,7 @@ const Location = () => {
         </DialogFooter>
       </Dialog>
 
-      {/* modal Edit Customer */}
+      {/* modal Edit Location */}
 
       <Dialog open={openModalEdit} size="xs" handler={handleModalEdit}>
         <DialogHeader className="bg-yellow-700 py-3  px-3  justify-center text-lg text-white opacity-80">
@@ -406,8 +464,8 @@ const Location = () => {
                   style={{ backgroundColor: "#F4F4F4" }}
                   value={dataEdit.name}
                   onChange={(e) =>
-                    setEditLocation({
-                      ...editLocation,
+                    setDataEdit({
+                      ...dataEdit,
                       name: e.target.value,
                     })
                   }
@@ -420,11 +478,11 @@ const Location = () => {
                   maxLength="10"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
-                  value={dataEdit.tel}
+                  value={dataEdit.tell}
                   onChange={(e) =>
-                    setEditLocation({
-                      ...editLocation,
-                      tel: e.target.value,
+                    setDataEdit({
+                      ...dataEdit,
+                      tell: e.target.value,
                     })
                   }
                 />
@@ -437,8 +495,8 @@ const Location = () => {
                   style={{ backgroundColor: "#F4F4F4" }}
                   value={dataEdit.address}
                   onChange={(e) =>
-                    setEditLocation({
-                      ...editLocation,
+                    setDataEdit({
+                      ...dataEdit,
                       address: e.target.value,
                     })
                   }
@@ -463,8 +521,8 @@ const Location = () => {
           <Button
             size="sm"
             variant="gradient"
-            color="green"
-            // onClick={handleEditProduct}
+            color="purple"
+            onClick={handleEditLocation}
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
@@ -475,7 +533,7 @@ const Location = () => {
         </DialogFooter>
       </Dialog>
 
-      {/* modal Delete Customer */}
+      {/* modal Delete Location */}
 
       <Dialog open={openModalDelete} size="sm" handler={handleModalDelete}>
         <DialogHeader className="bg-red-700 py-3  px-3  justify-center text-lg text-white opacity-80">
@@ -484,7 +542,7 @@ const Location = () => {
         <DialogBody divider className=" overflow-auto ">
           <div className="flex flex-col w-full justify-center gap-3 ">
             <Typography variant="h5" className="text-center">
-              ต้องการลบ สถานที่: {dataDelete?.code || ""}{" "}
+              ต้องการลบ สถานที่: {dataDelete?.name || ""}{" "}
             </Typography>
             <Typography variant="h5" className="text-center">
               จริงหรือไม่?{" "}
@@ -497,10 +555,12 @@ const Location = () => {
               variant="gradient"
               color="red"
               size="sm"
-              // onClick={() => handleDelete(String(dataDelete?.id))}
+              onClick={() => handleDeleteLocation(dataDelete?.id)}
               className="flex mr-1 text-base"
             >
-              <span className="text-xl mr-2"><FaCheckCircle /></span>
+              <span className="text-xl mr-2">
+                <FaCheckCircle />
+              </span>
               ตกลง
             </Button>
             <Button
@@ -510,7 +570,9 @@ const Location = () => {
               onClick={handleModalDelete}
               className="flex mr-1 text-base"
             >
-              <span className="text-xl mr-2"><AiOutlineStop /></span>
+              <span className="text-xl mr-2">
+                <AiOutlineStop />
+              </span>
               ยกเลิก
             </Button>
           </div>
