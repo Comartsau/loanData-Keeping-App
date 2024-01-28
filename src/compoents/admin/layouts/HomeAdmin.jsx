@@ -6,6 +6,8 @@ import {
   MenuFoldOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+
+import { Typography } from "@material-tailwind/react";
 import Logo from "./Logo";
 import MenuList from "./MenuList";
 import ThemeButton from "./ThemeButton";
@@ -15,7 +17,6 @@ import { useRecoilState } from "recoil";
 import { locationStore } from "../../../store/Store";
 
 import { getLocation } from "../../../api/locationApi";
-
 
 const { Header, Sider, Content } = Layout;
 
@@ -104,13 +105,24 @@ export function HomeAdmin() {
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
           <div className="flex h-[100%] justify-between items-center pr-10">
-            <Button
-              type="text"
-              className="toggle"
-              onClick={() => setCollapsed(!collapsed)}
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            ></Button>
-            {/* <Typography>ระบบเก็บข้อมูล</Typography> */}
+            <div className="flex items-center gap-5">
+              <div>
+                <Button
+                  type="text"
+                  className="toggle"
+                  onClick={() => setCollapsed(!collapsed)}
+                  icon={
+                    collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+                  }
+                ></Button>
+              </div>
+              <div>
+                <Typography className="text-start">
+                  ระบบบันทึกยืมเงิน
+                </Typography>
+              </div>
+            </div>
+
             <Dropdown
               menu={{
                 items,

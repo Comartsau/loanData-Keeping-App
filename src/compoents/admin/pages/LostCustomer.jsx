@@ -77,6 +77,7 @@ const LostCustomer = () => {
   return (
     <div>
       <div className=" h-[74vh]  ">
+      <Typography className="text-center mt-5 text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (เฟส2)</Typography>
         <div className="flex flex-col w-full">
           {/* <p>ข้อมูลผู้บริจาค</p> */}
           <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">

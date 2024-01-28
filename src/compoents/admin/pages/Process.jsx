@@ -346,7 +346,8 @@ const Process = () => {
   return (
     <Card>
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
-      <div className="flex flex-col w-full mt-10">
+      <Typography className="text-center mt-5 text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (เฟส2)</Typography>
+      <div className="flex flex-col w-full ">
         <div className="w-full flex   px-0 md:px-10">
           <div className="w-full flex flex-col md:flex-row justify-center md:justify-start items-center gap-5">
             <div>
@@ -460,6 +461,7 @@ const Process = () => {
 
       <Dialog open={openModalProcess} size="xxl">
         <DialogBody divider className=" h-[90vh]   overflow-auto">
+        <Typography className="text-center  text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (เฟส2)</Typography>
           <div className="flex  flex-col  overflow-auto   items-center ">
             <div className="flex w-full flex-col md:flex-row gap-5 ">
               <div className="flex flex-col w-full h-[85vh]   md:w-3/12 ">
@@ -626,7 +628,7 @@ const Process = () => {
                       variant="outlined"
                       className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
                         activeCustomerMenu === "menu2"
-                          ? " bg-green-500 text-black"
+                          ? " bg-green-500 text-white"
                           : "bg-green-300 text-gray-600"
                       }`}
                       onClick={() => setActiveCustomerMenu("menu2")}
@@ -640,7 +642,7 @@ const Process = () => {
                       variant="outlined"
                       className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
                         activeCustomerMenu === "menu3"
-                          ? " bg-red-500 text-black"
+                          ? " bg-red-500 text-white"
                           : "bg-red-300 text-gray-600"
                       }`}
                       onClick={() => setActiveCustomerMenu("menu3")}
@@ -829,11 +831,11 @@ const Process = () => {
                                         color="blue-gray"
                                         className={`font-normal ${
                                           data?.status == "กำลังจ่าย"
-                                            ? "bg-yellow-500 "
+                                            ? "bg-yellow-300 bg-opacity-60 px-3  rounded-lg "
                                             : data?.status == "จ่ายครบ"
-                                            ? "bg-green-500"
+                                            ? "bg-green-300  bg-opacity-60 px-3  rounded-lg"
                                             : data?.status == "ลูกค้าเสีย"
-                                            ? "bg-red-500"
+                                            ? "bg-red-300  bg-opacity-60 px-3   rounded-lg"
                                             : ""
                                         } `}
                                       >
@@ -984,11 +986,11 @@ const Process = () => {
                                           color="blue-gray"
                                           className={`font-normal ${
                                             data?.status == "กำลังจ่าย"
-                                              ? "bg-yellow-500 "
+                                              ? "bg-yellow-300 bg-opacity-60 px-3   rounded-lg "
                                               : data?.status == "จ่ายครบ"
-                                              ? "bg-green-500"
+                                              ? "bg-green-300 bg-opacity-60 px-3   rounded-lg"
                                               : data?.status == "ลูกค้าเสีย"
-                                              ? "bg-red-500"
+                                              ? "bg-red-300 bg-opacity-60 px-3   rounded-lg"
                                               : ""
                                           } `}
                                         >
