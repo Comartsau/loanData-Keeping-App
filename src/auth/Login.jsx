@@ -77,7 +77,7 @@ import {
           toast.error(res?.data?.error);
         }
       } catch (error) {
-        toast.error("เข้าสู่ระบบwไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+        toast.error("ไม่สำเร็จ กรุณาลองอีกครั้ง");
       }
     };
   
