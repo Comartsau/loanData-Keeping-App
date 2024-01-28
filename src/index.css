@@ -35,7 +35,6 @@
     /* border-radius: 50%; */
     /* background: rgba(28, 17, 41, 0.88); */
 }
-
 .menu-bar {
     height: 90vh;
     margin-top: 1rem;
@@ -44,9 +43,7 @@
     gap: 15px;
     font-size: 1rem;
     position: relative;
-
 }
-
 .theme-btn {
     position: absolute;
     bottom: 30px;

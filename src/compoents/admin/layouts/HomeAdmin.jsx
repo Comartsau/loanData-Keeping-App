@@ -50,20 +50,21 @@ export function HomeAdmin() {
   } = theme.useToken();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [dataLocationStore,setDataLocationStore] = useRecoilState(locationStore)
+  const [dataLocationStore, setDataLocationStore] =
+    useRecoilState(locationStore);
 
   const fetchLocation = async () => {
     try {
       const response = await getLocation(searchQuery);
-      setDataLocationStore(response)
+      setDataLocationStore(response);
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(()=>{
-    fetchLocation()
-  },[])
+  useEffect(() => {
+    fetchLocation();
+  }, []);
 
   return (
     <Layout>
@@ -73,6 +74,7 @@ export function HomeAdmin() {
         trigger={null}
         theme={darkTheme ? "dark" : "light"}
         className="sidebar"
+        style={{ display: collapsed ? "none" : "block" }}
       >
         <Logo darkTheme={darkTheme} toggleTheme={toggleTheme} />
         <MenuList darkTheme={darkTheme} toggleTheme={toggleTheme} />
