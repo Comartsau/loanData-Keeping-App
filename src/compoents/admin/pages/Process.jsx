@@ -346,7 +346,7 @@ const Process = () => {
   return (
     <Card>
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
-      <Typography className="text-center mt-5 text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (เฟส2)</Typography>
+      <Typography className="text-center mt-5 text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (งวด3/3)</Typography>
       <div className="flex flex-col w-full ">
         <div className="w-full flex   px-0 md:px-10">
           <div className="w-full flex flex-col md:flex-row justify-center md:justify-start items-center gap-5">
@@ -461,7 +461,7 @@ const Process = () => {
 
       <Dialog open={openModalProcess} size="xxl">
         <DialogBody divider className=" h-[90vh]   overflow-auto">
-        <Typography className="text-center  text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (เฟส2)</Typography>
+        <Typography className="text-center  text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (งวด3/3)</Typography>
           <div className="flex  flex-col  overflow-auto   items-center ">
             <div className="flex w-full flex-col md:flex-row gap-5 ">
               <div className="flex flex-col w-full h-[85vh]   md:w-3/12 ">
