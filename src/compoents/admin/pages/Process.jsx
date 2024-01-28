@@ -38,7 +38,7 @@ import { getCustomer, addCustomer } from "../../../api/customerApi";
 
 const Process = () => {
   //----------  Data Table --------------------//
-  const [listData, setListData] = useState([])
+  const [listData, setListData] = useState([]);
   const [listDataCustomer, setListDataCustomer] = useState([
     {
       id: 1,
@@ -90,7 +90,6 @@ const Process = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeRow, setActiveRow] = useState(0);
   const [activeRow2, setActiveRow2] = useState(0);
-
 
   const dataLocationStore = useRecoilValue(locationStore);
 
@@ -169,7 +168,6 @@ const Process = () => {
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
   const [dataAdd, setDataAdd] = useState([]);
-  
 
   const handleModalAdd = (data) => {
     setOpenModalAdd(!openModalAdd);
@@ -306,17 +304,24 @@ const Process = () => {
   const [amountDate, setAmountDate] = useState(0);
   const [amount, setAmount] = useState(0);
 
-  console.log(amountDate);
-  console.log(amount);
-
   const [searchQueryStart, setSearchQueryStart] = useState(new Date());
   const [searchQueryEnd, setSearchQueryEnd] = useState(new Date());
 
   // Function to add days to a date
   const addDays = (date, days) => {
+    // if (!date || !(date instanceof Date)) {
+    //   // Handle the case where date is null, undefined, or not a Date object
+    //   return null; // or some default value
+    // }
     const newDate = new Date(date);
-    newDate.setDate(newDate.getDate() + days);
+    newDate?.setDate(newDate.getDate() + days);
     return newDate;
+
+    // const defaultDate = new Date();
+    // const isValidDate = date && date instanceof Date;
+    // const newDate = isValidDate ? new Date(date) : defaultDate;
+    // newDate.setDate(newDate.getDate() + days);
+    // return newDate;
   };
 
   // Handle change for searchQueryStart
@@ -329,11 +334,13 @@ const Process = () => {
 
   // Handle change for daysToAdd
   const handleDaysToAddChange = (event) => {
-    const newDaysToAdd = parseInt(event.target.value, 10);
+    const inputValue = event.target.value || 0;
+    const newDaysToAdd = parseInt(inputValue, 10);
     setAmountDate(newDaysToAdd);
 
-    // Update searchQueryEnd based on the new value of daysToAdd
-    setSearchQueryEnd(addDays(searchQueryStart, newDaysToAdd));
+    if (searchQueryStart) {
+      setSearchQueryEnd(addDays(searchQueryStart, newDaysToAdd));
+    }
   };
 
   return (
