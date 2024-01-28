@@ -16,6 +16,7 @@ import { locationStore } from "../../../store/Store";
 
 import { getLocation } from "../../../api/locationApi";
 
+
 const { Header, Sider, Content } = Layout;
 
 const handleLogout = () => {
@@ -66,6 +67,25 @@ export function HomeAdmin() {
     fetchLocation();
   }, []);
 
+  const checkScreenSize = () => {
+    if (window.innerWidth < 960) {
+      setCollapsed(true);
+    } else {
+      setCollapsed(false);
+    }
+  };
+
+  useEffect(() => {
+    // เรียกฟังก์ชันเมื่อ Component โหลดหรือขนาดหน้าจอเปลี่ยน
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    // คืนค่าเมื่อ Component ถูก Unmount เพื่อเลิกติดตามการเปลี่ยนขนาดหน้าจอ
+    return () => {
+      window.removeEventListener("resize", checkScreenSize);
+    };
+  }, []);
+
   return (
     <Layout>
       <Sider
@@ -80,6 +100,7 @@ export function HomeAdmin() {
         <MenuList darkTheme={darkTheme} toggleTheme={toggleTheme} />
         <ThemeButton darkTheme={darkTheme} toggleTheme={toggleTheme} />
       </Sider>
+
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
           <div className="flex h-[100%] justify-between items-center pr-10">
