@@ -629,7 +629,7 @@ const Process = () => {
                       className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
                         activeCustomerMenu === "menu2"
                           ? " bg-green-500 text-white"
-                          : "bg-green-300 text-gray-600"
+                          : "bg-green-300 text-white"
                       }`}
                       onClick={() => setActiveCustomerMenu("menu2")}
                     >
@@ -643,7 +643,7 @@ const Process = () => {
                       className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
                         activeCustomerMenu === "menu3"
                           ? " bg-red-500 text-white"
-                          : "bg-red-300 text-gray-600"
+                          : "bg-red-300 text-white"
                       }`}
                       onClick={() => setActiveCustomerMenu("menu3")}
                     >

@@ -1,5 +1,5 @@
 import { Card, Button } from "@material-tailwind/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import NotPaid from "./NotPaid";
 import NotPaidLocation from "./NotPaidLoation";
@@ -8,7 +8,7 @@ import LostCustomer from "./LostCustomer";
 const Report = () => {
   //---------- Dialog  ดูข้อมูลผู้บริจาค -------------- //
   const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
-  const openCreateInvoice = useState();
+
 
   return (
     <div>

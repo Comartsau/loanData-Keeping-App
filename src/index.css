@@ -15,18 +15,8 @@
 
 .sidebar {
     color: #fff;
+    width: 400px !important;
 }
-@media (max-width: 768px) {
-    .sidebar {
-      display: none;
-    }
-  }
-  
-  @media (min-width: 769px) {
-    .sidebar {
-      display: block;
-    }
-  }
 
 .logo {
     display: flex;
@@ -67,3 +57,4 @@
 .toggle{
     margin-left:15px ;
 }
+

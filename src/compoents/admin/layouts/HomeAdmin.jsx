@@ -14,7 +14,7 @@ import ThemeButton from "./ThemeButton";
 import { Outlet, Link } from "react-router-dom";
 
 import { useRecoilState } from "recoil";
-import { locationStore } from "../../../store/Store";
+import { locationStore, collapsedStore } from "../../../store/Store";
 
 import { getLocation } from "../../../api/locationApi";
 
@@ -41,7 +41,8 @@ const items = [
 
 export function HomeAdmin() {
   const [darkTheme, setDarkTheme] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useRecoilState(collapsedStore);
+  const [menuSize, setMenuSize] = useState(false);
 
   const toggleTheme = () => {
     setDarkTheme(!darkTheme);
@@ -71,8 +72,10 @@ export function HomeAdmin() {
   const checkScreenSize = () => {
     if (window.innerWidth < 960) {
       setCollapsed(true);
+      setMenuSize(true)
     } else {
       setCollapsed(false);
+      setMenuSize(false)
     }
   };
 
@@ -91,10 +94,10 @@ export function HomeAdmin() {
     <Layout>
       <Sider
         collapsed={collapsed}
+        width={ menuSize == true ? 400 : 200 }  
         collapsible
         trigger={null}
         theme={darkTheme ? "dark" : "light"}
-        className="sidebar"
         style={{ display: collapsed ? "none" : "block" }}
       >
         <Logo darkTheme={darkTheme} toggleTheme={toggleTheme} />
@@ -107,15 +110,18 @@ export function HomeAdmin() {
           <div className="flex h-[100%] justify-between items-center pr-10">
             <div className="flex items-center gap-5">
               <div>
-                <Button
-                  type="text"
-                  className="toggle"
-                  onClick={() => setCollapsed(!collapsed)}
-                  icon={
-                    collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
-                  }
-                ></Button>
+                {collapsed && (
+                  <Button
+                    type="text"
+                    className="toggle"
+                    onClick={() => setCollapsed(!collapsed)}
+                    icon={
+                      collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+                    }
+                  ></Button>
+                )}
               </div>
+
               <div>
                 <Typography className="text-start">
                   ระบบบันทึกยืมเงิน
