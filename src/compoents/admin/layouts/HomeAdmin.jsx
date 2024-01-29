@@ -98,14 +98,54 @@ export function HomeAdmin() {
         collapsible
         trigger={null}
         theme={darkTheme ? "dark" : "light"}
-        style={{ display: collapsed ? "none" : "block" }}
+        style={{ display: collapsed ? "none" : "block" ,  position: menuSize == true ? "absolute" : '' , zIndex: menuSize == true ? "1" : ''  }}
       >
         <Logo darkTheme={darkTheme} toggleTheme={toggleTheme} />
         <MenuList darkTheme={darkTheme} toggleTheme={toggleTheme} />
         <ThemeButton darkTheme={darkTheme} toggleTheme={toggleTheme} />
       </Sider>
 
-      <Layout>
+      {/* <Layout>
+        <Header style={{ padding: 0, background: colorBgContainer }}>
+          <div className="flex h-[100%] justify-between items-center pr-10">
+            <div className="flex items-center gap-5">
+              <div>
+                {collapsed && (
+                  <Button
+                    type="text"
+                    className="toggle"
+                    onClick={() => setCollapsed(!collapsed)}
+                    icon={
+                      collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+                    }
+                  ></Button>
+                )}
+              </div>
+
+              <div>
+                <Typography className="text-start">
+                  ระบบบันทึกยืมเงิน
+                </Typography>
+              </div>
+            </div>
+
+            <Dropdown
+              menu={{
+                items,
+              }}
+              placement="bottom"
+              arrow
+            >
+              <Avatar icon={<UserOutlined />}></Avatar>
+            </Dropdown>
+          </div>
+        </Header>
+        <Content style={{ padding: "15px" }}>
+          <Outlet />
+        </Content>
+      </Layout> */}
+
+<Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
           <div className="flex h-[100%] justify-between items-center pr-10">
             <div className="flex items-center gap-5">
