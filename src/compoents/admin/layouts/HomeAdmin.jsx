@@ -94,7 +94,7 @@ export function HomeAdmin() {
     <Layout>
       <Sider
         collapsed={collapsed}
-        width={ menuSize == true ? 300 : 200 }  
+        // width={ menuSize == true ? 300 : 200 }  
         collapsible
         trigger={null}
         theme={darkTheme ? "dark" : "light"}
