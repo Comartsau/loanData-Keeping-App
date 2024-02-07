@@ -17,8 +17,6 @@ const Logo = ({ darkTheme, toggleTheme }) => {
     setTextToogle(!textToggle);
   };
 
-  console.log(textToggle)
-
   useEffect(() => {
     toggleText();
   }, [darkTheme]);
@@ -45,7 +43,9 @@ const Logo = ({ darkTheme, toggleTheme }) => {
   return (
     <div className="logo ">
       <div className="logo-icon  justify-between">
-        <p className={textToggle == false ? "text-white" : "text-black"}>Menu</p>
+        <p className={textToggle == false ? "text-white" : "text-black"}>
+          Menu
+        </p>
       </div>
       <div className=" text-end">
         <Button

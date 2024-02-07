@@ -9,3 +9,8 @@ export const collapsedStore = atom({
     key:'keycollapsed',
     default: false,
 })
+
+export const customerStore = atom({
+    key:'keyCustomer',
+    default: [],
+})

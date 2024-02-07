@@ -23,17 +23,21 @@ import { BsPlusCircle } from "react-icons/bs";
 import { IoTrashBin } from "react-icons/io5";
 
 import { getCustomer, addCustomer, editCustomer, deleteCustomer } from "../../../api/customerApi";
+import { useRecoilState } from "recoil";
+import { customerStore } from "../../../store/Store";
 
 const Customer = () => {
   //----------  Data Table --------------------//
   const [listData, setListData] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [customerDataStore , setCustomerDataStore] = useRecoilState(customerStore)
 
   const fetchCustomer = async () => {
     try {
       const response = await getCustomer(searchQuery);
       setListData(response);
+      setCustomerDataStore(response)
     } catch (error) {
       console.error(error);
     }

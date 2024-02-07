@@ -26,94 +26,47 @@ import "react-toastify/dist/ReactToastify.css";
 // import {Input} from 'antd'
 import { useEffect, useState } from "react";
 
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
-import { locationStore } from "../../../store/Store";
+import { locationStore, customerStore } from "../../../store/Store";
 
 import { FaRegSave } from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle, BsFillEyeFill } from "react-icons/bs";
 
-import { getCustomer, addCustomer } from "../../../api/customerApi";
+import { getProcess, addProcess } from "../../../api/ProcessApi";
+import { getCustomer } from "../../../api/customerApi";
+import { getLocation } from "../../../api/locationApi";
 
 const Process = () => {
   //----------  Data Table --------------------//
   const [listData, setListData] = useState([]);
-  const [listDataCustomer, setListDataCustomer] = useState([
-    {
-      id: 1,
-      name: "user01",
-      total: 1000,
-      date: 20,
-      sDate: "10/01/24",
-      eDate: "20/01/24",
-      status: "กำลังจ่าย",
-    },
-    {
-      id: 2,
-      name: "user02",
-      total: 1200,
-      date: 20,
-      sDate: "10/01/24",
-      eDate: "20/01/24",
-      status: "กำลังจ่าย",
-    },
-    {
-      id: 3,
-      name: "user03",
-      total: 2000,
-      date: 20,
-      sDate: "10/01/24",
-      eDate: "20/01/24",
-      status: "จ่ายครบ",
-    },
-    {
-      id: 4,
-      name: "user04",
-      total: 5000,
-      date: 20,
-      sDate: "10/01/24",
-      eDate: "20/01/24",
-      status: "กำลังจ่าย",
-    },
-    {
-      id: 5,
-      name: "user05",
-      total: 1000,
-      date: 20,
-      sDate: "10/01/24",
-      eDate: "20/01/24",
-      status: "ลูกค้าเสีย",
-    },
-  ]);
+  const [listDataCustomer, setListDataCustomer] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchQueryCustomer, setSearchQueryCustomer] = useState("");
   const [activeRow, setActiveRow] = useState(0);
   const [activeRow2, setActiveRow2] = useState(0);
 
-  const dataLocationStore = useRecoilValue(locationStore);
+  const [customerDataStore, setCuatomerDataStore] =
+    useRecoilState(customerStore);
+  const [locationDataStore, setLocationDataStore] =
+    useRecoilState(locationStore);
 
-  const locationOptions = dataLocationStore?.map((location) => ({
+  const locationOptions = locationDataStore?.map((location) => ({
     value: location.id,
     label: location.name,
   }));
 
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const customerOptions = customerDataStore?.map((customer) => ({
+    value: customer.id,
+    label: customer.name,
+  }));
 
-  const handleLocationSelect = (e) => {
-    // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
-    const locations = dataLocationStore.find(
-      (location) => location.id === e.value
-    );
-    // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
-    setSelectedLocation(locations);
-  };
-
-  console.log(selectedLocation);
-
-  const fetchCustomer = async () => {
+  const fetchProcess = async () => {
     try {
-      const response = await getCustomer(searchQuery);
+      const response = await getProcess(searchQuery);
+      console.log(response);
       setListData(response);
     } catch (error) {
       console.error(error);
@@ -121,9 +74,35 @@ const Process = () => {
   };
 
   useEffect(() => {
-    fetchCustomer();
+    fetchProcess();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
+
+  const fetchCustomer = async () => {
+    try {
+      const response = await getCustomer(searchQueryCustomer);
+      console.log(response);
+      setCuatomerDataStore(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchLocation = async () => {
+    try {
+      const response = await getLocation(searchQueryCustomer);
+      console.log(response);
+      setLocationDataStore(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomer();
+    fetchLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
   const [currentPage, setCurrentPage] = useState(1);
@@ -137,33 +116,57 @@ const Process = () => {
 
   const totalPages = Math.ceil(listDataCustomer?.length / itemsPerPage);
 
-  //------------- modal Add Card -----------------------//
+  //------------- modal Add Process -----------------------//
   const [newCard, setNewCard] = useState([]);
-  const [openModalAddCard, setOpenModalAddCard] = useState(false);
+  const [openModalAddProcess, setOpenModalAddProcess] = useState(false);
 
-  const handleModalAddCard = (data) => {
-    setOpenModalAddCard(!openModalAddCard);
+  const handleModalAddProcess = () => {
+    setOpenModalAddProcess(!openModalAddProcess);
   };
 
-  // const handleAddCard = async () => {
-  //   try {
-  //     let data = {
-  //       name: newCard.name,
-  //       tell: newCard.tell,
-  //       address: newCard.address,
-  //     };
+  const handleAddProcess = async () => {
+    try {
+      let data = {
+        house_id: selectedLocation?.id,
+      };
 
-  //     const response = await addCustomer(data);
-  //     // console.log(response);
-  //     setOpenModalAdd(false);
-  //     fetchCustomer();
-  //     toast.success("เพิ่มข้อมูล สินค้า สำเร็จ");
-  //   } catch (error) {
-  //     toast.error(error);
-  //   }
-  // };
+      const response = await addProcess(data);
+      // console.log(response);
+      setOpenModalAddProcess(false);
+      fetchProcess();
+      toast.success("เพิ่มข้อมูล Process สำเร็จ");
+    } catch (error) {
+      toast.error(error);
+    }
+  };
 
-  //------------- modal Add Product -----------------------//
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+  const handleLocationSelect = (e) => {
+    // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
+    const locations = locationDataStore.find(
+      (location) => location.id === e.value
+    );
+    // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
+    setSelectedLocation(locations);
+  };
+
+  console.log(selectedLocation);
+
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+
+  const handleCustomerSelect = (e) => {
+    // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
+    const customer = customerDataStore.find(
+      (customer) => customer.id === e.value
+    );
+    // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
+    setSelectedCustomer(customer);
+  };
+
+  console.log(selectedCustomer);
+
+  //------------- modal Add Customer -----------------------//
   const [newCustomer, setNewCustomer] = useState([]);
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
@@ -185,113 +188,12 @@ const Process = () => {
       const response = await addCustomer(data);
       // console.log(response);
       setOpenModalAdd(false);
-      fetchCustomer();
+      // fetchCustomer();
       toast.success("เพิ่มข้อมูล สินค้า สำเร็จ");
     } catch (error) {
       toast.error(error);
     }
   };
-
-  const cardItems = [
-    {
-      id: 1,
-      name: "ขอนแก่น",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 2,
-      name: "ขอนแก่น-2",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 3,
-      name: "มหาสารคาม",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 4,
-      name: "มุกดาหาร",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 5,
-      name: "มุกดาหาร-2",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 3,
-      name: "มหาสารคาม",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 4,
-      name: "มุกดาหาร",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 5,
-      name: "มุกดาหาร-2",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 3,
-      name: "มหาสารคาม",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 4,
-      name: "มุกดาหาร",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 5,
-      name: "มุกดาหาร-2",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 3,
-      name: "มหาสารคาม",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 4,
-      name: "มุกดาหาร",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-    {
-      id: 5,
-      name: "มุกดาหาร-2",
-      total: 1000,
-      Paid: 400,
-      overdue: 600,
-    },
-  ];
 
   const [selectCard, setSelectCard] = useState([]);
   const [openModalProcess, setOpenModalProcess] = useState(false);
@@ -346,8 +248,7 @@ const Process = () => {
   return (
     <Card>
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
-      <Typography className="text-center mt-5 text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (งวด3/3)</Typography>
-      <div className="flex flex-col w-full ">
+      <div className="flex flex-col w-full mt-5 ">
         <div className="w-full flex   px-0 md:px-10">
           <div className="w-full flex flex-col md:flex-row justify-center md:justify-start items-center gap-5">
             <div>
@@ -367,7 +268,7 @@ const Process = () => {
                 variant="gradient"
                 color="green"
                 className="text-base flex justify-center  items-center   bg-green-500"
-                onClick={handleModalAdd}
+                onClick={handleModalAddProcess}
               >
                 <span className="mr-2 text-xl">
                   <BsPlusCircle />
@@ -381,7 +282,7 @@ const Process = () => {
         {/* ------------ Card  ----------------------------------------- */}
         <Card className="mt-5 border-1 max-h-[60vh] lg:max-h-[70vh] overflow-auto px-3">
           <List className="flex flex-wrap  flex-row  w-full   ">
-            {cardItems?.map((item, index) => (
+            {listData?.map((item, index) => (
               <ListItem
                 key={index}
                 className="flex-none w-full md:w-[300px] p-2  md:ps-10"
@@ -396,7 +297,7 @@ const Process = () => {
                       ยอดรวม: {Number(item?.total).toLocaleString()} บาท
                     </Typography>
                     <Typography>
-                      ชำระแล้ว: {Number(item?.Paid).toLocaleString()} บาท
+                      ชำระแล้ว: {Number(item?.paid).toLocaleString()} บาท
                     </Typography>
                     <Typography>
                       ค้างชำระ: {Number(item?.overdue).toLocaleString()} บาท
@@ -409,9 +310,14 @@ const Process = () => {
         </Card>
       </div>
 
-      {/* modal Add Card */}
+      {/* modal Add Process */}
 
-      <Dialog open={openModalAddCard} size="xs" className="h-[65vh]">
+      <Dialog
+        open={openModalAddProcess}
+        handler={handleModalAddProcess}
+        size="xs"
+        className="h-[65vh]"
+      >
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
           <Typography variant="h5">เพิ่มการบันทึกใหม่</Typography>
         </DialogHeader>
@@ -434,7 +340,7 @@ const Process = () => {
             variant="text"
             color="red"
             size="sm"
-            onClick={handleModalAddCard}
+            onClick={handleModalAddProcess}
             className="flex mr-1 text-base"
           >
             <span className="text-xl mr-2">
@@ -446,7 +352,7 @@ const Process = () => {
             size="sm"
             variant="gradient"
             color="purple"
-            // onClick={handleAddCustomer}
+            onClick={handleAddProcess}
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
@@ -461,14 +367,16 @@ const Process = () => {
 
       <Dialog open={openModalProcess} size="xxl">
         <DialogBody divider className=" h-[90vh]   overflow-auto">
-        <Typography className="text-center  text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (งวด3/3)</Typography>
+          <Typography className="text-center  text-red-500 text-xl font-bold">
+            อยู่ระหว่างการพัฒนา (งวด3/3)
+          </Typography>
           <div className="flex  flex-col  overflow-auto   items-center ">
             <div className="flex w-full flex-col md:flex-row gap-5 ">
               <div className="flex flex-col w-full h-[85vh]   md:w-3/12 ">
                 <div className="flex  items-center gap-3">
                   <div>
                     <Typography className="text-lg lg:text-xl font-bold">
-                      {selectCard?.name}
+                      {selectCard?.name} aaaa
                     </Typography>
                   </div>
                   <div>
@@ -493,8 +401,8 @@ const Process = () => {
                     // isClearable={isClearable}
                     isSearchable={isSearchable}
                     name="color"
-                    options={locationOptions}
-                    onChange={(e) => handleLocationSelect(e)}
+                    options={customerOptions}
+                    onChange={(e) => handleCustomerSelect(e)}
                   />
                 </div>
                 <div className="flex w-full flex-col lg:flex-row justify-center mt-3 gap-3  ">
