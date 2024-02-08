@@ -11,7 +11,6 @@ import {
   DialogFooter,
   List,
   ListItem,
-  Textarea,
 } from "@material-tailwind/react";
 
 import Select from "react-select";
@@ -23,7 +22,8 @@ import th from "date-fns/locale/th";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// import {Input} from 'antd'
+import moment from "moment/min/moment-with-locales";
+
 import { useEffect, useState } from "react";
 
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -34,26 +34,38 @@ import { FaRegSave } from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle, BsFillEyeFill } from "react-icons/bs";
 
-import { getProcess, addProcess, getProcessId } from "../../../api/ProcessApi";
-import { getCustomer, addCustomer } from "../../../api/customerApi";
-import { getLocation } from "../../../api/locationApi";
+import { getProcess, addProcess, getUpdateAll , getProcessUser , userUpdate } from "../../../api/ProcessApi";
+import { getCustomer } from "../../../api/customerApi";
 
 const Process = () => {
   //----------  Data Table --------------------//
   const [listData, setListData] = useState([]);
   const [dataProcessId, setDataProcessId] = useState([]);
+  const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
+  const [sumUser ,setSumUser] = useState([])
+  const [status, setStatus] = useState("0");
+  const [cardId, setCardId] = useState("");
+  
   const [listDataCustomer, setListDataCustomer] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
+  const [isClearable, setIsClearable] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchUserId, setSearchUserId] = useState("");
-  const [searchQueryCustomer, setSearchQueryCustomer] = useState("");
-  const [activeRow, setActiveRow] = useState(0);
+  const [activeRow, setActiveRow] = useState();
   const [activeRow2, setActiveRow2] = useState(0);
 
-  const [customerDataStore, setCuatomerDataStore] =
+  const [selectedShop, setSelectedShop] = useState(null);
+
+  const handleShopSelect = (e) => {
+    // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
+    const shop = shopDataStore.find((shop) => shop.id === e.value);
+    // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
+    // console.log(shop);
+    setSelectedShop(shop);
+  };
+
+  const [customerDataStore, setCustomerDataStore] =
     useRecoilState(customerStore);
-  const [locationDataStore, setLocationDataStore] =
-    useRecoilState(locationStore);
+  const locationDataStore = useRecoilValue(locationStore);
 
   const locationOptions = locationDataStore?.map((location) => ({
     value: location.id,
@@ -79,34 +91,38 @@ const Process = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
-  const fetchProcessId = async () => {
+  const fetchUpdateAll = async (processId) => {
     try {
-      const response = await getProcessId(searchUserId);
-      console.log(response);
+      const response = await getUpdateAll(processId);
+      // console.log(response);
       setDataProcessId(response);
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(() => {
-    fetchProcessId();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchUserId]);
-
-  const fetchCustomer = async () => {
+  const fetchStatus = async () => {
     try {
-      const response = await getCustomer(searchQueryCustomer);
-      setCuatomerDataStore(response);
+      const response = await getProcessUser(cardId , status);
+      console.log(response);
+      setListDataCustomer(response)
+      setSumUser(response)
     } catch (error) {
       console.error(error);
     }
   };
 
-  const fetchLocation = async () => {
+  useEffect(() => {
+    if(cardId) {
+      fetchStatus();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cardId]);
+
+  const fetchCustomer = async () => {
     try {
-      const response = await getLocation(searchQueryCustomer);
-      setLocationDataStore(response);
+      const response = await getCustomer(searchQuery);
+      setCustomerDataStore(response);
     } catch (error) {
       console.error(error);
     }
@@ -114,13 +130,12 @@ const Process = () => {
 
   useEffect(() => {
     fetchCustomer();
-    fetchLocation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 300;
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -131,7 +146,7 @@ const Process = () => {
   const totalPages = Math.ceil(listDataCustomer?.length / itemsPerPage);
 
   //------------- modal Add Process -----------------------//
-  const [newCard, setNewCard] = useState([]);
+
   const [openModalAddProcess, setOpenModalAddProcess] = useState(false);
   const [openModalConfirm, setOpenModalConfirm] = useState(false);
 
@@ -177,6 +192,7 @@ const Process = () => {
   };
 
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedValue, setSelectedValue] = useState(null);
 
   const handleCustomerSelect = (e) => {
     // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
@@ -185,45 +201,17 @@ const Process = () => {
     );
     // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
     setSelectedCustomer(customer);
-  };
-  // console.log(selectedCustomer);
-
-  //------------- modal Add Customer -----------------------//
-  const [newCustomer, setNewCustomer] = useState([]);
-  const [openModalAdd, setOpenModalAdd] = useState(false);
-  const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
-  const [dataAdd, setDataAdd] = useState([]);
-
-  const handleModalAdd = (data) => {
-    setOpenModalAdd(!openModalAdd);
-    setDataAdd(data);
-  };
-
-  const handleAddCustomer = async () => {
-    try {
-      let data = {
-        name: newCustomer.name,
-        tell: newCustomer.tell,
-        address: newCustomer.address,
-      };
-
-      const response = await addCustomer(data);
-      // console.log(response);
-      toast.success("เพิ่มข้อมูล ลูกค้า สำเร็จ");
-      setOpenModalAdd(false);
-      fetchCustomer();
-    } catch (error) {
-      toast.error(error);
-    }
+    setSelectedValue(e)
   };
 
   const [selectCard, setSelectCard] = useState([]);
   const [openModalProcess, setOpenModalProcess] = useState(false);
 
-  const handleSelectCard = (item) => {
+  const handleSelectCard = async (item) => {
     setOpenModalProcess(!openModalProcess);
     setSelectCard(item);
-    setSearchUserId(item?.name);
+    setCardId(item?.id)
+    await fetchUpdateAll(item?.id);
   };
 
   const [amountDate, setAmountDate] = useState(0);
@@ -234,19 +222,9 @@ const Process = () => {
 
   // Function to add days to a date
   const addDays = (date, days) => {
-    // if (!date || !(date instanceof Date)) {
-    //   // Handle the case where date is null, undefined, or not a Date object
-    //   return null; // or some default value
-    // }
     const newDate = new Date(date);
     newDate?.setDate(newDate.getDate() + days);
     return newDate;
-
-    // const defaultDate = new Date();
-    // const isValidDate = date && date instanceof Date;
-    // const newDate = isValidDate ? new Date(date) : defaultDate;
-    // newDate.setDate(newDate.getDate() + days);
-    // return newDate;
   };
 
   // Handle change for searchQueryStart
@@ -267,6 +245,49 @@ const Process = () => {
       setSearchQueryEnd(addDays(searchQueryStart, newDaysToAdd));
     }
   };
+
+  const handleUser = async () => {
+    try {
+      let data = {
+        process_id: cardId,
+        user_id: selectedCustomer?.id,
+        price: Number(amount),
+        count_day: Number(amountDate),
+        start_day: startDate ,
+        end_day: startEnd ,
+      };
+
+      const response = await userUpdate(data)
+      console.log(response)
+      setAmountDate(0)
+      setAmount(0)
+      setSearchQueryStart(new Date())
+      setSearchQueryEnd(new Date())
+      setSelectedValue(null)
+      if (response == undefined) {
+        toast.error("ไม่สามารถเพิ่มหรืออัพเดรท ลูกค้า ได้");
+      } else {
+        toast.success("เพิ่ม/อัพเดรทข้อมูล ลูกค้า สำเร็จ");
+        fetchStatus() 
+      }
+    } catch (error) {
+      console.log(error)
+      
+    }
+  }
+
+  // const startDate = moment(searchQueryStart).format("DD-MM-YYYY");
+  // const startEnd = moment(searchQueryEnd).format("DD-MM-YYYY");
+
+  const startDate = moment(searchQueryStart).add(543, 'years').format('DD-MM-YYYY');
+  const startEnd = moment(searchQueryEnd).add(543, 'years').format('DD-MM-YYYY');
+
+  console.log(cardId)
+  console.log(selectedCustomer)
+  console.log(amount)
+  console.log(amountDate)
+  console.log(startDate)
+  console.log(startEnd)
 
   return (
     <Card>
@@ -449,7 +470,7 @@ const Process = () => {
                 <div className="flex  items-center gap-3">
                   <div>
                     <Typography className="text-lg lg:text-xl font-bold">
-                      {selectCard?.name}
+                      {selectCard?.name || ""}
                     </Typography>
                   </div>
                   <div>
@@ -471,8 +492,9 @@ const Process = () => {
                   <Select
                     classNamePrefix="select"
                     placeholder="เลือกลูกค้า"
-                    // isClearable={isClearable}
+                    isClearable={isClearable}
                     isSearchable={isSearchable}
+                    value={selectedValue}
                     name="color"
                     options={customerOptions}
                     onChange={(e) => handleCustomerSelect(e)}
@@ -484,6 +506,7 @@ const Process = () => {
                       <input
                         type="number"
                         min={0}
+                        value={amount}
                         className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
                         style={{ backgroundColor: "rgb(244,244,244)" }}
                         onChange={(e) => setAmount(e.target.value)}
@@ -498,6 +521,7 @@ const Process = () => {
                       <input
                         type="number"
                         min={0}
+                        value={amountDate}
                         className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
                         style={{ backgroundColor: "rgb(244,244,244)" }}
                         onChange={handleDaysToAddChange}
@@ -515,7 +539,7 @@ const Process = () => {
                         selected={searchQueryStart}
                         locale={th}
                         dateFormat="เริ่มต้น dd/MM/yyyy"
-                        onChange={handleSearchQueryStartChange}
+                        onChange={handleSearchQueryStartChange} 
                         className="w-full rounded-md border border-gray-400 p-2 text-gray-600  shadow-sm focus:border-blue-500 focus:outline-none"
                       />
                     </div>
@@ -555,7 +579,7 @@ const Process = () => {
                       color="green"
                       className="text-base flex justify-center  items-center  w-full  bg-green-500"
                       // disabled={openPrint == true ? true : false}
-                      // onClick={handleSendReceipt}
+                      onClick={handleUser}
                     >
                       <span className="mr-2 text-xl ">
                         {/* <IoIosSave /> */}
@@ -575,32 +599,28 @@ const Process = () => {
                     <Typography className=" font-bold mt-5">
                       ยอดรวม (ทั้งหมด):{" "}
                       <sapn>
-                        {Number(dataProcessId?.[0]?.total).toLocaleString() ==
-                        "NaN"
+                        {Number(dataProcessId?.total).toLocaleString() == "NaN"
                           ? 0
-                          : Number(dataProcessId?.[0]?.total).toLocaleString()}
+                          : Number(dataProcessId?.total).toLocaleString()}
                       </sapn>{" "}
                       บาท
                     </Typography>
                     <Typography className=" font-bold mt-3">
                       ชำระแล้ว (ทั้งหมด):{" "}
                       <sapn>
-                        {Number(dataProcessId?.[0]?.paid).toLocaleString() ==
-                        "NaN"
+                        {Number(dataProcessId?.paid).toLocaleString() == "NaN"
                           ? 0
-                          : Number(dataProcessId?.[0]?.paid).toLocaleString()}
+                          : Number(dataProcessId?.paid).toLocaleString()}
                       </sapn>{" "}
                       บาท
                     </Typography>
                     <Typography className=" font-bold mt-3">
                       ค้างชำระ (ทั้งหมด):{" "}
                       <sapn>
-                        {Number(dataProcessId?.[0]?.overdue).toLocaleString() ==
+                        {Number(dataProcessId?.overdue).toLocaleString() ==
                         "NaN"
                           ? 0
-                          : Number(
-                              dataProcessId?.[0]?.overdue
-                            ).toLocaleString()}
+                          : Number(dataProcessId?.overdue).toLocaleString()}
                       </sapn>{" "}
                       บาท
                     </Typography>
@@ -620,7 +640,10 @@ const Process = () => {
                             ? "#FFEB3B"
                             : "#ebdb6b",
                       }}
-                      onClick={() => setActiveCustomerMenu("menu1")}
+                      onClick={() => [
+                        setActiveCustomerMenu("menu1"),
+                        setStatus("0"),
+                      ]}
                     >
                       กำลังจ่าย
                     </Button>
@@ -635,7 +658,10 @@ const Process = () => {
                           ? " bg-green-500 text-white"
                           : "bg-green-300 text-white"
                       }`}
-                      onClick={() => setActiveCustomerMenu("menu2")}
+                      onClick={() => [
+                        setActiveCustomerMenu("menu2"),
+                        setStatus("1"),
+                      ]}
                     >
                       จ่ายครบแล้ว
                     </Button>
@@ -649,7 +675,10 @@ const Process = () => {
                           ? " bg-red-500 text-white"
                           : "bg-red-300 text-white"
                       }`}
-                      onClick={() => setActiveCustomerMenu("menu3")}
+                      onClick={() => [
+                        setActiveCustomerMenu("menu3"),
+                        setStatus("2"),
+                      ]}
                     >
                       ลูกค้าเสีย
                     </Button>
@@ -750,15 +779,14 @@ const Process = () => {
                           </tbody>
                         ) : (
                           <tbody>
-                            {displayedData?.map((data, index) => {
-                              const isLast =
-                                index === displayedData?.length - 1;
-                              const pageIndex = startIndex + index;
-                              const classes = isLast
-                                ? "p-2"
-                                : `p-3 border-b border-blue-gray-50 ${
-                                    index === activeRow ? "bg-gray-300" : ""
-                                  }`;
+                             {displayedData?.map((data, index) => {
+                                const isLast =
+                                  index === displayedData?.length ;
+                                const classes = isLast
+                                  ? "p-2"
+                                  : `p-3 border-b border-blue-gray-50 ${
+                                      index === activeRow ? "bg-gray-300" : ""
+                                    }`;
                               return (
                                 <tr key={index}>
                                   <td className={classes}>
@@ -768,7 +796,7 @@ const Process = () => {
                                         color="blue-gray"
                                         className="font-normal"
                                       >
-                                        {pageIndex + 1 || ""}
+                                        {index + 1 || ""}
                                       </Typography>
                                     </div>
                                   </td>
@@ -802,7 +830,7 @@ const Process = () => {
                                         color="blue-gray"
                                         className="font-normal "
                                       >
-                                        {data?.date || ""}
+                                        {data?.count_day || ""}
                                       </Typography>
                                     </div>
                                   </td>
@@ -813,7 +841,7 @@ const Process = () => {
                                         color="blue-gray"
                                         className="font-normal "
                                       >
-                                        {data?.sDate || ""}
+                                        {data?.start_day || ""}
                                       </Typography>
                                     </div>
                                   </td>
@@ -824,7 +852,7 @@ const Process = () => {
                                         color="blue-gray"
                                         className="font-normal "
                                       >
-                                        {data?.eDate || ""}
+                                        {data?.end_day || ""}
                                       </Typography>
                                     </div>
                                   </td>
@@ -834,16 +862,16 @@ const Process = () => {
                                         variant="small"
                                         color="blue-gray"
                                         className={`font-normal ${
-                                          data?.status == "กำลังจ่าย"
+                                          data?.status == "0"
                                             ? "bg-yellow-300 bg-opacity-60 px-3  rounded-lg "
-                                            : data?.status == "จ่ายครบ"
+                                            : data?.status == "1"
                                             ? "bg-green-300  bg-opacity-60 px-3  rounded-lg"
-                                            : data?.status == "ลูกค้าเสีย"
+                                            : data?.status == "2"
                                             ? "bg-red-300  bg-opacity-60 px-3   rounded-lg"
                                             : ""
                                         } `}
                                       >
-                                        {data?.status || ""}
+                                        {data?.status == 0 ? "กำลังจ่าย" : data?.status == 1 ? "จ่ายแล้ว" :  data?.status == 2 ? "ลูกค้าเสีย" : '' }
                                       </Typography>
                                     </div>
                                   </td>
@@ -854,8 +882,7 @@ const Process = () => {
                                         color="blue"
                                         size="sm"
                                         className="ml-3 "
-                                        // onClick={() => handleModalView(data)}
-                                        onClick={() => setActiveRow(index)}
+                                        onClick={() => [setActiveRow(index) , setSumUser(data)]}
                                       >
                                         <BsFillEyeFill className="h-5 w-5  text-light-blue-700 " />
                                       </IconButton>
@@ -1031,16 +1058,22 @@ const Process = () => {
                   >
                     <div className="gap-3  p-3">
                       <Typography className="text-xl font-bold">
-                        ยอดรวม(user01)
+                        ยอดรวม ({sumUser?.name})
                       </Typography>
                       <Typography className=" font-bold mt-5">
-                        ยอดรวม (ทั้งหมด): <sapn>1,000 บาท</sapn>
+                        ยอดรวม (ทั้งหมด): <sapn> {Number(sumUser?.total).toLocaleString() == "NaN"
+                          ? 0
+                          : Number(sumUser?.total).toLocaleString()}</sapn> บาท
                       </Typography>
                       <Typography className=" font-bold mt-3">
-                        ชำระแล้ว (ทั้งหมด): <sapn>600 บาท</sapn>
+                        ชำระแล้ว (ทั้งหมด): <sapn>{Number(sumUser?.paid).toLocaleString() == "NaN"
+                          ? 0
+                          : Number(sumUser?.paid).toLocaleString()}</sapn> บาท
                       </Typography>
                       <Typography className=" font-bold mt-3">
-                        ค้างชำระ (ทั้งหมด): <sapn>400 บาท</sapn>
+                        ค้างชำระ (ทั้งหมด): <sapn>{Number(sumUser?.overdue).toLocaleString() == "NaN"
+                          ? 0
+                          : Number(sumUser?.overdue).toLocaleString()}</sapn> บาท
                       </Typography>
                     </div>
                   </div>
@@ -1054,7 +1087,7 @@ const Process = () => {
             variant="text"
             color="red"
             size="sm"
-            onClick={() => [setOpenModalProcess(false), setDataProcessId([])]}
+            onClick={() => [setOpenModalProcess(false), setDataProcessId([]) , setActiveRow()]}
             className="flex mr-1 text-base"
           >
             <span className="text-xl mr-2">
@@ -1067,7 +1100,7 @@ const Process = () => {
 
       {/* modal Add Customer */}
 
-      <Dialog open={openModalAdd} size="xs" handler={handleModalAdd}>
+      {/* <Dialog open={openModalAdd} size="xs" handler={handleModalAdd}>
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
           <Typography variant="h5">เพิ่มข้อมูลลูกค้า</Typography>
         </DialogHeader>
@@ -1147,7 +1180,7 @@ const Process = () => {
             บันทึก
           </Button>
         </DialogFooter>
-      </Dialog>
+      </Dialog> */}
     </Card>
   );
 };

@@ -141,9 +141,9 @@ const Location = () => {
       setOpenModalDelete(false);
       fetchLocation();
       if (response == undefined) {
-        toast.error("ไม่สามารถลบข้อมูลสินค้า");
+        toast.error("ไม่สามารถลบสถานที่ได้ เนื่องจากถูกใช้งานแล้ว");
       } else {
-        toast.success("ลบข้อมูล สินค้า สำเร็จ");
+        toast.success("ลบข้อมูล สถานที่ สำเร็จ");
       }
     } catch (error) {
       toast.error(error);
