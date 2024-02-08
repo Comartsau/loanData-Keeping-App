@@ -57,3 +57,8 @@
 .toggle{
     margin-left:15px ;
 }
+
+.toast {
+    position: absolute;
+    z-index: 99999 !important;
+}

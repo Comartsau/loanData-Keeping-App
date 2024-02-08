@@ -34,16 +34,18 @@ import { FaRegSave } from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle, BsFillEyeFill } from "react-icons/bs";
 
-import { getProcess, addProcess } from "../../../api/ProcessApi";
-import { getCustomer } from "../../../api/customerApi";
+import { getProcess, addProcess, getProcessId } from "../../../api/ProcessApi";
+import { getCustomer, addCustomer } from "../../../api/customerApi";
 import { getLocation } from "../../../api/locationApi";
 
 const Process = () => {
   //----------  Data Table --------------------//
   const [listData, setListData] = useState([]);
+  const [dataProcessId, setDataProcessId] = useState([]);
   const [listDataCustomer, setListDataCustomer] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchUserId, setSearchUserId] = useState("");
   const [searchQueryCustomer, setSearchQueryCustomer] = useState("");
   const [activeRow, setActiveRow] = useState(0);
   const [activeRow2, setActiveRow2] = useState(0);
@@ -66,7 +68,6 @@ const Process = () => {
   const fetchProcess = async () => {
     try {
       const response = await getProcess(searchQuery);
-      console.log(response);
       setListData(response);
     } catch (error) {
       console.error(error);
@@ -78,10 +79,24 @@ const Process = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
+  const fetchProcessId = async () => {
+    try {
+      const response = await getProcessId(searchUserId);
+      console.log(response);
+      setDataProcessId(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProcessId();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchUserId]);
+
   const fetchCustomer = async () => {
     try {
       const response = await getCustomer(searchQueryCustomer);
-      console.log(response);
       setCuatomerDataStore(response);
     } catch (error) {
       console.error(error);
@@ -91,7 +106,6 @@ const Process = () => {
   const fetchLocation = async () => {
     try {
       const response = await getLocation(searchQueryCustomer);
-      console.log(response);
       setLocationDataStore(response);
     } catch (error) {
       console.error(error);
@@ -119,9 +133,14 @@ const Process = () => {
   //------------- modal Add Process -----------------------//
   const [newCard, setNewCard] = useState([]);
   const [openModalAddProcess, setOpenModalAddProcess] = useState(false);
+  const [openModalConfirm, setOpenModalConfirm] = useState(false);
 
   const handleModalAddProcess = () => {
     setOpenModalAddProcess(!openModalAddProcess);
+  };
+  const handleModalConfirm = () => {
+    setOpenModalConfirm(!openModalConfirm);
+    setOpenModalAddProcess(false);
   };
 
   const handleAddProcess = async () => {
@@ -131,10 +150,16 @@ const Process = () => {
       };
 
       const response = await addProcess(data);
-      // console.log(response);
-      setOpenModalAddProcess(false);
+      console.log(response);
+      if (response == undefined) {
+        toast.error("สถานที่นี้ถูกสร้างไปแล้ว");
+      } else {
+        toast.success("เพิ่มข้อมูล Process สำเร็จ");
+      }
+
       fetchProcess();
-      toast.success("เพิ่มข้อมูล Process สำเร็จ");
+
+      setOpenModalConfirm(false);
     } catch (error) {
       toast.error(error);
     }
@@ -151,8 +176,6 @@ const Process = () => {
     setSelectedLocation(locations);
   };
 
-  console.log(selectedLocation);
-
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const handleCustomerSelect = (e) => {
@@ -163,8 +186,7 @@ const Process = () => {
     // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
     setSelectedCustomer(customer);
   };
-
-  console.log(selectedCustomer);
+  // console.log(selectedCustomer);
 
   //------------- modal Add Customer -----------------------//
   const [newCustomer, setNewCustomer] = useState([]);
@@ -187,9 +209,9 @@ const Process = () => {
 
       const response = await addCustomer(data);
       // console.log(response);
+      toast.success("เพิ่มข้อมูล ลูกค้า สำเร็จ");
       setOpenModalAdd(false);
-      // fetchCustomer();
-      toast.success("เพิ่มข้อมูล สินค้า สำเร็จ");
+      fetchCustomer();
     } catch (error) {
       toast.error(error);
     }
@@ -201,6 +223,7 @@ const Process = () => {
   const handleSelectCard = (item) => {
     setOpenModalProcess(!openModalProcess);
     setSelectCard(item);
+    setSearchUserId(item?.name);
   };
 
   const [amountDate, setAmountDate] = useState(0);
@@ -247,8 +270,8 @@ const Process = () => {
 
   return (
     <Card>
-      <ToastContainer className="mt-10" autoClose={800} theme="colored" />
       <div className="flex flex-col w-full mt-5 ">
+        <ToastContainer className="toast " autoClose={800} theme="colored" />
         <div className="w-full flex   px-0 md:px-10">
           <div className="w-full flex flex-col md:flex-row justify-center md:justify-start items-center gap-5">
             <div>
@@ -352,6 +375,59 @@ const Process = () => {
             size="sm"
             variant="gradient"
             color="purple"
+            onClick={handleModalConfirm}
+            className="flex text-base mr-1"
+          >
+            <span className="mr-2 text-xl">
+              <FaRegSave />
+            </span>
+            บันทึก
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      {/* modal Add Confirm */}
+
+      <Dialog
+        open={openModalConfirm}
+        handler={handleModalConfirm}
+        size="xs"
+        className="h-[20vh] "
+      >
+        <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
+          <Typography variant="h5">ยืนยันการสร้าง</Typography>
+        </DialogHeader>
+        {/* <DialogBody divider className=" h-[47vh]">
+          <div className=" w-full  flex flex-col justify-center mt-3  ">
+            <Select
+              className="  max-h-0"
+              classNamePrefix="select"
+              placeholder="เลือกบริษัท"
+              // isClearable={isClearable}
+              isSearchable={isSearchable}
+              name="color"
+              options={locationOptions}
+              onChange={(e) => handleLocationSelect(e)}
+            />
+          </div>
+        </DialogBody> */}
+        <DialogFooter className="flex justify-center gap-5 mt-3">
+          <Button
+            variant="text"
+            color="red"
+            size="sm"
+            onClick={handleModalConfirm}
+            className="flex mr-1 text-base"
+          >
+            <span className="text-xl mr-2">
+              <AiOutlineStop />
+            </span>
+            ยกเลิก
+          </Button>
+          <Button
+            size="sm"
+            variant="gradient"
+            color="purple"
             onClick={handleAddProcess}
             className="flex text-base mr-1"
           >
@@ -367,16 +443,13 @@ const Process = () => {
 
       <Dialog open={openModalProcess} size="xxl">
         <DialogBody divider className=" h-[90vh]   overflow-auto">
-          <Typography className="text-center  text-red-500 text-xl font-bold">
-            อยู่ระหว่างการพัฒนา (งวด3/3)
-          </Typography>
           <div className="flex  flex-col  overflow-auto   items-center ">
             <div className="flex w-full flex-col md:flex-row gap-5 ">
               <div className="flex flex-col w-full h-[85vh]   md:w-3/12 ">
                 <div className="flex  items-center gap-3">
                   <div>
                     <Typography className="text-lg lg:text-xl font-bold">
-                      {selectCard?.name} aaaa
+                      {selectCard?.name}
                     </Typography>
                   </div>
                   <div>
@@ -385,7 +458,7 @@ const Process = () => {
                       variant="gradient"
                       color="green"
                       className="text-base flex justify-center  items-center   bg-green-500"
-                      onClick={handleModalAdd}
+                      // onClick={handleModalAdd}
                     >
                       <span className="mr-2 text-xl">
                         <BsPlusCircle />
@@ -397,7 +470,7 @@ const Process = () => {
                 <div className=" w-full  flex flex-col justify-center mt-3  ">
                   <Select
                     classNamePrefix="select"
-                    placeholder="เลือกบริษัท"
+                    placeholder="เลือกลูกค้า"
                     // isClearable={isClearable}
                     isSearchable={isSearchable}
                     name="color"
@@ -500,13 +573,36 @@ const Process = () => {
                       ยอดรวม(ทั้งหมด)
                     </Typography>
                     <Typography className=" font-bold mt-5">
-                      ยอดรวม (ทั้งหมด): <sapn>1,000 บาท</sapn>
+                      ยอดรวม (ทั้งหมด):{" "}
+                      <sapn>
+                        {Number(dataProcessId?.[0]?.total).toLocaleString() ==
+                        "NaN"
+                          ? 0
+                          : Number(dataProcessId?.[0]?.total).toLocaleString()}
+                      </sapn>{" "}
+                      บาท
                     </Typography>
                     <Typography className=" font-bold mt-3">
-                      ชำระแล้ว (ทั้งหมด): <sapn>600 บาท</sapn>
+                      ชำระแล้ว (ทั้งหมด):{" "}
+                      <sapn>
+                        {Number(dataProcessId?.[0]?.paid).toLocaleString() ==
+                        "NaN"
+                          ? 0
+                          : Number(dataProcessId?.[0]?.paid).toLocaleString()}
+                      </sapn>{" "}
+                      บาท
                     </Typography>
                     <Typography className=" font-bold mt-3">
-                      ค้างชำระ (ทั้งหมด): <sapn>400 บาท</sapn>
+                      ค้างชำระ (ทั้งหมด):{" "}
+                      <sapn>
+                        {Number(dataProcessId?.[0]?.overdue).toLocaleString() ==
+                        "NaN"
+                          ? 0
+                          : Number(
+                              dataProcessId?.[0]?.overdue
+                            ).toLocaleString()}
+                      </sapn>{" "}
+                      บาท
                     </Typography>
                   </div>
                 </div>
@@ -958,25 +1054,13 @@ const Process = () => {
             variant="text"
             color="red"
             size="sm"
-            onClick={handleSelectCard}
+            onClick={() => [setOpenModalProcess(false), setDataProcessId([])]}
             className="flex mr-1 text-base"
           >
             <span className="text-xl mr-2">
               <AiOutlineStop />
             </span>
             ยกเลิก
-          </Button>
-          <Button
-            size="sm"
-            variant="gradient"
-            color="purple"
-            // onClick={handleAddCustomer}
-            className="flex text-base mr-1"
-          >
-            <span className="mr-2 text-xl">
-              <FaRegSave />
-            </span>
-            บันทึก
           </Button>
         </DialogFooter>
       </Dialog>

@@ -39,13 +39,14 @@ const Location = () => {
   const [listData, setListData] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [dataLocationStore,setDataLocationStore] = useRecoilState(locationStore)
+  const [dataLocationStore, setDataLocationStore] =
+    useRecoilState(locationStore);
 
   const fetchLocation = async () => {
     try {
       const response = await getLocation(searchQuery);
       setListData(response);
-      setDataLocationStore(response)
+      setDataLocationStore(response);
     } catch (error) {
       console.error(error);
     }
@@ -58,7 +59,7 @@ const Location = () => {
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 12;
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -136,9 +137,14 @@ const Location = () => {
   const handleDeleteLocation = async (id) => {
     try {
       const response = await deleteLocation(id);
+
       setOpenModalDelete(false);
       fetchLocation();
-      toast.success("ลบข้อมูล สินค้า สำเร็จ");
+      if (response == undefined) {
+        toast.error("ไม่สามารถลบข้อมูลสินค้า");
+      } else {
+        toast.success("ลบข้อมูล สินค้า สำเร็จ");
+      }
     } catch (error) {
       toast.error(error);
     }
@@ -326,39 +332,6 @@ const Location = () => {
               )}
             </table>
           </div>
-          <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-            <Button
-              variant="outlined"
-              size="sm"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-            >
-              ก่อนหน้า
-            </Button>
-            <div className="flex items-center gap-2">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <IconButton
-                  key={i}
-                  variant="outlined"
-                  size="sm"
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={
-                    currentPage === i + 1 ? "bg-purple-400 text-white" : ""
-                  }
-                >
-                  {i + 1}
-                </IconButton>
-              ))}
-            </div>
-            <Button
-              variant="outlined"
-              size="sm"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-            >
-              ถัดไป
-            </Button>
-          </CardFooter>
         </Card>
       </div>
 

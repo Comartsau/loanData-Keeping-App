@@ -22,7 +22,12 @@ import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle } from "react-icons/bs";
 import { IoTrashBin } from "react-icons/io5";
 
-import { getCustomer, addCustomer, editCustomer, deleteCustomer } from "../../../api/customerApi";
+import {
+  getCustomer,
+  addCustomer,
+  editCustomer,
+  deleteCustomer,
+} from "../../../api/customerApi";
 import { useRecoilState } from "recoil";
 import { customerStore } from "../../../store/Store";
 
@@ -31,13 +36,15 @@ const Customer = () => {
   const [listData, setListData] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [customerDataStore , setCustomerDataStore] = useRecoilState(customerStore)
+  const [customerDataStore, setCustomerDataStore] =
+    useRecoilState(customerStore);
 
   const fetchCustomer = async () => {
     try {
       const response = await getCustomer(searchQuery);
+      console.log(response);
       setListData(response);
-      setCustomerDataStore(response)
+      setCustomerDataStore(response);
     } catch (error) {
       console.error(error);
     }
@@ -50,7 +57,7 @@ const Customer = () => {
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 12;
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -176,181 +183,146 @@ const Customer = () => {
           </div>
         </div>
         {/* ------------ table  ----------------------------------------- */}
-        <Card className="mt-5  border-2 overflow-auto ">
-          <div>
-            <table className="w-full min-w-max  ">
-              <thead>
+        <Card className="mt-5  border-2  ">
+          <table className="w-full min-w-max   ">
+            <thead>
+              <tr>
+                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4  w-1">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-bold leading-none opacity-70"
+                  >
+                    ลำดับ
+                  </Typography>
+                </th>
+                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-bold leading-none opacity-70"
+                  >
+                    ชื่อ-สกุล
+                  </Typography>
+                </th>
+                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-bold leading-none opacity-70"
+                  >
+                    เบอร์โทรศัพท์
+                  </Typography>
+                </th>
+                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-bold leading-none opacity-70"
+                  >
+                    ที่อยู่
+                  </Typography>
+                </th>
+                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1  ">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-bold leading-none opacity-70"
+                  >
+                    แก้ไข/ลบ
+                  </Typography>
+                </th>
+              </tr>
+            </thead>
+            {listData?.length == 0 ? (
+              <tbody>
                 <tr>
-                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4  w-1">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-bold leading-none opacity-70"
-                    >
-                      ลำดับ
-                    </Typography>
-                  </th>
-                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-bold leading-none opacity-70"
-                    >
-                      ชื่อ-สกุล
-                    </Typography>
-                  </th>
-                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-bold leading-none opacity-70"
-                    >
-                      เบอร์โทรศัพท์
-                    </Typography>
-                  </th>
-                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-bold leading-none opacity-70"
-                    >
-                      ที่อยู่
-                    </Typography>
-                  </th>
-                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1  ">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-bold leading-none opacity-70"
-                    >
-                      แก้ไข/ลบ
-                    </Typography>
-                  </th>
+                  <td colSpan={5} className=" text-center pt-5 ">
+                    <Typography>...ไม่พบข้อมูล...</Typography>
+                  </td>
                 </tr>
-              </thead>
-              {listData?.length == 0 ? (
-                <tbody>
-                  <tr>
-                    <td colSpan={5} className=" text-center pt-5 ">
-                      <Typography>...ไม่พบข้อมูล...</Typography>
-                    </td>
-                  </tr>
-                </tbody>
-              ) : (
-                <tbody>
-                  {displayedData.map((data, index) => {
-                    const isLast = index === displayedData.length - 1;
-                    const pageIndex = startIndex + index;
-                    const classes = isLast
-                      ? "p-2"
-                      : "p-3 border-b border-blue-gray-50";
+              </tbody>
+            ) : (
+              <tbody>
+                {displayedData.map((data, index) => {
+                  const isLast = index === displayedData.length - 1;
+                  const pageIndex = startIndex + index;
+                  const classes = isLast
+                    ? "p-2"
+                    : "p-3 border-b border-blue-gray-50";
 
-                    return (
-                      <tr key={index}>
-                        <td className={classes}>
-                          <div className="flex items-center justify-center">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-normal "
-                            >
-                              {pageIndex + 1 || ""}
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex items-center justify-center">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-normal "
-                            >
-                              {data?.name || ""}
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex items-center justify-center">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-normal "
-                            >
-                              {data?.tell || ""}
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex items-center justify-center ">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-normal "
-                            >
-                              {data?.address || ""}
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex justify-center  px-3 gap-2">
-                            <IconButton
-                              variant="outlined"
-                              size="sm"
-                              onClick={() => handleModalEdit(data)}
-                            >
-                              <FaRegEdit className="h-5 w-5  text-yellow-700 " />
-                            </IconButton>
+                  return (
+                    <tr key={index}>
+                      <td className={classes}>
+                        <div className="flex items-center justify-center">
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal "
+                          >
+                            {pageIndex + 1 || ""}
+                          </Typography>
+                        </div>
+                      </td>
+                      <td className={classes}>
+                        <div className="flex items-center justify-center">
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal "
+                          >
+                            {data?.name || ""}
+                          </Typography>
+                        </div>
+                      </td>
+                      <td className={classes}>
+                        <div className="flex items-center justify-center">
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal "
+                          >
+                            {data?.tell || ""}
+                          </Typography>
+                        </div>
+                      </td>
+                      <td className={classes}>
+                        <div className="flex items-center justify-center ">
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal "
+                          >
+                            {data?.address || ""}
+                          </Typography>
+                        </div>
+                      </td>
+                      <td className={classes}>
+                        <div className="flex justify-center  px-3 gap-2">
+                          <IconButton
+                            variant="outlined"
+                            size="sm"
+                            onClick={() => handleModalEdit(data)}
+                          >
+                            <FaRegEdit className="h-5 w-5  text-yellow-700 " />
+                          </IconButton>
 
-                            <IconButton
-                              variant="outlined"
-                              color="blue"
-                              size="sm"
-                              onClick={() => handleModalDelete(data)}
-                            >
-                              <IoTrashBin className="h-5 w-5  text-red-700 " />
-                            </IconButton>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              )}
-            </table>
-          </div>
-          <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-            <Button
-              variant="outlined"
-              size="sm"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-            >
-              ก่อนหน้า
-            </Button>
-            <div className="flex items-center gap-2">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <IconButton
-                  key={i}
-                  variant="outlined"
-                  size="sm"
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={
-                    currentPage === i + 1 ? "bg-purple-400 text-white" : ""
-                  }
-                >
-                  {i + 1}
-                </IconButton>
-              ))}
-            </div>
-            <Button
-              variant="outlined"
-              size="sm"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-            >
-              ถัดไป
-            </Button>
-          </CardFooter>
+                          <IconButton
+                            variant="outlined"
+                            color="blue"
+                            size="sm"
+                            onClick={() => handleModalDelete(data)}
+                          >
+                            <IoTrashBin className="h-5 w-5  text-red-700 " />
+                          </IconButton>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            )}
+          </table>
         </Card>
       </div>
 

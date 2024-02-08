@@ -8,8 +8,8 @@ function Database() {
 
   return (
     <div>
-      <Card className="w-full h-[86vh] overflow-auto  px-3">
-        <div className="w-ful " >
+      <Card className="w-full h-[86vh]  px-3">
+        <div className="w-full " >
           <div className=" item-center mt-5 flex w-full flex-col gap-2  lg:flex-row">
             <div className="flex  flex-col gap-10   sm:flex-row  ">
               <div className="flex  flex-col justify-center gap-5 sm:flex-row lg:gap-20  ">
@@ -47,12 +47,12 @@ function Database() {
             </div>
           </div>
           {activeCustomerMenu === "menu1" && (
-            <div className="w-full mt-5 ">
+            <div className="w-full mt-5 overflow-auto ">
               <Customer />
             </div>
           )}
           {activeCustomerMenu === "menu2" && (
-            <div className="w-full mt-5 ">
+            <div className="w-full mt-5 overflow-auto">
               <Location />
             </div>
           )}
