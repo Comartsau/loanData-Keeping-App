@@ -30,11 +30,20 @@ import { useRecoilState, useRecoilValue } from "recoil";
 
 import { locationStore, customerStore } from "../../../store/Store";
 
-import { FaRegSave } from "react-icons/fa";
+import { FaRegSave, FaExchangeAlt } from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle, BsFillEyeFill } from "react-icons/bs";
 
-import { getProcess, addProcess, getUpdateAll , getProcessUser , userUpdate } from "../../../api/ProcessApi";
+import {
+  getProcess,
+  addProcess,
+  getUpdateAll,
+  getProcessUser,
+  userUpdate,
+  getProcessUserList,
+  changeStatus,
+  getProcessUserListSum,
+} from "../../../api/ProcessApi";
 import { getCustomer } from "../../../api/customerApi";
 
 const Process = () => {
@@ -42,10 +51,9 @@ const Process = () => {
   const [listData, setListData] = useState([]);
   const [dataProcessId, setDataProcessId] = useState([]);
   const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
-  const [sumUser ,setSumUser] = useState([])
-  const [status, setStatus] = useState("0");
+  const [sumUser, setSumUser] = useState([]);
   const [cardId, setCardId] = useState("");
-  
+
   const [listDataCustomer, setListDataCustomer] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
   const [isClearable, setIsClearable] = useState(true);
@@ -91,34 +99,6 @@ const Process = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
-  const fetchUpdateAll = async (processId) => {
-    try {
-      const response = await getUpdateAll(processId);
-      // console.log(response);
-      setDataProcessId(response);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchStatus = async () => {
-    try {
-      const response = await getProcessUser(cardId , status);
-      console.log(response);
-      setListDataCustomer(response)
-      setSumUser(response)
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    if(cardId) {
-      fetchStatus();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardId]);
-
   const fetchCustomer = async () => {
     try {
       const response = await getCustomer(searchQuery);
@@ -130,8 +110,60 @@ const Process = () => {
 
   useEffect(() => {
     fetchCustomer();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchUpdateAll = async (processId) => {
+    try {
+      const response = await getUpdateAll(processId);
+      // console.log(response);
+      setDataProcessId(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchStatus = async (statused) => {
+    try {
+      const response = await getProcessUser(cardId, statused);
+      console.log(response);
+      setListDataCustomer(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (cardId) {
+      fetchStatus(" ");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cardId]);
+
+  const [userId, setUserId] = useState("");
+
+  const fetchUserList = async (id) => {
+    try {
+      setUserId(id);
+      const response = await getProcessUserList(id);
+      console.log(response);
+      setSumUser(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const [userListSum, setUserListSum] = useState([]);
+
+  const fetchUserListSum = async (id) => {
+    try {
+      const response = await getProcessUserListSum(id);
+      console.log(response);
+      setUserListSum(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
   const [currentPage, setCurrentPage] = useState(1);
@@ -201,7 +233,7 @@ const Process = () => {
     );
     // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
     setSelectedCustomer(customer);
-    setSelectedValue(e)
+    setSelectedValue(e);
   };
 
   const [selectCard, setSelectCard] = useState([]);
@@ -210,7 +242,7 @@ const Process = () => {
   const handleSelectCard = async (item) => {
     setOpenModalProcess(!openModalProcess);
     setSelectCard(item);
-    setCardId(item?.id)
+    setCardId(item?.id);
     await fetchUpdateAll(item?.id);
   };
 
@@ -253,42 +285,63 @@ const Process = () => {
         user_id: selectedCustomer?.id,
         price: Number(amount),
         count_day: Number(amountDate),
-        start_day: startDate ,
-        end_day: startEnd ,
+        start_day: startDate,
+        end_day: startEnd,
       };
 
-      const response = await userUpdate(data)
-      console.log(response)
-      setAmountDate(0)
-      setAmount(0)
-      setSearchQueryStart(new Date())
-      setSearchQueryEnd(new Date())
-      setSelectedValue(null)
+      const response = await userUpdate(data);
+      console.log(response);
+      setAmountDate(0);
+      setAmount(0);
+      setSearchQueryStart(new Date());
+      setSearchQueryEnd(new Date());
+      setSelectedValue(null);
       if (response == undefined) {
         toast.error("ไม่สามารถเพิ่มหรืออัพเดรท ลูกค้า ได้");
       } else {
         toast.success("เพิ่ม/อัพเดรทข้อมูล ลูกค้า สำเร็จ");
-        fetchStatus() 
+        fetchStatus();
       }
     } catch (error) {
-      console.log(error)
-      
+      console.log(error);
     }
-  }
+  };
 
   // const startDate = moment(searchQueryStart).format("DD-MM-YYYY");
   // const startEnd = moment(searchQueryEnd).format("DD-MM-YYYY");
 
-  const startDate = moment(searchQueryStart).add(543, 'years').format('DD-MM-YYYY');
-  const startEnd = moment(searchQueryEnd).add(543, 'years').format('DD-MM-YYYY');
+  // const startDate = moment(searchQueryStart).add(543, 'years').format('YYYY-MM-DD')
+  const startDate = moment(searchQueryStart).format("YYYY-MM-DD");
+  const startEnd = moment(searchQueryEnd).format("YYYY-MM-DD");
 
-  console.log(cardId)
-  console.log(selectedCustomer)
-  console.log(amount)
-  console.log(amountDate)
-  console.log(startDate)
-  console.log(startEnd)
+  const [userListData, setUserListData] = useState([]);
 
+  const handleChangeStatus = async (changestatus, dataed) => {
+    console.log(dataed);
+    try {
+      let data = {
+        id: dataed?.id,
+        status: changestatus,
+        price: dataed?.price,
+        process_user_id: userId,
+        process_id: cardId,
+      };
+
+      console.log(data);
+
+      const response = await changeStatus(data);
+      console.log(response);
+      if (response == undefined) {
+        toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
+      } else {
+        toast.success("เปลี่ยนสถานะ สำเร็จ");
+        fetchUserList(userId);
+      }
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+  console.log(userListData);
   return (
     <Card>
       <div className="flex flex-col w-full mt-5 ">
@@ -539,7 +592,7 @@ const Process = () => {
                         selected={searchQueryStart}
                         locale={th}
                         dateFormat="เริ่มต้น dd/MM/yyyy"
-                        onChange={handleSearchQueryStartChange} 
+                        onChange={handleSearchQueryStartChange}
                         className="w-full rounded-md border border-gray-400 p-2 text-gray-600  shadow-sm focus:border-blue-500 focus:outline-none"
                       />
                     </div>
@@ -633,34 +686,50 @@ const Process = () => {
                     <Button
                       size="lg"
                       variant="outlined"
+                      className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
+                        activeCustomerMenu === "menu1"
+                          ? " bg-blue-300 "
+                          : "bg-blue-100"
+                      }`}
+                      onClick={() => [
+                        setActiveCustomerMenu("menu1"),
+                        fetchStatus(""),
+                      ]}
+                    >
+                      ทั้งหมด
+                    </Button>
+                  </div>
+                  <div className=" justify-center">
+                    <Button
+                      size="lg"
+                      variant="outlined"
                       className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400 `}
                       style={{
                         backgroundColor:
-                          activeCustomerMenu === "menu1"
+                          activeCustomerMenu === "menu2"
                             ? "#FFEB3B"
                             : "#ebdb6b",
                       }}
                       onClick={() => [
-                        setActiveCustomerMenu("menu1"),
-                        setStatus("0"),
+                        setActiveCustomerMenu("menu2"),
+                        fetchStatus(0),
                       ]}
                     >
                       กำลังจ่าย
                     </Button>
                   </div>
-
                   <div className=" justify-center">
                     <Button
                       size="lg"
                       variant="outlined"
                       className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                        activeCustomerMenu === "menu2"
+                        activeCustomerMenu === "menu3"
                           ? " bg-green-500 text-white"
                           : "bg-green-300 text-white"
                       }`}
                       onClick={() => [
-                        setActiveCustomerMenu("menu2"),
-                        setStatus("1"),
+                        setActiveCustomerMenu("menu3"),
+                        fetchStatus(1),
                       ]}
                     >
                       จ่ายครบแล้ว
@@ -671,13 +740,13 @@ const Process = () => {
                       size="lg"
                       variant="outlined"
                       className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                        activeCustomerMenu === "menu3"
+                        activeCustomerMenu === "menu4"
                           ? " bg-red-500 text-white"
                           : "bg-red-300 text-white"
                       }`}
                       onClick={() => [
-                        setActiveCustomerMenu("menu3"),
-                        setStatus("2"),
+                        setActiveCustomerMenu("menu4"),
+                        fetchStatus(2),
                       ]}
                     >
                       ลูกค้าเสีย
@@ -779,14 +848,13 @@ const Process = () => {
                           </tbody>
                         ) : (
                           <tbody>
-                             {displayedData?.map((data, index) => {
-                                const isLast =
-                                  index === displayedData?.length ;
-                                const classes = isLast
-                                  ? "p-2"
-                                  : `p-3 border-b border-blue-gray-50 ${
-                                      index === activeRow ? "bg-gray-300" : ""
-                                    }`;
+                            {displayedData?.map((data, index) => {
+                              const isLast = index === displayedData?.length;
+                              const classes = isLast
+                                ? "p-2"
+                                : `p-3 border-b border-blue-gray-50 ${
+                                    index === activeRow ? "bg-gray-300" : ""
+                                  }`;
                               return (
                                 <tr key={index}>
                                   <td className={classes}>
@@ -866,12 +934,20 @@ const Process = () => {
                                             ? "bg-yellow-300 bg-opacity-60 px-3  rounded-lg "
                                             : data?.status == "1"
                                             ? "bg-green-300  bg-opacity-60 px-3  rounded-lg"
-                                            : data?.status == "2"
-                                            ? "bg-red-300  bg-opacity-60 px-3   rounded-lg"
+                                            : data?.status == "3"
+                                            ? "bg-purple-500  bg-opacity-60 px-3   rounded-lg"
                                             : ""
                                         } `}
                                       >
-                                        {data?.status == 0 ? "กำลังจ่าย" : data?.status == 1 ? "จ่ายแล้ว" :  data?.status == 2 ? "ลูกค้าเสีย" : '' }
+                                        {data?.status == 0
+                                          ? "กำลังจ่าย"
+                                          : data?.status == 1
+                                          ? "จ่ายครบแล้ว"
+                                          : data?.status == 2
+                                          ? "จ่ายแล้ว"
+                                          : data?.status == 3
+                                          ? "รียอด"
+                                          : ""}
                                       </Typography>
                                     </div>
                                   </td>
@@ -882,7 +958,12 @@ const Process = () => {
                                         color="blue"
                                         size="sm"
                                         className="ml-3 "
-                                        onClick={() => [setActiveRow(index) , setSumUser(data)]}
+                                        onClick={() => [
+                                          setActiveRow(index),
+                                          fetchUserList(data?.id),
+                                          setUserListData(data),
+                                          fetchUserListSum(data.id),
+                                        ]}
                                       >
                                         <BsFillEyeFill className="h-5 w-5  text-light-blue-700 " />
                                       </IconButton>
@@ -954,7 +1035,7 @@ const Process = () => {
                               </th>
                             </tr>
                           </thead>
-                          {listDataCustomer?.length == 0 ? (
+                          {sumUser?.length == 0 ? (
                             <tbody>
                               <tr>
                                 <td colSpan={8}>
@@ -966,9 +1047,8 @@ const Process = () => {
                             </tbody>
                           ) : (
                             <tbody>
-                              {displayedData?.map((data, index) => {
-                                const isLast =
-                                  index === displayedData?.length - 1;
+                              {sumUser?.map((data, index) => {
+                                const isLast = index === sumUser?.length;
                                 const pageIndex = startIndex + index;
                                 const classes = isLast
                                   ? "p-2"
@@ -995,7 +1075,7 @@ const Process = () => {
                                           color="blue-gray"
                                           className="font-normal"
                                         >
-                                          {data?.name}
+                                          {data?.date}
                                         </Typography>
                                       </div>
                                     </td>
@@ -1006,7 +1086,7 @@ const Process = () => {
                                           color="blue-gray"
                                           className="font-normal "
                                         >
-                                          {data?.eDate || ""}
+                                          {data?.price || ""}
                                         </Typography>
                                       </div>
                                     </td>
@@ -1016,16 +1096,18 @@ const Process = () => {
                                           variant="small"
                                           color="blue-gray"
                                           className={`font-normal ${
-                                            data?.status == "กำลังจ่าย"
-                                              ? "bg-yellow-300 bg-opacity-60 px-3   rounded-lg "
-                                              : data?.status == "จ่ายครบ"
-                                              ? "bg-green-300 bg-opacity-60 px-3   rounded-lg"
-                                              : data?.status == "ลูกค้าเสีย"
+                                            data?.status == "0"
+                                              ? "bg-green-300 bg-opacity-60 px-3   rounded-lg "
+                                              : data?.status == "1"
                                               ? "bg-red-300 bg-opacity-60 px-3   rounded-lg"
                                               : ""
                                           } `}
                                         >
-                                          {data?.status || ""}
+                                          {data?.status == 0
+                                            ? "จ่ายแล้ว"
+                                            : data?.status == 1
+                                            ? "ยังไม่จ่าย"
+                                            : ""}
                                         </Typography>
                                       </div>
                                     </td>
@@ -1036,10 +1118,19 @@ const Process = () => {
                                           color="blue"
                                           size="sm"
                                           className="ml-3 "
-                                          // onClick={() => handleModalView(data)}
-                                          onClick={() => setActiveRow2(index)}
+                                          onClick={() => [
+                                            setActiveRow2(index),
+                                            handleChangeStatus(
+                                              data?.status == 0
+                                                ? 1
+                                                : data?.status == 1
+                                                ? 0
+                                                : "",
+                                              data
+                                            ),
+                                          ]}
                                         >
-                                          <BsFillEyeFill className="h-5 w-5  text-light-blue-700 " />
+                                          <FaExchangeAlt className="h-5 w-5  text-light-blue-700 " />
                                         </IconButton>
                                       </div>
                                     </td>
@@ -1058,22 +1149,35 @@ const Process = () => {
                   >
                     <div className="gap-3  p-3">
                       <Typography className="text-xl font-bold">
-                        ยอดรวม ({sumUser?.name})
+                        ยอดรวม ({userListData?.name})
                       </Typography>
                       <Typography className=" font-bold mt-5">
-                        ยอดรวม (ทั้งหมด): <sapn> {Number(sumUser?.total).toLocaleString() == "NaN"
-                          ? 0
-                          : Number(sumUser?.total).toLocaleString()}</sapn> บาท
+                        ยอดรวม (ทั้งหมด):{" "}
+                        <sapn>
+                          {" "}
+                          {Number(sumUser?.total).toLocaleString() == "NaN"
+                            ? 0
+                            : Number(sumUser?.total).toLocaleString()}
+                        </sapn>{" "}
+                        บาท
                       </Typography>
                       <Typography className=" font-bold mt-3">
-                        ชำระแล้ว (ทั้งหมด): <sapn>{Number(sumUser?.paid).toLocaleString() == "NaN"
-                          ? 0
-                          : Number(sumUser?.paid).toLocaleString()}</sapn> บาท
+                        ชำระแล้ว (ทั้งหมด):{" "}
+                        <sapn>
+                          {Number(sumUser?.paid).toLocaleString() == "NaN"
+                            ? 0
+                            : Number(sumUser?.paid).toLocaleString()}
+                        </sapn>{" "}
+                        บาท
                       </Typography>
                       <Typography className=" font-bold mt-3">
-                        ค้างชำระ (ทั้งหมด): <sapn>{Number(sumUser?.overdue).toLocaleString() == "NaN"
-                          ? 0
-                          : Number(sumUser?.overdue).toLocaleString()}</sapn> บาท
+                        ค้างชำระ (ทั้งหมด):{" "}
+                        <sapn>
+                          {Number(sumUser?.overdue).toLocaleString() == "NaN"
+                            ? 0
+                            : Number(sumUser?.overdue).toLocaleString()}
+                        </sapn>{" "}
+                        บาท
                       </Typography>
                     </div>
                   </div>
@@ -1087,7 +1191,13 @@ const Process = () => {
             variant="text"
             color="red"
             size="sm"
-            onClick={() => [setOpenModalProcess(false), setDataProcessId([]) , setActiveRow()]}
+            onClick={() => [
+              setOpenModalProcess(false),
+              setDataProcessId([]),
+              setActiveRow(),
+              setSumUser([]),
+              setUserId(""),
+            ]}
             className="flex mr-1 text-base"
           >
             <span className="text-xl mr-2">

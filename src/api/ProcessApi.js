@@ -84,11 +84,63 @@ export const getProcessUser = async (id, status) => {
   }
 };
 
+
+export const getProcessUserList = async (id) => {
+  try {
+    // let token = localStorage.getItem("Token")
+    const response = await axios.get(
+      `${
+        import.meta.env.VITE_APP_API
+      }/api/process/user/list?process_user_id=${id}`,
+      {
+        ...HeaderAPI(localStorage.getItem("Token")),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+export const getProcessUserListSum = async (id) => {
+  try {
+    // let token = localStorage.getItem("Token")
+    const response = await axios.get(
+      `${
+        import.meta.env.VITE_APP_API
+      }/api/process/user/update?id=${id}`,
+      {
+        ...HeaderAPI(localStorage.getItem("Token")),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const userUpdate = async (data) => {
   console.log(data);
   try {
     const response = await axios.post(
       `${import.meta.env.VITE_APP_API}/api/process/user`,
+      data,
+      {
+        ...HeaderAPI(localStorage.getItem("Token")),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const changeStatus = async (data) => {
+  console.log(data);
+  try {
+    const response = await axios.put(
+      `${import.meta.env.VITE_APP_API}/api/process/user/list`,
       data,
       {
         ...HeaderAPI(localStorage.getItem("Token")),
