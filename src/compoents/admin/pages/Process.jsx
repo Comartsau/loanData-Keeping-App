@@ -37,6 +37,8 @@ import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle, BsFillEyeFill } from "react-icons/bs";
 import { IoIosSave } from "react-icons/io";
 import { TbReload } from "react-icons/tb";
+import { MdSmsFailed } from "react-icons/md";
+import { CiLogout } from "react-icons/ci";
 
 import {
   getProcess,
@@ -47,6 +49,8 @@ import {
   getProcessUserList,
   changeStatus,
   getProcessUserListSum,
+  sendUpdate,
+  sendReload,
 } from "../../../api/ProcessApi";
 import { getCustomer } from "../../../api/customerApi";
 
@@ -60,21 +64,22 @@ const Process = () => {
 
   const [listDataCustomer, setListDataCustomer] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
-  const [isClearable, setIsClearable] = useState(true);
+  // const [isClearable, setIsClearable] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeRow, setActiveRow] = useState();
   const [activeRow2, setActiveRow2] = useState(0);
 
-  const [selectedShop, setSelectedShop] = useState(null);
   const [selectDisable, setSelectDisable] = useState(0);
 
-  const handleShopSelect = (e) => {
-    // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
-    const shop = shopDataStore.find((shop) => shop.id === e.value);
-    // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
-    // console.log(shop);
-    setSelectedShop(shop);
-  };
+  // const [selectedShop, setSelectedShop] = useState(null);
+
+  // const handleShopSelect = (e) => {
+  // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
+  // const shop = shopDataStore.find((shop) => shop.id === e.value);
+  // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
+  // console.log(shop);
+  // setSelectedShop(shop);
+  // };
 
   const [customerDataStore, setCustomerDataStore] =
     useRecoilState(customerStore);
@@ -185,6 +190,7 @@ const Process = () => {
   const [openModalAddProcess, setOpenModalAddProcess] = useState(false);
   const [openModalConfirm, setOpenModalConfirm] = useState(false);
   const [openModalReload, setOpenModalReload] = useState(false);
+  const [openModalDataReload, setOpenModalDataReload] = useState(false);
 
   const handleModalAddProcess = () => {
     setOpenModalAddProcess(!openModalAddProcess);
@@ -197,6 +203,10 @@ const Process = () => {
 
   const handleModalReload = () => {
     setOpenModalReload(!openModalReload);
+  };
+
+  const handleModalDataReload = () => {
+    setOpenModalDataReload(!openModalDataReload);
     // setOpenModalAddProcess(false);
   };
 
@@ -335,11 +345,60 @@ const Process = () => {
       };
 
       const response = await changeStatus(data);
+      if (response == undefined) {
+        toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
+      } else {
+        toast.success("เปลี่ยนสถานะ สำเร็จ");
+        fetchUserList(userId);
+        fetchUserListSum(userId);
+      }
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      let data = {
+        id: userId,
+        status: 2,
+      };
+
+      const response = await sendUpdate(data);
       console.log(response);
       if (response == undefined) {
         toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
       } else {
         toast.success("เปลี่ยนสถานะ สำเร็จ");
+        fetchUserList(userId);
+        fetchUserListSum(userId);
+        fetchStatus("");
+      }
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  console.log(userListData);
+  const [returnReload, setReturnReload] = useState([]);
+
+  const handleReload = async () => {
+    try {
+      let data = {
+        process_user_id: userId,
+        process_id: cardId,
+        price: userListData?.price,
+        count_day: userListData?.count_day,
+      };
+
+      const response = await sendReload(data);
+      console.log(response);
+      if (response == undefined) {
+        toast.error("รีโหลด ไม่สำเร็จ");
+      } else {
+        toast.success("รีโหลด สำเร็จ");
+        setReturnReload(response);
+        handleModalDataReload();
         fetchUserList(userId);
         fetchUserListSum(userId);
       }
@@ -545,6 +604,7 @@ const Process = () => {
                         setAmountDate(0),
                         setSearchQueryStart(new Date()),
                         setSearchQueryEnd(new Date()),
+                        setUserListData([]),
                       ]}
                     >
                       <span className="mr-2 text-xl">
@@ -634,6 +694,7 @@ const Process = () => {
                       size="sm"
                       variant="gradient"
                       color="purple"
+                      disabled={userListData?.status == 0 ? false : true}
                       className="text-base flex justify-center  items-center w-full   bg-green-500"
                       onClick={handleModalReload}
                     >
@@ -664,11 +725,12 @@ const Process = () => {
                       size="sm"
                       variant="gradient"
                       color="purple"
+                      disabled={userListData.status == 0 ? false : true}
                       className="text-base flex justify-center  items-center w-full   bg-green-500"
-                      // onClick={handleout}
+                      onClick={handleUpdate}
                     >
                       <span className="mr-2 text-xl ">
-                        {/* <TbLogout2 /> */}
+                        <MdSmsFailed />
                       </span>
                       อัพเดท
                     </Button>
@@ -717,45 +779,44 @@ const Process = () => {
                 <div className=" flex flex-col xl:flex-row  items-center sm:items-start  w-full justify-center md:justify-start    gap-5  ">
                   <div className="flex flex-col  xl:flex-row gap-5">
                     <div className="flex gap-5">
-                    <div className=" justify-center">
-                      <Button
-                        size="lg"
-                        variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                          activeCustomerMenu === "menu1"
-                            ? " bg-blue-300 "
-                            : "bg-blue-100"
-                        }`}
-                        onClick={() => [
-                          setActiveCustomerMenu("menu1"),
-                          fetchStatus(""),
-                        ]}
-                      >
-                        ทั้งหมด
-                      </Button>
-                    </div>
-                    <div className=" justify-center">
-                      <Button
-                        size="lg"
-                        variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400 `}
-                        style={{
-                          backgroundColor:
-                            activeCustomerMenu === "menu2"
-                              ? "#FFEB3B"
-                              : "#ebdb6b",
-                        }}
-                        onClick={() => [
-                          setActiveCustomerMenu("menu2"),
-                          fetchStatus(0),
-                        ]}
-                      >
-                        กำลังจ่าย
-                      </Button>
+                      <div className=" justify-center">
+                        <Button
+                          size="lg"
+                          variant="outlined"
+                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
+                            activeCustomerMenu === "menu1"
+                              ? " bg-blue-300 "
+                              : "bg-blue-100"
+                          }`}
+                          onClick={() => [
+                            setActiveCustomerMenu("menu1"),
+                            fetchStatus(""),
+                          ]}
+                        >
+                          ทั้งหมด
+                        </Button>
+                      </div>
+                      <div className=" justify-center">
+                        <Button
+                          size="lg"
+                          variant="outlined"
+                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400 `}
+                          style={{
+                            backgroundColor:
+                              activeCustomerMenu === "menu2"
+                                ? "#FFEB3B"
+                                : "#ebdb6b",
+                          }}
+                          onClick={() => [
+                            setActiveCustomerMenu("menu2"),
+                            fetchStatus(0),
+                          ]}
+                        >
+                          กำลังจ่าย
+                        </Button>
+                      </div>
                     </div>
 
-                    </div>
-              
                     <div className="flex gap-5">
                       <div className=" justify-center">
                         <Button
@@ -794,7 +855,7 @@ const Process = () => {
                     </div>
                   </div>
                 </div>
-                <div >
+                <div>
                   <Card
                     className="w-full  h-[45vh] p-2 "
                     style={{ border: "3px solid black" }}
@@ -975,6 +1036,8 @@ const Process = () => {
                                             ? "bg-yellow-300 bg-opacity-60 px-3  rounded-lg "
                                             : data?.status == "1"
                                             ? "bg-green-300  bg-opacity-60 px-3  rounded-lg"
+                                            : data?.status == "2"
+                                            ? "bg-red-500  bg-opacity-60 px-3   rounded-lg"
                                             : data?.status == "3"
                                             ? "bg-purple-500  bg-opacity-60 px-3   rounded-lg"
                                             : ""
@@ -985,7 +1048,7 @@ const Process = () => {
                                           : data?.status == 1
                                           ? "จ่ายครบแล้ว"
                                           : data?.status == 2
-                                          ? "จ่ายแล้ว"
+                                          ? "ลูกค้าเสีย"
                                           : data?.status == 3
                                           ? "รียอด"
                                           : ""}
@@ -1274,6 +1337,7 @@ const Process = () => {
               setAmountDate(0),
               setSearchQueryStart(new Date()),
               setSearchQueryEnd(new Date()),
+              setUserListData([]),
             ]}
             className="flex mr-1 text-base"
           >
@@ -1293,7 +1357,7 @@ const Process = () => {
         className="h-[20vh] "
       >
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">ยืนยันการสร้าง</Typography>
+          <Typography variant="h5">ยืนยันการรีโหลด</Typography>
         </DialogHeader>
         <DialogFooter className="flex justify-center gap-5 mt-3">
           <Button
@@ -1312,13 +1376,46 @@ const Process = () => {
             size="sm"
             variant="gradient"
             color="purple"
-            onClick={handleAddProcess}
+            onClick={handleReload}
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
               <FaRegSave />
             </span>
             บันทึก
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      {/* modal Show reload  */}
+      <Dialog
+        open={openModalDataReload}
+        handler={handleModalDataReload}
+        size="md"
+        className="h-[40vh] "
+      >
+        <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
+          <Typography variant="h5">ยืนยันการสร้าง</Typography>
+        </DialogHeader>
+           <DialogBody divider className=" h-[20vh]">
+          <div className=" w-full  flex flex-col text-center justify-center mt-3 gap-3 ">
+            <Typography className=" text-xl font-bold">ยอดกู้ใหม่ <span>{Number(returnReload?.newSum).toLocaleString()}</span> บาท</Typography>
+            <Typography className=" text-xl font-bold">หักจากยอดเก่าคงเหลือ <span>{Number(returnReload?.mySum).toLocaleString()}</span> บาท</Typography>
+            <Typography className=" text-xl font-bold">หักค่าเอกสาร และหักงวดแรก คงเหลือ <span>{Number(returnReload?.totalSum).toLocaleString()}</span> บาท</Typography>
+          </div>
+        </DialogBody>
+        <DialogFooter  className="flex justify-center gap-5 mt-3">
+          <Button
+            size="sm"
+            variant="gradient"
+            color="gray"
+            onClick={handleModalDataReload}
+            className="flex text-base mr-1"
+          >
+            <span className="mr-2 text-xl">
+            <CiLogout />
+            </span>
+            ปิด
           </Button>
         </DialogFooter>
       </Dialog>
