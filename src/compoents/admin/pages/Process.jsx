@@ -24,6 +24,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import moment from "moment/min/moment-with-locales";
 
+import { parse, addYears } from "date-fns";
+
 import { useEffect, useState } from "react";
 
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -33,6 +35,8 @@ import { locationStore, customerStore } from "../../../store/Store";
 import { FaRegSave, FaExchangeAlt } from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle, BsFillEyeFill } from "react-icons/bs";
+import { IoIosSave } from "react-icons/io";
+import { TbReload } from "react-icons/tb";
 
 import {
   getProcess,
@@ -62,6 +66,7 @@ const Process = () => {
   const [activeRow2, setActiveRow2] = useState(0);
 
   const [selectedShop, setSelectedShop] = useState(null);
+  const [selectDisable, setSelectDisable] = useState(0);
 
   const handleShopSelect = (e) => {
     // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
@@ -146,7 +151,6 @@ const Process = () => {
     try {
       setUserId(id);
       const response = await getProcessUserList(id);
-      console.log(response);
       setSumUser(response);
     } catch (error) {
       console.error(error);
@@ -158,7 +162,6 @@ const Process = () => {
   const fetchUserListSum = async (id) => {
     try {
       const response = await getProcessUserListSum(id);
-      console.log(response);
       setUserListSum(response);
     } catch (error) {
       console.error(error);
@@ -181,13 +184,20 @@ const Process = () => {
 
   const [openModalAddProcess, setOpenModalAddProcess] = useState(false);
   const [openModalConfirm, setOpenModalConfirm] = useState(false);
+  const [openModalReload, setOpenModalReload] = useState(false);
 
   const handleModalAddProcess = () => {
     setOpenModalAddProcess(!openModalAddProcess);
   };
+
   const handleModalConfirm = () => {
     setOpenModalConfirm(!openModalConfirm);
     setOpenModalAddProcess(false);
+  };
+
+  const handleModalReload = () => {
+    setOpenModalReload(!openModalReload);
+    // setOpenModalAddProcess(false);
   };
 
   const handleAddProcess = async () => {
@@ -227,6 +237,7 @@ const Process = () => {
   const [selectedValue, setSelectedValue] = useState(null);
 
   const handleCustomerSelect = (e) => {
+    console.log(e);
     // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
     const customer = customerDataStore.find(
       (customer) => customer.id === e.value
@@ -307,9 +318,6 @@ const Process = () => {
     }
   };
 
-  // const startDate = moment(searchQueryStart).format("DD-MM-YYYY");
-  // const startEnd = moment(searchQueryEnd).format("DD-MM-YYYY");
-
   // const startDate = moment(searchQueryStart).add(543, 'years').format('YYYY-MM-DD')
   const startDate = moment(searchQueryStart).format("YYYY-MM-DD");
   const startEnd = moment(searchQueryEnd).format("YYYY-MM-DD");
@@ -317,7 +325,6 @@ const Process = () => {
   const [userListData, setUserListData] = useState([]);
 
   const handleChangeStatus = async (changestatus, dataed) => {
-    console.log(dataed);
     try {
       let data = {
         id: dataed?.id,
@@ -327,8 +334,6 @@ const Process = () => {
         process_id: cardId,
       };
 
-      console.log(data);
-
       const response = await changeStatus(data);
       console.log(response);
       if (response == undefined) {
@@ -336,12 +341,13 @@ const Process = () => {
       } else {
         toast.success("เปลี่ยนสถานะ สำเร็จ");
         fetchUserList(userId);
+        fetchUserListSum(userId);
       }
     } catch (error) {
       toast.error(error);
     }
   };
-  console.log(userListData);
+
   return (
     <Card>
       <div className="flex flex-col w-full mt-5 ">
@@ -517,9 +523,9 @@ const Process = () => {
 
       <Dialog open={openModalProcess} size="xxl">
         <DialogBody divider className=" h-[90vh]   overflow-auto">
-          <div className="flex  flex-col  overflow-auto   items-center ">
+          <div className="flex   flex-col  overflow-auto   items-center ">
             <div className="flex w-full flex-col md:flex-row gap-5 ">
-              <div className="flex flex-col w-full h-[85vh]   md:w-3/12 ">
+              <div className="flex flex-col w-full h-[85vh] md:w-4/12 xl:w-4/12 ">
                 <div className="flex  items-center gap-3">
                   <div>
                     <Typography className="text-lg lg:text-xl font-bold">
@@ -532,7 +538,14 @@ const Process = () => {
                       variant="gradient"
                       color="green"
                       className="text-base flex justify-center  items-center   bg-green-500"
-                      // onClick={handleModalAdd}
+                      onClick={() => [
+                        setSelectDisable(0),
+                        setSelectedValue(null),
+                        setAmount(0),
+                        setAmountDate(0),
+                        setSearchQueryStart(new Date()),
+                        setSearchQueryEnd(new Date()),
+                      ]}
                     >
                       <span className="mr-2 text-xl">
                         <BsPlusCircle />
@@ -545,9 +558,11 @@ const Process = () => {
                   <Select
                     classNamePrefix="select"
                     placeholder="เลือกลูกค้า"
-                    isClearable={isClearable}
+                    // isClearable={isClearable}
                     isSearchable={isSearchable}
+                    isDisabled={selectDisable}
                     value={selectedValue}
+                    // value={{ value: selectedCustomer?.id, label: selectedCustomer?.name }}
                     name="color"
                     options={customerOptions}
                     onChange={(e) => handleCustomerSelect(e)}
@@ -560,6 +575,7 @@ const Process = () => {
                         type="number"
                         min={0}
                         value={amount}
+                        disabled={selectDisable}
                         className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
                         style={{ backgroundColor: "rgb(244,244,244)" }}
                         onChange={(e) => setAmount(e.target.value)}
@@ -575,6 +591,7 @@ const Process = () => {
                         type="number"
                         min={0}
                         value={amountDate}
+                        disabled={selectDisable}
                         className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
                         style={{ backgroundColor: "rgb(244,244,244)" }}
                         onChange={handleDaysToAddChange}
@@ -590,6 +607,7 @@ const Process = () => {
                     <div className=" relative w-full min-w-[100px] h-10">
                       <DatePicker
                         selected={searchQueryStart}
+                        disabled={selectDisable}
                         locale={th}
                         dateFormat="เริ่มต้น dd/MM/yyyy"
                         onChange={handleSearchQueryStartChange}
@@ -615,14 +633,14 @@ const Process = () => {
                     <Button
                       size="sm"
                       variant="gradient"
-                      color="gray"
+                      color="purple"
                       className="text-base flex justify-center  items-center w-full   bg-green-500"
-                      // onClick={handleout}
+                      onClick={handleModalReload}
                     >
                       <span className="mr-2 text-xl ">
-                        {/* <TbLogout2 /> */}
+                        <TbReload />
                       </span>
-                      ออก
+                      รียอด
                     </Button>
                   </div>
                   <div className="w-full">
@@ -630,20 +648,35 @@ const Process = () => {
                       size="sm"
                       variant="gradient"
                       color="green"
+                      disabled={selectDisable}
                       className="text-base flex justify-center  items-center  w-full  bg-green-500"
                       // disabled={openPrint == true ? true : false}
                       onClick={handleUser}
                     >
                       <span className="mr-2 text-xl ">
-                        {/* <IoIosSave /> */}
+                        <IoIosSave />
                       </span>
                       บันทึก
                     </Button>
                   </div>
+                  <div className="w-full ">
+                    <Button
+                      size="sm"
+                      variant="gradient"
+                      color="purple"
+                      className="text-base flex justify-center  items-center w-full   bg-green-500"
+                      // onClick={handleout}
+                    >
+                      <span className="mr-2 text-xl ">
+                        {/* <TbLogout2 /> */}
+                      </span>
+                      อัพเดท
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex w-full flex-col h-full   justify-center md:justify-end   ">
+                <div className="flex w-full flex-col h-full mt-5 lg:mt-0  justify-center md:justify-end   ">
                   <div
-                    className="p-3 md:h-[210px] items-center   "
+                    className="p-3  md:h-[260px] lg:h-[210px] items-center   "
                     style={{ border: "3px solid black" }}
                   >
                     <Typography className="text-xl font-bold ">
@@ -680,86 +713,94 @@ const Process = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col  w-full gap-3 md:w-9/12 ">
-                <div className=" flex flex-col sm:flex-row  items-center sm:items-start  w-full justify-center md:justify-start px-10   gap-5  ">
-                  <div className=" justify-center">
-                    <Button
-                      size="lg"
-                      variant="outlined"
-                      className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                        activeCustomerMenu === "menu1"
-                          ? " bg-blue-300 "
-                          : "bg-blue-100"
-                      }`}
-                      onClick={() => [
-                        setActiveCustomerMenu("menu1"),
-                        fetchStatus(""),
-                      ]}
-                    >
-                      ทั้งหมด
-                    </Button>
-                  </div>
-                  <div className=" justify-center">
-                    <Button
-                      size="lg"
-                      variant="outlined"
-                      className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400 `}
-                      style={{
-                        backgroundColor:
-                          activeCustomerMenu === "menu2"
-                            ? "#FFEB3B"
-                            : "#ebdb6b",
-                      }}
-                      onClick={() => [
-                        setActiveCustomerMenu("menu2"),
-                        fetchStatus(0),
-                      ]}
-                    >
-                      กำลังจ่าย
-                    </Button>
-                  </div>
-                  <div className=" justify-center">
-                    <Button
-                      size="lg"
-                      variant="outlined"
-                      className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                        activeCustomerMenu === "menu3"
-                          ? " bg-green-500 text-white"
-                          : "bg-green-300 text-white"
-                      }`}
-                      onClick={() => [
-                        setActiveCustomerMenu("menu3"),
-                        fetchStatus(1),
-                      ]}
-                    >
-                      จ่ายครบแล้ว
-                    </Button>
-                  </div>
-                  <div className=" justify-center">
-                    <Button
-                      size="lg"
-                      variant="outlined"
-                      className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                        activeCustomerMenu === "menu4"
-                          ? " bg-red-500 text-white"
-                          : "bg-red-300 text-white"
-                      }`}
-                      onClick={() => [
-                        setActiveCustomerMenu("menu4"),
-                        fetchStatus(2),
-                      ]}
-                    >
-                      ลูกค้าเสีย
-                    </Button>
+              <div className="flex w-full flex-col mt-24 md:mt-0 gap-3 md:w-8/12 xl:w-9/12 ">
+                <div className=" flex flex-col xl:flex-row  items-center sm:items-start  w-full justify-center md:justify-start    gap-5  ">
+                  <div className="flex flex-col  xl:flex-row gap-5">
+                    <div className="flex gap-5">
+                    <div className=" justify-center">
+                      <Button
+                        size="lg"
+                        variant="outlined"
+                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
+                          activeCustomerMenu === "menu1"
+                            ? " bg-blue-300 "
+                            : "bg-blue-100"
+                        }`}
+                        onClick={() => [
+                          setActiveCustomerMenu("menu1"),
+                          fetchStatus(""),
+                        ]}
+                      >
+                        ทั้งหมด
+                      </Button>
+                    </div>
+                    <div className=" justify-center">
+                      <Button
+                        size="lg"
+                        variant="outlined"
+                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400 `}
+                        style={{
+                          backgroundColor:
+                            activeCustomerMenu === "menu2"
+                              ? "#FFEB3B"
+                              : "#ebdb6b",
+                        }}
+                        onClick={() => [
+                          setActiveCustomerMenu("menu2"),
+                          fetchStatus(0),
+                        ]}
+                      >
+                        กำลังจ่าย
+                      </Button>
+                    </div>
+
+                    </div>
+              
+                    <div className="flex gap-5">
+                      <div className=" justify-center">
+                        <Button
+                          size="lg"
+                          variant="outlined"
+                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
+                            activeCustomerMenu === "menu3"
+                              ? " bg-green-500 text-white"
+                              : "bg-green-300 text-white"
+                          }`}
+                          onClick={() => [
+                            setActiveCustomerMenu("menu3"),
+                            fetchStatus(1),
+                          ]}
+                        >
+                          จ่ายครบแล้ว
+                        </Button>
+                      </div>
+                      <div className=" justify-center">
+                        <Button
+                          size="lg"
+                          variant="outlined"
+                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
+                            activeCustomerMenu === "menu4"
+                              ? " bg-red-500 text-white"
+                              : "bg-red-300 text-white"
+                          }`}
+                          onClick={() => [
+                            setActiveCustomerMenu("menu4"),
+                            fetchStatus(2),
+                          ]}
+                        >
+                          ลูกค้าเสีย
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className=" flex flex-col sm:flex-row  items-center sm:items-start  w-full justify-center md:justify-start   ">
+                <div >
                   <Card
-                    className="w-full h-[45vh] p-2"
+                    className="w-full  h-[45vh] p-2 "
                     style={{ border: "3px solid black" }}
                   >
-                    <div className="mt-5 h-[380px] overflow-auto ">
-                      <table className="w-full min-w-max  ">
+                    <div className="mt-5 h-[380px] w-full overflow-auto  ">
+                      <table className="w-full min-w-max">
                         <thead>
                           <tr>
                             <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
@@ -962,7 +1003,35 @@ const Process = () => {
                                           setActiveRow(index),
                                           fetchUserList(data?.id),
                                           setUserListData(data),
-                                          fetchUserListSum(data.id),
+                                          fetchUserListSum(data?.id),
+                                          setSelectedValue(data),
+                                          setSelectedValue({
+                                            ...selectedValue,
+                                            label: data?.name,
+                                          }),
+                                          setSelectDisable(1),
+                                          setAmount(data?.total),
+                                          setAmountDate(data?.count_day),
+                                          setSearchQueryStart(
+                                            addYears(
+                                              parse(
+                                                data?.start_day,
+                                                "dd-MM-yyyy",
+                                                new Date()
+                                              ),
+                                              -543
+                                            )
+                                          ),
+                                          setSearchQueryEnd(
+                                            addYears(
+                                              parse(
+                                                data?.end_day,
+                                                "dd-MM-yyyy",
+                                                new Date()
+                                              ),
+                                              -543
+                                            )
+                                          ),
                                         ]}
                                       >
                                         <BsFillEyeFill className="h-5 w-5  text-light-blue-700 " />
@@ -1097,16 +1166,16 @@ const Process = () => {
                                           color="blue-gray"
                                           className={`font-normal ${
                                             data?.status == "0"
-                                              ? "bg-green-300 bg-opacity-60 px-3   rounded-lg "
+                                              ? "bg-red-300 bg-opacity-60 px-3   rounded-lg "
                                               : data?.status == "1"
-                                              ? "bg-red-300 bg-opacity-60 px-3   rounded-lg"
+                                              ? "bg-green-300 bg-opacity-60 px-3   rounded-lg"
                                               : ""
                                           } `}
                                         >
                                           {data?.status == 0
-                                            ? "จ่ายแล้ว"
-                                            : data?.status == 1
                                             ? "ยังไม่จ่าย"
+                                            : data?.status == 1
+                                            ? "จ่ายแล้ว"
                                             : ""}
                                         </Typography>
                                       </div>
@@ -1122,9 +1191,9 @@ const Process = () => {
                                             setActiveRow2(index),
                                             handleChangeStatus(
                                               data?.status == 0
-                                                ? 1
+                                                ? "1"
                                                 : data?.status == 1
-                                                ? 0
+                                                ? "0"
                                                 : "",
                                               data
                                             ),
@@ -1144,7 +1213,7 @@ const Process = () => {
                     </Card>
                   </div>
                   <div
-                    className="flex w-full md:w-[30%] md:h-[210px]  "
+                    className="flex w-full md:w-[30%] md:h-[330px] lg:h-[250px]  xl:h-[210px]  "
                     style={{ border: "3px solid black" }}
                   >
                     <div className="gap-3  p-3">
@@ -1155,27 +1224,28 @@ const Process = () => {
                         ยอดรวม (ทั้งหมด):{" "}
                         <sapn>
                           {" "}
-                          {Number(sumUser?.total).toLocaleString() == "NaN"
+                          {Number(userListSum?.total).toLocaleString() == "NaN"
                             ? 0
-                            : Number(sumUser?.total).toLocaleString()}
+                            : Number(userListSum?.total).toLocaleString()}
                         </sapn>{" "}
                         บาท
                       </Typography>
                       <Typography className=" font-bold mt-3">
                         ชำระแล้ว (ทั้งหมด):{" "}
                         <sapn>
-                          {Number(sumUser?.paid).toLocaleString() == "NaN"
+                          {Number(userListSum?.paid).toLocaleString() == "NaN"
                             ? 0
-                            : Number(sumUser?.paid).toLocaleString()}
+                            : Number(userListSum?.paid).toLocaleString()}
                         </sapn>{" "}
                         บาท
                       </Typography>
                       <Typography className=" font-bold mt-3">
                         ค้างชำระ (ทั้งหมด):{" "}
                         <sapn>
-                          {Number(sumUser?.overdue).toLocaleString() == "NaN"
+                          {Number(userListSum?.overdue).toLocaleString() ==
+                          "NaN"
                             ? 0
-                            : Number(sumUser?.overdue).toLocaleString()}
+                            : Number(userListSum?.overdue).toLocaleString()}
                         </sapn>{" "}
                         บาท
                       </Typography>
@@ -1197,6 +1267,13 @@ const Process = () => {
               setActiveRow(),
               setSumUser([]),
               setUserId(""),
+              setUserListSum([]),
+              setSelectDisable(0),
+              setSelectedValue(null),
+              setAmount(0),
+              setAmountDate(0),
+              setSearchQueryStart(new Date()),
+              setSearchQueryEnd(new Date()),
             ]}
             className="flex mr-1 text-base"
           >
@@ -1208,68 +1285,22 @@ const Process = () => {
         </DialogFooter>
       </Dialog>
 
-      {/* modal Add Customer */}
-
-      {/* <Dialog open={openModalAdd} size="xs" handler={handleModalAdd}>
+      {/* modal รียอด  */}
+      <Dialog
+        open={openModalReload}
+        handler={handleModalReload}
+        size="xs"
+        className="h-[20vh] "
+      >
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">เพิ่มข้อมูลลูกค้า</Typography>
+          <Typography variant="h5">ยืนยันการสร้าง</Typography>
         </DialogHeader>
-        <DialogBody divider className=" overflow-auto ">
-          <div className=" w-full flex flex-col justify-center  gap-4 ">
-            <div className="w-full flex flex-col justify-center gap-4  ">
-              <div className="flex   mt-3">
-                <Input
-                  type="text"
-                  label="ชื่อลูกค้า"
-                  maxLength="50"
-                  color="blue-gray"
-                  style={{ backgroundColor: "#F4F4F4" }}
-                  onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
-                      name: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className="flex  mt-3">
-                <Input
-                  type="text"
-                  label="เบอร์โทรศัพท์"
-                  maxLength="10"
-                  color="blue-gray"
-                  style={{ backgroundColor: "#F4F4F4" }}
-                  onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
-                      tell: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className="flex   mt-3">
-                <Textarea
-                  label="ที่อยู่"
-                  maxLength="100"
-                  color="blue-gray"
-                  style={{ backgroundColor: "#F4F4F4" }}
-                  onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
-                      address: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        </DialogBody>
-        <DialogFooter>
+        <DialogFooter className="flex justify-center gap-5 mt-3">
           <Button
             variant="text"
             color="red"
             size="sm"
-            onClick={handleModalAdd}
+            onClick={handleModalReload}
             className="flex mr-1 text-base"
           >
             <span className="text-xl mr-2">
@@ -1281,7 +1312,7 @@ const Process = () => {
             size="sm"
             variant="gradient"
             color="purple"
-            onClick={handleAddCustomer}
+            onClick={handleAddProcess}
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
@@ -1290,7 +1321,7 @@ const Process = () => {
             บันทึก
           </Button>
         </DialogFooter>
-      </Dialog> */}
+      </Dialog>
     </Card>
   );
 };

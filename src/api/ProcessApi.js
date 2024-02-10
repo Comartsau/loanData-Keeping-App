@@ -109,7 +109,7 @@ export const getProcessUserListSum = async (id) => {
     const response = await axios.get(
       `${
         import.meta.env.VITE_APP_API
-      }/api/process/user/update?id=${id}`,
+      }/api/process/update/user?id=${id}`,
       {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
