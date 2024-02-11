@@ -5,13 +5,13 @@ import { Button } from "antd";
 import { MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons";
 
 import { useRecoilState } from "recoil";
-import { collapsedStore ,autoHideStore } from "../../../store/Store";
+import { collapsedStore  } from "../../../store/Store";
 
 const Logo = ({ darkTheme, toggleTheme }) => {
   const [textToggle, setTextToogle] = useState(darkTheme);
   const [collapsed, setCollapsed] = useRecoilState(collapsedStore);
   const [showButton, setShowButton] = useState(false);
-  const [autohide ,setAutoHide] = useRecoilState(autoHideStore)
+
 
   // eslint-disable-next-line no-unused-vars
   const toggleText = () => {
