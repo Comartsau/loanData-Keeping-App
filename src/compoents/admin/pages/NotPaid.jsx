@@ -133,6 +133,15 @@ const NotPaid = () => {
                             ยอดค้างจ่าย
                           </Typography>
                         </th>
+                        <th className="border-y border-purple-100 bg-purple-300/50 p-4  ">
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-bold leading-none opacity-70"
+                          >
+                            กำไร
+                          </Typography>
+                        </th>
                       </tr>
                     </thead>
                     {listData?.length == 0 ? (
@@ -217,8 +226,18 @@ const NotPaid = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {Number(data?.overdue).toLocaleString() ||
-                                      ""}
+                                    {Number(data?.overdue) < 0 ? "0" : Number(data?.overdue).toLocaleString() }
+                                  </Typography>
+                                </div>
+                              </td>
+                              <td className={classes}>
+                                <div className="flex items-center justify-center ">
+                                  <Typography
+                                    variant="small"
+                                    color="blue-gray"
+                                    className="font-normal "
+                                  >
+                                    {Number(data?.overdue) < 0 ?  Math.abs(Number(data?.overdue)).toLocaleString() : 0 }
                                   </Typography>
                                 </div>
                               </td>
