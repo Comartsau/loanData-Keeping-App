@@ -8,39 +8,23 @@ import {
 
 import Select from "react-select";
 
-import { useState } from "react";
 
 import { useRecoilValue } from "recoil";
 
 import { locationStore } from "../../../store/Store";
 
-const LostCustomer = () => {
-  const [listData, setListData] = useState([
-    {
-      name: "user01",
-      location: "ขอนแก่น",
-      borrowed: 1500,
-      paid: 700,
-      balance: 800,
-    },
-    {
-      name: "user02",
-      location: "หน้าโรงแรม A",
-      borrowed: 5000,
-      paid: 2700,
-      balance: 2300,
-    },
-    {
-      name: "user03",
-      location: "บึงแก่นนคร",
-      borrowed: 2500,
-      paid: 500,
-      balance: 2000,
-    },
-  ]);
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-  const [searchQuery, setSearchQuery] = useState("");
+import { useEffect, useState } from "react";
+
+import { getLostCustomer } from "../../../api/ReportApi";
+
+
+const LostCustomer = () => {
+  const [listData, setListData] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
+  const [sendId, setSendId] = useState("");
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,11 +32,11 @@ const LostCustomer = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const displayedData = Array.isArray(listData)
-    ? listData.slice(startIndex, endIndex)
+  const displayedData = Array.isArray(listData?.data)
+    ? listData?.data?.slice(startIndex, endIndex)
     : [];
 
-  const totalPages = Math.ceil(listData?.length / itemsPerPage);
+  const totalPages = Math.ceil(listData?.data?.length / itemsPerPage);
 
   const dataLocationStore = useRecoilValue(locationStore);
 
@@ -70,14 +54,30 @@ const LostCustomer = () => {
     );
     // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
     setSelectedLocation(locations);
+    setSendId(locations?.id || "");
   };
 
   console.log(selectedLocation);
 
+  const fecthLostCustomer = async () => {
+    try {
+      const respone = await getLostCustomer(sendId);
+      console.log(respone)
+      setListData(respone);
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fecthLostCustomer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sendId]);
+
   return (
     <div>
       <div className=" h-[74vh]  ">
-      <Typography className="text-center mt-5 text-red-500 text-xl font-bold">อยู่ระหว่างการพัฒนา (งวด3/3)</Typography>
+      <ToastContainer className="toast " autoClose={800} theme="colored" />
         <div className="flex flex-col w-full">
           {/* <p>ข้อมูลผู้บริจาค</p> */}
           <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
@@ -300,13 +300,16 @@ const LostCustomer = () => {
                 style={{ border: "3px solid black" }}
               >
                 <Typography className=" font-bold mt-5">
-                  จำนวนยืม: <sapn className="font-normal">1,000 บาท</sapn>
+                  จำนวนยืม: <sapn className="font-normal">{Number(listData?.totals?.total).toLocaleString() == "NaN" ? 0 : Number(listData?.totals?.total).toLocaleString()}</sapn> บาท
                 </Typography>
                 <Typography className=" font-bold mt-3">
-                  จ่ายแล้ว: <sapn className="font-normal">600 บาท</sapn>
+                  จ่ายแล้ว: <sapn className="font-normal">{Number(listData?.totals?.price).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.price).toLocaleString()}</sapn> บาท
                 </Typography>
                 <Typography className=" font-bold mt-3">
-                  ค้างจ่าย: <sapn className="font-normal">400 บาท</sapn>
+                  ค้างจ่าย: <sapn className="font-normal">{Number(listData?.totals?.overdue).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.overdue).toLocaleString()}</sapn> บาท
+                </Typography>
+                <Typography className=" font-bold mt-3">
+                  กำไร: <sapn className="font-normal">{Number(listData?.totals?.overdue).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.overdue) < 0 ?  Math.abs(Number(listData?.totals?.overdue)).toLocaleString() : 0 }</sapn> บาท
                 </Typography>
               </div>
             </div>

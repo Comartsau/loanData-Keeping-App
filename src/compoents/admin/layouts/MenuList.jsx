@@ -3,7 +3,7 @@ import { DatabaseOutlined } from "@ant-design/icons";
 import { TbReportAnalytics } from "react-icons/tb";
 import { Link, useNavigate } from "react-router-dom";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { GoWorkflow } from "react-icons/go";
 
@@ -18,6 +18,27 @@ const MenuList = ({ darkTheme, toggleTheme }) => {
   const iconStyle = { fontSize: "26px", marginRight: "5px", marginTop: "7px" };
 
   const [collapsed, setCollapsed] = useRecoilState(collapsedStore);
+
+  const [HideActive , setHideActive] = useState(0)
+
+  const checkScreenSize = () => {
+    if (window.innerWidth < 960) {
+      setHideActive(1);
+    } else {
+      setHideActive(0);
+    }
+  };
+
+  useEffect(() => {
+    // เรียกฟังก์ชันเมื่อ Component โหลดหรือขนาดหน้าจอเปลี่ยน
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    // คืนค่าเมื่อ Component ถูก Unmount เพื่อเลิกติดตามการเปลี่ยนขนาดหน้าจอ
+    return () => {
+      window.removeEventListener("resize", checkScreenSize);
+    };
+  }, []);
 
   return (
     <div>
@@ -37,15 +58,15 @@ const MenuList = ({ darkTheme, toggleTheme }) => {
           selectedKeys={[currentPath]}
         >
           <Menu.Item key="/admin" icon={<DatabaseOutlined style={iconStyle} />}>
-            <Link to="/admin" onClick={() => setCollapsed(!collapsed)}>
+            <Link to="/admin" onClick={() => [HideActive == 1 ? setCollapsed(!collapsed) : '']} >
               ข้อมูลพื้นฐาน
             </Link>
           </Menu.Item>
-          <Menu.Item
+          <Menu.Item 
             key="/admin/process"
             icon={<GoWorkflow style={iconStyle} />}
           >
-            <Link to="/admin/process" onClick={() => setCollapsed(!collapsed)}>
+            <Link to="/admin/process"  onClick={() => [HideActive == 1 ? setCollapsed(!collapsed) : '']} >
               Process
             </Link>
           </Menu.Item>
@@ -53,7 +74,7 @@ const MenuList = ({ darkTheme, toggleTheme }) => {
             key="/admin/report"
             icon={<TbReportAnalytics style={iconStyle} />}
           >
-            <Link to="/admin/report" onClick={() => setCollapsed(!collapsed)}>
+            <Link to="/admin/report"  onClick={() => [HideActive == 1 ? setCollapsed(!collapsed) : '']} >
               รายงาน
             </Link>
           </Menu.Item>

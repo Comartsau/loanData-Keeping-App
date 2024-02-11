@@ -45,6 +45,7 @@ import {
   addProcess,
   getUpdateAll,
   getProcessUser,
+  getProcessUser1,
   userUpdate,
   getProcessUserList,
   changeStatus,
@@ -70,6 +71,9 @@ const Process = () => {
   const [activeRow2, setActiveRow2] = useState(0);
 
   const [selectDisable, setSelectDisable] = useState(0);
+  const [showButton, setShowButton] = useState(false);
+  const [userListSum, setUserListSum] = useState([]);
+  const [userListData, setUserListData] = useState([]);
 
   // const [selectedShop, setSelectedShop] = useState(null);
 
@@ -133,11 +137,19 @@ const Process = () => {
     }
   };
 
+  const [statused ,setStatused] = useState('')
+
   const fetchStatus = async (statused) => {
+    console.log(statused)
     try {
-      const response = await getProcessUser(cardId, statused);
-      console.log(response);
-      setListDataCustomer(response);
+      const response = await getProcessUser(cardId, statused );
+      if (response == undefined) {
+        toast.error("ดึงข้อมูลไม่สำเร็จ  กรุณาลองใหม่");
+      } else {
+        toast.success("ดึงข้อมูลสำเร็จ");
+        setListDataCustomer(response);
+      }
+
     } catch (error) {
       console.error(error);
     }
@@ -145,10 +157,34 @@ const Process = () => {
 
   useEffect(() => {
     if (cardId) {
-      fetchStatus(" ");
+      fetchStatus(' ');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardId]);
+
+  const fetchStatus1 = async () => {
+    console.log(statused)
+    try {
+      const response = await getProcessUser1(cardId);
+      console.log(response);
+      if(response == undefined){
+        return
+      }else {
+        setListDataCustomer(response);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(()=>{
+    if(userListSum){
+      fetchStatus1()
+    }else {
+      return
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[userListSum])
 
   const [userId, setUserId] = useState("");
 
@@ -162,7 +198,7 @@ const Process = () => {
     }
   };
 
-  const [userListSum, setUserListSum] = useState([]);
+
 
   const fetchUserListSum = async (id) => {
     try {
@@ -321,7 +357,6 @@ const Process = () => {
         toast.error("ไม่สามารถเพิ่มหรืออัพเดรท ลูกค้า ได้");
       } else {
         toast.success("เพิ่ม/อัพเดรทข้อมูล ลูกค้า สำเร็จ");
-        fetchStatus();
       }
     } catch (error) {
       console.log(error);
@@ -332,7 +367,7 @@ const Process = () => {
   const startDate = moment(searchQueryStart).format("YYYY-MM-DD");
   const startEnd = moment(searchQueryEnd).format("YYYY-MM-DD");
 
-  const [userListData, setUserListData] = useState([]);
+  
 
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
@@ -372,7 +407,6 @@ const Process = () => {
         toast.success("เปลี่ยนสถานะ สำเร็จ");
         fetchUserList(userId);
         fetchUserListSum(userId);
-        fetchStatus("");
       }
     } catch (error) {
       toast.error(error);
@@ -406,6 +440,20 @@ const Process = () => {
       toast.error(error);
     }
   };
+
+  
+
+  const handleButton = () => {
+    setShowButton(!showButton);
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setShowButton(false);
+    }, 5000);
+
+    return () => clearTimeout(timeoutId);
+  }, [showButton]);
 
   return (
     <Card>
@@ -462,7 +510,15 @@ const Process = () => {
                       ชำระแล้ว: {Number(item?.paid).toLocaleString()} บาท
                     </Typography>
                     <Typography>
-                      ค้างชำระ: {Number(item?.overdue).toLocaleString()} บาท
+                      ค้างชำระ:{" "}
+                      {Number(item?.overdue) < 0
+                        ? 0
+                        : Number(item?.overdue).toLocaleString()}{" "}
+                      บาท
+                    </Typography>
+                    <Typography>
+                      กำไร: {Math.abs(Number(item?.overdue)).toLocaleString()}{" "}
+                      บาท
                     </Typography>
                   </CardBody>
                 </Card>
@@ -768,7 +824,23 @@ const Process = () => {
                         {Number(dataProcessId?.overdue).toLocaleString() ==
                         "NaN"
                           ? 0
+                          : Number(dataProcessId?.overdue) < 0
+                          ? 0
                           : Number(dataProcessId?.overdue).toLocaleString()}
+                      </sapn>{" "}
+                      บาท
+                    </Typography>
+                    <Typography className=" font-bold mt-3">
+                      กำไร (ทั้งหมด):{" "}
+                      <sapn>
+                        {Number(dataProcessId?.overdue).toLocaleString() ==
+                        "NaN"
+                          ? 0
+                          : Number(dataProcessId?.overdue) < 0
+                          ? Math.abs(
+                              Number(dataProcessId?.overdue)
+                            ).toLocaleString()
+                          : 0}
                       </sapn>{" "}
                       บาท
                     </Typography>
@@ -790,7 +862,7 @@ const Process = () => {
                           }`}
                           onClick={() => [
                             setActiveCustomerMenu("menu1"),
-                            fetchStatus(""),
+                            fetchStatus1(),
                           ]}
                         >
                           ทั้งหมด
@@ -809,7 +881,7 @@ const Process = () => {
                           }}
                           onClick={() => [
                             setActiveCustomerMenu("menu2"),
-                            fetchStatus(0),
+                            fetchStatus(0)
                           ]}
                         >
                           กำลังจ่าย
@@ -1250,6 +1322,7 @@ const Process = () => {
                                           color="blue"
                                           size="sm"
                                           className="ml-3 "
+                                          disabled={showButton}
                                           onClick={() => [
                                             setActiveRow2(index),
                                             handleChangeStatus(
@@ -1260,6 +1333,7 @@ const Process = () => {
                                                 : "",
                                               data
                                             ),
+                                            handleButton(),
                                           ]}
                                         >
                                           <FaExchangeAlt className="h-5 w-5  text-light-blue-700 " />
@@ -1308,7 +1382,23 @@ const Process = () => {
                           {Number(userListSum?.overdue).toLocaleString() ==
                           "NaN"
                             ? 0
+                            : Number(userListSum?.overdue) < 0
+                            ? 0
                             : Number(userListSum?.overdue).toLocaleString()}
+                        </sapn>{" "}
+                        บาท
+                      </Typography>
+                      <Typography className=" font-bold mt-3">
+                        กำไร (ทั้งหมด):{" "}
+                        <sapn>
+                          {Number(userListSum?.overdue).toLocaleString() ==
+                          "NaN"
+                            ? 0
+                            : Number(userListSum?.overdue) < 0
+                            ? Math.abs(
+                                Number(userListSum?.overdue)
+                              ).toLocaleString()
+                            : 0}
                         </sapn>{" "}
                         บาท
                       </Typography>
@@ -1338,6 +1428,7 @@ const Process = () => {
               setSearchQueryStart(new Date()),
               setSearchQueryEnd(new Date()),
               setUserListData([]),
+              fetchProcess(),
             ]}
             className="flex mr-1 text-base"
           >
@@ -1397,14 +1488,23 @@ const Process = () => {
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
           <Typography variant="h5">ยืนยันการสร้าง</Typography>
         </DialogHeader>
-           <DialogBody divider className=" h-[20vh]">
+        <DialogBody divider className=" h-[20vh]">
           <div className=" w-full  flex flex-col text-center justify-center mt-3 gap-3 ">
-            <Typography className=" text-xl font-bold">ยอดกู้ใหม่ <span>{Number(returnReload?.newSum).toLocaleString()}</span> บาท</Typography>
-            <Typography className=" text-xl font-bold">หักจากยอดเก่าคงเหลือ <span>{Number(returnReload?.mySum).toLocaleString()}</span> บาท</Typography>
-            <Typography className=" text-xl font-bold">หักค่าเอกสาร และหักงวดแรก คงเหลือ <span>{Number(returnReload?.totalSum).toLocaleString()}</span> บาท</Typography>
+            <Typography className=" text-xl font-bold">
+              ยอดกู้ใหม่{" "}
+              <span>{Number(returnReload?.newSum).toLocaleString()}</span> บาท
+            </Typography>
+            <Typography className=" text-xl font-bold">
+              หักจากยอดเก่าคงเหลือ{" "}
+              <span>{Number(returnReload?.mySum).toLocaleString()}</span> บาท
+            </Typography>
+            <Typography className=" text-xl font-bold">
+              หักค่าเอกสาร และหักงวดแรก คงเหลือ{" "}
+              <span>{Number(returnReload?.totalSum).toLocaleString()}</span> บาท
+            </Typography>
           </div>
         </DialogBody>
-        <DialogFooter  className="flex justify-center gap-5 mt-3">
+        <DialogFooter className="flex justify-center gap-5 mt-3">
           <Button
             size="sm"
             variant="gradient"
@@ -1413,7 +1513,7 @@ const Process = () => {
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
-            <CiLogout />
+              <CiLogout />
             </span>
             ปิด
           </Button>

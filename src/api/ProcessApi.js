@@ -1,7 +1,6 @@
 import axios from "axios";
 import { HeaderAPI } from "../../headerApi";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 
 export const getProcess = async (searchQuery) => {
   console.log(searchQuery);
@@ -74,6 +73,24 @@ export const getProcessUser = async (id, status) => {
       `${
         import.meta.env.VITE_APP_API
       }/api/process/user?process_id=${id}&status=${status}`,
+      {
+        ...HeaderAPI(localStorage.getItem("Token")),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+export const getProcessUser1 = async (id) => {
+  try {
+    // let token = localStorage.getItem("Token")
+    const response = await axios.get(
+      `${
+        import.meta.env.VITE_APP_API
+      }/api/process/user?process_id=${id}`,
       {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
