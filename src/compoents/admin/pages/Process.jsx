@@ -140,13 +140,12 @@ const Process = () => {
   const [statused ,setStatused] = useState('')
 
   const fetchStatus = async (statused) => {
-    console.log(statused)
     try {
       const response = await getProcessUser(cardId, statused );
-      if (response == undefined) {
+      console.log(response)
+      if (response == undefined ) {
         toast.error("ดึงข้อมูลไม่สำเร็จ  กรุณาลองใหม่");
       } else {
-        toast.success("ดึงข้อมูลสำเร็จ");
         setListDataCustomer(response);
       }
 
@@ -170,7 +169,7 @@ const Process = () => {
       if(response == undefined){
         return
       }else {
-        setListDataCustomer(response);
+          setListDataCustomer(response);
       }
     } catch (error) {
       console.error(error);
@@ -1429,6 +1428,8 @@ const Process = () => {
               setSearchQueryEnd(new Date()),
               setUserListData([]),
               fetchProcess(),
+              setListDataCustomer([]),
+              setCardId('')
             ]}
             className="flex mr-1 text-base"
           >
