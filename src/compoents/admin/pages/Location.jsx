@@ -159,7 +159,7 @@ const Location = () => {
           <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
             <Typography className=" font-bold ">ข้อมูลสถานที่:</Typography>
           </div>
-          <div className="w-full md:w-[50%] flex   px-0 md:px-10">
+          <div className="w-full md:w-[50%] flex bg-red-500   px-0 md:px-10">
             <div className="w-full flex flex-col md:flex-row justify-center md:justify-end items-center gap-5">
               <div>
                 <Input
