@@ -183,7 +183,7 @@ const Customer = () => {
           </div>
         </div>
         {/* ------------ table  ----------------------------------------- */}
-        <Card className="mt-5 w-full h-[40vh] sm:h-[48vh] md:h-[58vh] lg:h-[60vh] overflow-auto  border-2  ">
+        <Card className="mt-5 w-full h-[38vh] sm:h-[48vh] md:h-[58vh] lg:h-[60vh] overflow-auto  border-2  ">
           <table className="w-full min-w-max   ">
             <thead>
               <tr>
