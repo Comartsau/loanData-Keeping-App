@@ -9,7 +9,7 @@ function Database() {
   return (
     <div>
       {/* <Card className="w-full h-[86vh]  px-3"> */}
-      <Card className="w-full bg-red-500  px-3">
+      <Card className="w-full   px-3">
         <div className="w-full " >
           <div className=" item-center mt-5 flex w-full flex-col gap-2  lg:flex-row">
             <div className="flex  flex-col gap-10   sm:flex-row  ">
