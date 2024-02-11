@@ -12,7 +12,7 @@ function Database() {
       <Card className="w-full   px-3">
         <div className="w-full " >
           <div className=" item-center mt-5 flex w-full flex-col gap-2  lg:flex-row">
-            <div className="flex  flex-col gap-10   sm:flex-row  ">
+            <div className="flex  flex-col gap-5 md:gap-10  sm:flex-row  ">
               <div className="flex  flex-col justify-center gap-5 sm:flex-row lg:gap-20  ">
                 <div className="flex justify-center">
                   <Button
