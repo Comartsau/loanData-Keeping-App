@@ -47,12 +47,12 @@ function Database() {
             </div>
           </div>
           {activeCustomerMenu === "menu1" && (
-            <div className="w-full mt-5 overflow-auto ">
+            <div className="w-full mt-5  ">
               <Customer />
             </div>
           )}
           {activeCustomerMenu === "menu2" && (
-            <div className="w-full mt-5 overflow-auto">
+            <div className="w-full mt-5 ">
               <Location />
             </div>
           )}

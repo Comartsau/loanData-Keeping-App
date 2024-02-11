@@ -144,7 +144,7 @@ const Customer = () => {
   };
 
   return (
-    <div className=" h-[70vh]  ">
+    <div className=" w-full h-[70vh] overflow-auto bg-red-500   ">
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
       <div className="flex flex-col w-full">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
@@ -183,7 +183,7 @@ const Customer = () => {
           </div>
         </div>
         {/* ------------ table  ----------------------------------------- */}
-        <Card className="mt-5  border-2  ">
+        <Card className="mt-5 w-full overflow-auto  border-2   ">
           <table className="w-full min-w-max   ">
             <thead>
               <tr>
