@@ -190,7 +190,7 @@ const Location = () => {
           </div>
         </div>
         {/* ------------ table  ----------------------------------------- */}
-        <Card className="mt-5 w-full h-[38vh] sm:h-[48vh] md:h-[58vh] lg:h-[60vh] overflow-auto  border-2  ">
+        <Card className="mt-5 w-full h-[35vh] sm:h-[48vh] md:h-[58vh] lg:h-[60vh] overflow-auto mb-5 border-2  ">
           <div>
             <table className="w-full min-w-max  ">
               <thead>
