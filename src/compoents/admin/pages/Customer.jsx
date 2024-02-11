@@ -144,7 +144,7 @@ const Customer = () => {
   };
 
   return (
-    <div className=" w-full h-[70vh] overflow-auto bg-red-500   ">
+    <div className=" w-full h-[90%] lg:h-[70vh] overflow-auto   ">
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
       <div className="flex flex-col w-full">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
