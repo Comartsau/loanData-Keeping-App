@@ -71,9 +71,10 @@ const Process = () => {
   const [activeRow2, setActiveRow2] = useState(0);
 
   const [selectDisable, setSelectDisable] = useState(0);
-  const [showButton, setShowButton] = useState(false);
   const [userListSum, setUserListSum] = useState([]);
   const [userListData, setUserListData] = useState([]);
+  const [disableButton, setDisableButton] = useState(true);
+
 
   // const [selectedShop, setSelectedShop] = useState(null);
 
@@ -140,7 +141,6 @@ const Process = () => {
   const fetchUpdateAll = async (cardId) => {
     try {
       const response = await getUpdateAll(cardId);
-      console.log(response);
       if (response?.status == 200) {
         setDataProcessId(response?.data);
       } else {
@@ -156,7 +156,6 @@ const Process = () => {
   const fetchStatus = async (statused) => {
     try {
       const response = await getProcessUser(cardId, statused);
-      console.log(response);
       if (response?.status == 200) {
         setListDataCustomer(response?.data);
       } else {
@@ -182,29 +181,26 @@ const Process = () => {
       if (response?.status == 200) {
         setListDataCustomer(response.data);
       } else {
-       return
+        return;
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(() => {
-    if (userListSum) {
-      fetchStatus1();
-    } else {
-      return;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userListSum]);
-
   const [userId, setUserId] = useState("");
 
-  const fetchUserList = async (id) => {
+  const fetchUserList = async (id, status) => {
     try {
       setUserId(id);
+      // setSumUser([]);
       const response = await getProcessUserList(id);
-      setSumUser(response);
+      if (response?.status == 200) {
+        setSumUser(response?.data);
+        setDisableButton(status == "1" || status == "2" || response?.data[response?.data?.length -1]?.status == "1" ? false : true);
+      } else {
+        toast.error(response);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -420,32 +416,22 @@ const Process = () => {
       };
 
       const response = await sendReload(data);
-      console.log(response);
-      if (response == undefined) {
-        toast.error("รีโหลด ไม่สำเร็จ");
-      } else {
-        toast.success("รีโหลด สำเร็จ");
-        setReturnReload(response);
+      console.log(response?.response?.data);
+      if (response?.status == 200) {
+      
+        toast.success("รียอด สำเร็จ");
+        setReturnReload(response?.data);
         handleModalDataReload();
-        fetchUserList(userId);
-        fetchUserListSum(userId);
+        handleFetch();
+      } else {
+        toast.error(response?.response?.data);
+        handleModalReload()
       }
     } catch (error) {
       toast.error(error);
+  
     }
   };
-
-  const handleButton = () => {
-    setShowButton(!showButton);
-  };
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setShowButton(false);
-    }, 5000);
-
-    return () => clearTimeout(timeoutId);
-  }, [showButton]);
 
   const handleFetch = () => {
     fetchUpdateAll(cardId);
@@ -453,6 +439,8 @@ const Process = () => {
     fetchUserList(userId);
     fetchUserListSum(userId);
   };
+
+  // console.log(sumUser);
 
   return (
     <Card>
@@ -766,7 +754,6 @@ const Process = () => {
                       color="green"
                       disabled={selectDisable}
                       className="text-base flex justify-center  items-center  w-full  bg-green-500"
-                      // disabled={openPrint == true ? true : false}
                       onClick={handleUser}
                     >
                       <span className="mr-2 text-xl ">
@@ -862,6 +849,9 @@ const Process = () => {
                           onClick={() => [
                             setActiveCustomerMenu("menu1"),
                             fetchStatus1(),
+                            setDisableButton(true),
+                            setSumUser([]),
+                            setActiveRow()
                           ]}
                         >
                           ทั้งหมด
@@ -881,6 +871,9 @@ const Process = () => {
                           onClick={() => [
                             setActiveCustomerMenu("menu2"),
                             fetchStatus(0),
+                            setDisableButton(true),
+                            setSumUser([]),
+                            setActiveRow()
                           ]}
                         >
                           กำลังจ่าย
@@ -901,6 +894,9 @@ const Process = () => {
                           onClick={() => [
                             setActiveCustomerMenu("menu3"),
                             fetchStatus(1),
+                            setDisableButton(false),
+                            setSumUser([]),
+                            setActiveRow()
                           ]}
                         >
                           จ่ายครบแล้ว
@@ -918,6 +914,9 @@ const Process = () => {
                           onClick={() => [
                             setActiveCustomerMenu("menu4"),
                             fetchStatus(2),
+                            setDisableButton(false),
+                            setSumUser([]),
+                            setActiveRow()
                           ]}
                         >
                           ลูกค้าเสีย
@@ -1135,9 +1134,16 @@ const Process = () => {
                                         className="ml-3 "
                                         onClick={() => [
                                           setActiveRow(index),
-                                          fetchUserList(data?.id),
+                                          fetchUserList(data?.id, data?.status),
+                                          setSumUser([]),
                                           setUserListData(data),
                                           fetchUserListSum(data?.id),
+                                          setDisableButton(
+                                            data?.status == 1 ||
+                                              data?.status == 2
+                                              ? false
+                                              : true
+                                          ),
                                           setSelectedValue(data),
                                           setSelectedValue({
                                             ...selectedValue,
@@ -1238,19 +1244,10 @@ const Process = () => {
                               </th>
                             </tr>
                           </thead>
-                          {sumUser?.length == 0 ? (
-                            <tbody>
-                              <tr>
-                                <td colSpan={8}>
-                                  <Typography className="mt-5 text-center">
-                                    ...ไม่พบข้อมูล...
-                                  </Typography>
-                                </td>
-                              </tr>
-                            </tbody>
-                          ) : (
-                            <tbody>
-                              {sumUser?.map((data, index) => {
+
+                          <tbody>
+                            {disableButton &&
+                              sumUser?.map((data, index) => {
                                 const isLast = index === sumUser?.length;
                                 const pageIndex = startIndex + index;
                                 const classes = isLast
@@ -1321,7 +1318,8 @@ const Process = () => {
                                           color="blue"
                                           size="sm"
                                           className="ml-3 "
-                                          disabled={showButton}
+                                          // disabled={data[data?.length -1]?.status == 1 ? false : true }
+
                                           onClick={() => [
                                             setActiveRow2(index),
                                             handleChangeStatus(
@@ -1332,7 +1330,7 @@ const Process = () => {
                                                 : "",
                                               data
                                             ),
-                                            handleButton(),
+                                            // handleButton(),
                                           ]}
                                         >
                                           <FaExchangeAlt className="h-5 w-5  text-light-blue-700 " />
@@ -1342,8 +1340,7 @@ const Process = () => {
                                   </tr>
                                 );
                               })}
-                            </tbody>
-                          )}
+                          </tbody>
                         </table>
                       </div>
                     </Card>

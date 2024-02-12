@@ -108,13 +108,15 @@ export const getProcessUserList = async (id) => {
       `${
         import.meta.env.VITE_APP_API
       }/api/process/user/list?process_user_id=${id}`,
+      // }/api/process/user/list?process_user_id=60`,
       {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
-    return response.data;
+    console.log(response)
+    return response;
   } catch (error) {
-    console.error(error);
+    return error
   }
 };
 
@@ -182,7 +184,6 @@ export const sendUpdate = async (data) => {
 };
 
 export const sendReload = async (data) => {
-  console.log(data);
   try {
     const response = await axios.put(
       `${import.meta.env.VITE_APP_API}/api/process/user/list/reload`,
@@ -191,8 +192,8 @@ export const sendReload = async (data) => {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
-    console.error(error);
+    return error
   }
 };
