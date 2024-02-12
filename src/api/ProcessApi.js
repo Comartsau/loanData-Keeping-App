@@ -60,7 +60,7 @@ export const getUpdateAll = async (processId) => {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error(error);
   }
@@ -77,9 +77,9 @@ export const getProcessUser = async (id, status) => {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
-    console.error(error);
+    return error
   }
 };
 
@@ -95,9 +95,9 @@ export const getProcessUser1 = async (id) => {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
-    console.error(error);
+    return error
   }
 };
 
@@ -134,7 +134,7 @@ export const getProcessUserListSum = async (id) => {
 };
 
 export const userUpdate = async (data) => {
-  console.log(data);
+
   try {
     const response = await axios.post(
       `${import.meta.env.VITE_APP_API}/api/process/user`,
@@ -143,14 +143,13 @@ export const userUpdate = async (data) => {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error(error);
   }
 };
 
 export const changeStatus = async (data) => {
-  console.log(data);
   try {
     const response = await axios.put(
       `${import.meta.env.VITE_APP_API}/api/process/user/list`,
@@ -159,14 +158,15 @@ export const changeStatus = async (data) => {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
-    return response.data;
+    console.log(response)
+    return response;
   } catch (error) {
-    console.error(error);
+    return error
   }
 };
 
 export const sendUpdate = async (data) => {
-  console.log(data);
+
   try {
     const response = await axios.put(
       `${import.meta.env.VITE_APP_API}/api/process/user`,
@@ -175,9 +175,9 @@ export const sendUpdate = async (data) => {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
-    console.error(error);
+    return error
   }
 };
 

@@ -127,28 +127,42 @@ const Process = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchUpdateAll = async (processId) => {
+  const [selectCard, setSelectCard] = useState([]);
+  const [openModalProcess, setOpenModalProcess] = useState(false);
+
+  const handleSelectCard = async (item) => {
+    setOpenModalProcess(!openModalProcess);
+    setSelectCard(item);
+    setCardId(item?.id);
+    await fetchUpdateAll(item?.id);
+  };
+
+  const fetchUpdateAll = async (cardId) => {
     try {
-      const response = await getUpdateAll(processId);
-      // console.log(response);
-      setDataProcessId(response);
+      const response = await getUpdateAll(cardId);
+      console.log(response);
+      if (response?.status == 200) {
+        console.log("aaaaa");
+        setDataProcessId(response?.data);
+      } else {
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const [statused ,setStatused] = useState('')
+  const [statused, setStatused] = useState("");
 
   const fetchStatus = async (statused) => {
     try {
-      const response = await getProcessUser(cardId, statused );
-      console.log(response)
-      if (response == undefined ) {
-        toast.error("ดึงข้อมูลไม่สำเร็จ  กรุณาลองใหม่");
+      const response = await getProcessUser(cardId, statused);
+      console.log(response);
+      if (response?.status == 200) {
+        setListDataCustomer(response?.data);
       } else {
-        setListDataCustomer(response);
+        toast.error("ดึงข้อมูลไม่สำเร็จ  กรุณาลองใหม่");
       }
-
     } catch (error) {
       console.error(error);
     }
@@ -156,34 +170,34 @@ const Process = () => {
 
   useEffect(() => {
     if (cardId) {
-      fetchStatus(' ');
+      fetchStatus(" ");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardId]);
 
   const fetchStatus1 = async () => {
-    console.log(statused)
+    console.log(statused);
     try {
       const response = await getProcessUser1(cardId);
       console.log(response);
-      if(response == undefined){
-        return
-      }else {
-          setListDataCustomer(response);
+      if (response?.status == 200) {
+        setListDataCustomer(response.data);
+      } else {
+        toast.error("ดึงข้อมูลไม่สำเร็จ  กรุณาลองใหม่");
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(()=>{
-    if(userListSum){
-      fetchStatus1()
-    }else {
-      return
+  useEffect(() => {
+    if (userListSum) {
+      fetchStatus1();
+    } else {
+      return;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[userListSum])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userListSum]);
 
   const [userId, setUserId] = useState("");
 
@@ -196,8 +210,6 @@ const Process = () => {
       console.error(error);
     }
   };
-
-
 
   const fetchUserListSum = async (id) => {
     try {
@@ -292,16 +304,6 @@ const Process = () => {
     setSelectedValue(e);
   };
 
-  const [selectCard, setSelectCard] = useState([]);
-  const [openModalProcess, setOpenModalProcess] = useState(false);
-
-  const handleSelectCard = async (item) => {
-    setOpenModalProcess(!openModalProcess);
-    setSelectCard(item);
-    setCardId(item?.id);
-    await fetchUpdateAll(item?.id);
-  };
-
   const [amountDate, setAmountDate] = useState(0);
   const [amount, setAmount] = useState(0);
 
@@ -313,6 +315,33 @@ const Process = () => {
     const newDate = new Date(date);
     newDate?.setDate(newDate.getDate() + days);
     return newDate;
+  };
+
+  const handleUser = async () => {
+    try {
+      let data = {
+        process_id: cardId,
+        user_id: selectedCustomer?.id,
+        price: Number(amount),
+        count_day: Number(amountDate),
+        start_day: startDate,
+        end_day: startEnd,
+      };
+      const response = await userUpdate(data);
+      if (response?.status == 200) {
+        toast.success("เพิ่ม/อัพเดรทข้อมูล ลูกค้า สำเร็จ");
+        handleFetch();
+        setAmountDate(0);
+        setAmount(0);
+        setSearchQueryStart(new Date());
+        setSearchQueryEnd(new Date());
+        setSelectedValue(null);
+      } else {
+        toast.error("ไม่สามารถบันทึกได้ กรุณาลองใหม่");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Handle change for searchQueryStart
@@ -334,39 +363,9 @@ const Process = () => {
     }
   };
 
-  const handleUser = async () => {
-    try {
-      let data = {
-        process_id: cardId,
-        user_id: selectedCustomer?.id,
-        price: Number(amount),
-        count_day: Number(amountDate),
-        start_day: startDate,
-        end_day: startEnd,
-      };
-
-      const response = await userUpdate(data);
-      console.log(response);
-      setAmountDate(0);
-      setAmount(0);
-      setSearchQueryStart(new Date());
-      setSearchQueryEnd(new Date());
-      setSelectedValue(null);
-      if (response == undefined) {
-        toast.error("ไม่สามารถเพิ่มหรืออัพเดรท ลูกค้า ได้");
-      } else {
-        toast.success("เพิ่ม/อัพเดรทข้อมูล ลูกค้า สำเร็จ");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   // const startDate = moment(searchQueryStart).add(543, 'years').format('YYYY-MM-DD')
   const startDate = moment(searchQueryStart).format("YYYY-MM-DD");
   const startEnd = moment(searchQueryEnd).format("YYYY-MM-DD");
-
-  
 
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
@@ -379,12 +378,12 @@ const Process = () => {
       };
 
       const response = await changeStatus(data);
-      if (response == undefined) {
-        toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
-      } else {
+      console.log(response);
+      if (response.status == 200) {
         toast.success("เปลี่ยนสถานะ สำเร็จ");
-        fetchUserList(userId);
-        fetchUserListSum(userId);
+        handleFetch();
+      } else {
+        toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
       }
     } catch (error) {
       toast.error(error);
@@ -397,22 +396,19 @@ const Process = () => {
         id: userId,
         status: 2,
       };
-
       const response = await sendUpdate(data);
       console.log(response);
-      if (response == undefined) {
-        toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
-      } else {
+      if (response?.status == 200) {
         toast.success("เปลี่ยนสถานะ สำเร็จ");
-        fetchUserList(userId);
-        fetchUserListSum(userId);
+        handleFetch();
+      } else {
+        toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
       }
     } catch (error) {
       toast.error(error);
     }
   };
 
-  console.log(userListData);
   const [returnReload, setReturnReload] = useState([]);
 
   const handleReload = async () => {
@@ -440,8 +436,6 @@ const Process = () => {
     }
   };
 
-  
-
   const handleButton = () => {
     setShowButton(!showButton);
   };
@@ -453,6 +447,13 @@ const Process = () => {
 
     return () => clearTimeout(timeoutId);
   }, [showButton]);
+
+  const handleFetch = () => {
+    fetchUpdateAll(cardId);
+    fetchStatus1();
+    fetchUserList(userId);
+    fetchUserListSum(userId);
+  };
 
   return (
     <Card>
@@ -880,7 +881,7 @@ const Process = () => {
                           }}
                           onClick={() => [
                             setActiveCustomerMenu("menu2"),
-                            fetchStatus(0)
+                            fetchStatus(0),
                           ]}
                         >
                           กำลังจ่าย
@@ -1429,7 +1430,7 @@ const Process = () => {
               setUserListData([]),
               fetchProcess(),
               setListDataCustomer([]),
-              setCardId('')
+              setCardId(""),
             ]}
             className="flex mr-1 text-base"
           >
@@ -1449,7 +1450,7 @@ const Process = () => {
         className="h-[20vh] "
       >
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">ยืนยันการรีโหลด</Typography>
+          <Typography variant="h5">ยืนยันการรียอด</Typography>
         </DialogHeader>
         <DialogFooter className="flex justify-center gap-5 mt-3">
           <Button
