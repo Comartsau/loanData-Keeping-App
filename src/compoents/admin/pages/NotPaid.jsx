@@ -290,7 +290,7 @@ const NotPaid = () => {
                 className="p-3 md:h-[180px] items-center mt-2 md:mt-5 px-5  "
                 style={{ border: "3px solid black" }}
               >
-                <Typography className=" font-bold mt-5">
+                <Typography className=" font-bold mt-2">
                   จำนวนยืม: <sapn className="font-normal">{Number(listData?.totals?.total).toLocaleString() == "NaN" ? 0 : Number(listData?.totals?.total).toLocaleString()}</sapn> บาท
                 </Typography>
                 <Typography className=" font-bold mt-3">

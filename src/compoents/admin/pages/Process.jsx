@@ -142,7 +142,6 @@ const Process = () => {
       const response = await getUpdateAll(cardId);
       console.log(response);
       if (response?.status == 200) {
-        console.log("aaaaa");
         setDataProcessId(response?.data);
       } else {
         return;
@@ -183,7 +182,7 @@ const Process = () => {
       if (response?.status == 200) {
         setListDataCustomer(response.data);
       } else {
-        toast.error("ดึงข้อมูลไม่สำเร็จ  กรุณาลองใหม่");
+       return
       }
     } catch (error) {
       console.error(error);
