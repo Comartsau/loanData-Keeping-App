@@ -148,8 +148,6 @@ export const userUpdate = async (data) => {
     console.log(response)
     if(response.status === 200) {
       return response;
-    }else {
-      return
     }
   } catch (error) {
     console.error(error);
