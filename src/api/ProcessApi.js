@@ -145,6 +145,7 @@ export const userUpdate = async (data) => {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
+    console.log(response)
     return response;
   } catch (error) {
     console.error(error);
