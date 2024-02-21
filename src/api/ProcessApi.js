@@ -136,7 +136,6 @@ export const getProcessUserListSum = async (id) => {
 };
 
 export const userUpdate = async (data) => {
-
   try {
     const response = await axios.post(
       `${import.meta.env.VITE_APP_API}/api/process/user`,
