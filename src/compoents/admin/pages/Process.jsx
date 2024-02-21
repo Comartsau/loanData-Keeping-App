@@ -328,6 +328,7 @@ const Process = () => {
         end_day: startEnd,
       };
       const response = await userUpdate(data);
+      console.log(response)
       if (response?.status == 200) {
         toast.success("เพิ่ม/อัพเดรทข้อมูล ลูกค้า สำเร็จ");
         handleFetch();
