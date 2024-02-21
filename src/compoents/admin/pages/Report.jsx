@@ -14,8 +14,8 @@ const Report = () => {
     <div>
       <Card className="w-full overflow-auto  px-3">
         <div >
-          <div className=" item-center mt-5 flex w-full flex-col gap-2 md:justify-around lg:flex-row">
-            <div className="flex  flex-col gap-5  lg:gap-10 xl:flex-row xl:gap-20 ">
+          <div className=" item-center mt-5 flex w-full flex-col gap-2 md:justify-left lg:flex-row">
+            <div className="flex  flex-col gap-5  lg:gap-10 xl:flex-row xl:gap-5 ">
               <div className="flex  flex-col justify-center gap-5 sm:flex-row lg:gap-20  ">
                 <div className="flex justify-center">
                   <Button
@@ -32,7 +32,7 @@ const Report = () => {
                   </Button>
                 </div>
               </div>
-              <div className="flex flex-col justify-center gap-5 sm:flex-row lg:gap-20">
+              <div className="flex flex-col justify-center gap-5 sm:flex-row lg:gap-5">
                 <div className="flex justify-center">
                   <Button
                     variant="outlined"

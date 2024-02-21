@@ -858,7 +858,7 @@ const Process = () => {
                         <Button
                           size="lg"
                           variant="outlined"
-                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
+                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white ${
                             activeCustomerMenu === "menu1"
                               ? " bg-blue-300 "
                               : "bg-blue-100"
@@ -878,12 +878,12 @@ const Process = () => {
                         <Button
                           size="lg"
                           variant="outlined"
-                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400 `}
+                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white `}
                           style={{
                             backgroundColor:
                               activeCustomerMenu === "menu2"
-                                ? "#FFEB3B"
-                                : "#ebdb6b",
+                                ? "#ff9800"
+                                : "#fdaf3d",
                           }}
                           onClick={() => [
                             setActiveCustomerMenu("menu2"),
