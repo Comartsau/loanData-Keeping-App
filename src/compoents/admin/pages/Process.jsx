@@ -362,35 +362,41 @@ const Process = () => {
       setSearchQueryEnd(addDays(searchQueryStart, newDaysToAdd));
     }
   };
-  const [changeDate , setChangeDate] = useState('')
+  const [changeDate, setChangeDate] = useState("");
 
   // const startDate = moment(searchQueryStart).add(543, 'years').format('YYYY-MM-DD')
   const startDate = moment(searchQueryStart).format("YYYY-MM-DD");
   const startEnd = moment(searchQueryEnd).format("YYYY-MM-DD");
-  const dateSend = moment(changeDate).format("YYYY-MM-DD")
-  
+  const dateSend = moment(changeDate).format("YYYY-MM-DD");
 
-  console.log(dateSend)
+  console.log(dateSend);
 
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
-      let data = {
-        id: dataed?.id,
-        status: changestatus,
-        price: dataed?.price,
-        process_user_id: userId,
-        process_id: cardId,
-        date: dateSend,
-      };
-      console.log(data)
-
-      const response = await changeStatus(data);
-      console.log(response);
-      if (response.status == 200) {
-        toast.success("เปลี่ยนสถานะ สำเร็จ");
-        handleFetch();
+      console.log(dateSend);
+      if (dateSend == "Invalid date") {
+        toast.error("กรุณาระบบวันที่");
       } else {
-        toast.error(response?.response?.data);
+        let data = {
+          id: dataed?.id,
+          status: changestatus,
+          price: dataed?.price,
+          process_user_id: userId,
+          process_id: cardId,
+          date: dateSend,
+        };
+        console.log(data);
+
+        const response = await changeStatus(data);
+        console.log(response);
+        if (response.status == 200) {
+          toast.success("เปลี่ยนสถานะ สำเร็จ");
+          setChangeDate("");
+          handleFetch();
+        } else {
+          toast.error(response?.response?.data);
+        }
+       
       }
     } catch (error) {
       toast.error(error);
@@ -1278,25 +1284,33 @@ const Process = () => {
                                         </Typography>
                                       </div>
                                     </td>
-                                    {data?.date == "Invalid dateInvalid date" ? 
-                                       <td className={classes}>
-                                       <div className="flex items-center justify-center ">
-                                        <input type= "date" className=" border-2 border-black text-center bg-gray-200 " placeholder="ระบุวันที่ DD-MM-YYY" onChange={(e) => setChangeDate(e.target.value)}   />
-                                       </div>
-                                     </td>
-                                     :
-                                    <td className={classes}>
-                                      <div className="flex items-center justify-center">
-                                        <Typography
-                                          variant="small"
-                                          color="blue-gray"
-                                          className="font-normal"
-                                        >
-                                          {data?.date}
-                                        </Typography>
-                                      </div>
-                                    </td>
-                                    }
+                                    {data?.date ==
+                                    "Invalid dateInvalid date" ? (
+                                      <td className={classes}>
+                                        <div className="flex items-center justify-center ">
+                                          <input
+                                            type="date"
+                                            className=" border-2 border-black text-center bg-gray-200 "
+                                            placeholder="ระบุวันที่ DD-MM-YYY"
+                                            onChange={(e) =>
+                                              setChangeDate(e.target.value)
+                                            }
+                                          />
+                                        </div>
+                                      </td>
+                                    ) : (
+                                      <td className={classes}>
+                                        <div className="flex items-center justify-center">
+                                          <Typography
+                                            variant="small"
+                                            color="blue-gray"
+                                            className="font-normal"
+                                          >
+                                            {data?.date}
+                                          </Typography>
+                                        </div>
+                                      </td>
+                                    )}
                                     <td className={classes}>
                                       <div className="flex items-center justify-center">
                                         <Typography
