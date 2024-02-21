@@ -329,14 +329,14 @@ const Process = () => {
       };
       const response = await userUpdate(data);
       // console.log(response)
-      if (response?.status == 200) {
-        // toast.success("เพิ่ม/อัพเดทข้อมูล ลูกค้า สำเร็จ");
-        // handleFetch();
-        // setAmountDate(0);
-        // setAmount(0);
-        // setSearchQueryStart(new Date());
-        // setSearchQueryEnd(new Date());
-        // setSelectedValue(null);
+      if (response?.status === 200) {
+        toast.success("เพิ่ม/อัพเดทข้อมูล ลูกค้า สำเร็จ");
+        handleFetch();
+        setAmountDate(0);
+        setAmount(0);
+        setSearchQueryStart(new Date());
+        setSearchQueryEnd(new Date());
+        setSelectedValue(null);
       } else {
         toast.error("ไม่สามารถบันทึกได้ กรุณาลองใหม่");
       }
