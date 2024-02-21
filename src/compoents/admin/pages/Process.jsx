@@ -329,7 +329,7 @@ const Process = () => {
       };
       const response = await userUpdate(data);
       // console.log(response)
-      if (response?.status === 200) {
+      if (response) {
         toast.success("เพิ่ม/อัพเดทข้อมูล ลูกค้า สำเร็จ");
         handleFetch();
         setAmountDate(0);

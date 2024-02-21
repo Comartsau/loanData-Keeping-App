@@ -146,7 +146,11 @@ export const userUpdate = async (data) => {
       }
     );
     console.log(response)
-    return response;
+    if(response.status === 200) {
+      return response;
+    }else {
+      return
+    }
   } catch (error) {
     console.error(error);
   }
