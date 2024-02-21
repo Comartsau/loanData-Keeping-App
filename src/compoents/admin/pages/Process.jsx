@@ -324,8 +324,8 @@ const Process = () => {
         user_id: selectedCustomer?.id,
         price: Number(amount),
         count_day: Number(amountDate),
-        start_day: startDate,
-        end_day: startEnd,
+        // start_day: startDate,
+        // end_day: startEnd,
       };
       const response = await userUpdate(data);
       // console.log(response)
@@ -722,7 +722,7 @@ const Process = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex w-full flex-col lg:flex-row justify-center mt-3 gap-3  ">
+                {/* <div className="flex w-full flex-col lg:flex-row justify-center mt-3 gap-3  ">
                   <div className="w-full lg:w-[50%]">
                     <div className=" relative w-full min-w-[100px] h-10">
                       <DatePicker
@@ -747,8 +747,8 @@ const Process = () => {
                       />
                     </div>
                   </div>
-                </div>
-                <div className="flex w-full flex-col lg:flex-row justify-center mt-3 gap-3  ">
+                </div> */}
+                <div className="flex w-full flex-col lg:flex-row justify-center mt-5 gap-3  ">
                   <div className="w-full ">
                     <Button
                       size="sm"
