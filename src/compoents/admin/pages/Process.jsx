@@ -317,7 +317,11 @@ const Process = () => {
     return newDate;
   };
 
+  const [hideButton ,setHideButton] = useState(false)
+
+
   const handleUser = async () => {
+    setSelectDisable(true)
     try {
       let data = {
         process_id: cardId,
@@ -337,8 +341,10 @@ const Process = () => {
         setSearchQueryStart(new Date());
         setSearchQueryEnd(new Date());
         setSelectedValue(null);
+        setSelectDisable(false)
       } else {
         toast.error("ไม่สามารถบันทึกได้ กรุณาลองใหม่");
+        setSelectDisable(false)
       }
     } catch (error) {
       console.log(error);
@@ -370,7 +376,7 @@ const Process = () => {
   const startEnd = moment(searchQueryEnd).format("YYYY-MM-DD");
   const dateSend = moment(changeDate).format("YYYY-MM-DD");
 
-  console.log(dateSend);
+  // console.log(dateSend);
 
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
@@ -665,6 +671,7 @@ const Process = () => {
                         setSearchQueryStart(new Date()),
                         setSearchQueryEnd(new Date()),
                         setUserListData([]),
+
                       ]}
                     >
                       <span className="mr-2 text-xl">
