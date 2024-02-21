@@ -75,7 +75,6 @@ const Process = () => {
   const [userListData, setUserListData] = useState([]);
   const [disableButton, setDisableButton] = useState(true);
 
-
   // const [selectedShop, setSelectedShop] = useState(null);
 
   // const handleShopSelect = (e) => {
@@ -197,7 +196,13 @@ const Process = () => {
       const response = await getProcessUserList(id);
       if (response?.status == 200) {
         setSumUser(response?.data);
-        setDisableButton(status == "1" || status == "2" || response?.data[response?.data?.length -1]?.status == "1" ? false : true);
+        setDisableButton(
+          status == "1" ||
+            status == "2" ||
+            response?.data[response?.data?.length - 1]?.status == "1"
+            ? false
+            : true
+        );
       } else {
         toast.error(response);
       }
@@ -357,10 +362,15 @@ const Process = () => {
       setSearchQueryEnd(addDays(searchQueryStart, newDaysToAdd));
     }
   };
+  const [changeDate , setChangeDate] = useState('')
 
   // const startDate = moment(searchQueryStart).add(543, 'years').format('YYYY-MM-DD')
   const startDate = moment(searchQueryStart).format("YYYY-MM-DD");
   const startEnd = moment(searchQueryEnd).format("YYYY-MM-DD");
+  const dateSend = moment(changeDate).format("YYYY-MM-DD")
+  
+
+  console.log(dateSend)
 
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
@@ -370,7 +380,9 @@ const Process = () => {
         price: dataed?.price,
         process_user_id: userId,
         process_id: cardId,
+        date: dateSend,
       };
+      console.log(data)
 
       const response = await changeStatus(data);
       console.log(response);
@@ -378,7 +390,7 @@ const Process = () => {
         toast.success("เปลี่ยนสถานะ สำเร็จ");
         handleFetch();
       } else {
-        toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
+        toast.error(response?.response?.data);
       }
     } catch (error) {
       toast.error(error);
@@ -418,18 +430,16 @@ const Process = () => {
       const response = await sendReload(data);
       console.log(response?.response?.data);
       if (response?.status == 200) {
-      
         toast.success("รียอด สำเร็จ");
         setReturnReload(response?.data);
         handleModalDataReload();
         handleFetch();
       } else {
         toast.error(response?.response?.data);
-        handleModalReload()
+        handleModalReload();
       }
     } catch (error) {
       toast.error(error);
-  
     }
   };
 
@@ -440,7 +450,7 @@ const Process = () => {
     fetchUserListSum(userId);
   };
 
-  // console.log(sumUser);
+  console.log(sumUser);
 
   return (
     <Card>
@@ -851,7 +861,7 @@ const Process = () => {
                             fetchStatus1(),
                             setDisableButton(true),
                             setSumUser([]),
-                            setActiveRow()
+                            setActiveRow(),
                           ]}
                         >
                           ทั้งหมด
@@ -873,7 +883,7 @@ const Process = () => {
                             fetchStatus(0),
                             setDisableButton(true),
                             setSumUser([]),
-                            setActiveRow()
+                            setActiveRow(),
                           ]}
                         >
                           กำลังจ่าย
@@ -896,7 +906,7 @@ const Process = () => {
                             fetchStatus(1),
                             setDisableButton(false),
                             setSumUser([]),
-                            setActiveRow()
+                            setActiveRow(),
                           ]}
                         >
                           จ่ายครบแล้ว
@@ -916,7 +926,7 @@ const Process = () => {
                             fetchStatus(2),
                             setDisableButton(false),
                             setSumUser([]),
-                            setActiveRow()
+                            setActiveRow(),
                           ]}
                         >
                           ลูกค้าเสีย
@@ -1268,6 +1278,13 @@ const Process = () => {
                                         </Typography>
                                       </div>
                                     </td>
+                                    {data?.date == "Invalid dateInvalid date" ? 
+                                       <td className={classes}>
+                                       <div className="flex items-center justify-center ">
+                                        <input type= "date" className=" border-2 border-black text-center bg-gray-200 " placeholder="ระบุวันที่ DD-MM-YYY" onChange={(e) => setChangeDate(e.target.value)}   />
+                                       </div>
+                                     </td>
+                                     :
                                     <td className={classes}>
                                       <div className="flex items-center justify-center">
                                         <Typography
@@ -1279,6 +1296,7 @@ const Process = () => {
                                         </Typography>
                                       </div>
                                     </td>
+                                    }
                                     <td className={classes}>
                                       <div className="flex items-center justify-center">
                                         <Typography
