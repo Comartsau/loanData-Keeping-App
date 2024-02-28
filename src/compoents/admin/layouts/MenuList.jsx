@@ -59,25 +59,25 @@ const MenuList = ({ darkTheme, toggleTheme }) => {
         >
           <Menu.Item key="/admin" icon={<DatabaseOutlined style={iconStyle} />}>
             <Link to="/admin" onClick={() => [HideActive == 1 ? setCollapsed(!collapsed) : '']} >
-              ข้อมูลพื้นฐาน
+              สถานที่
             </Link>
           </Menu.Item>
-          <Menu.Item 
+          {/* <Menu.Item 
             key="/admin/process"
             icon={<GoWorkflow style={iconStyle} />}
           >
             <Link to="/admin/process"  onClick={() => [HideActive == 1 ? setCollapsed(!collapsed) : '']} >
               Process
             </Link>
-          </Menu.Item>
-          <Menu.Item
+          </Menu.Item> */}
+          {/* <Menu.Item
             key="/admin/report"
             icon={<TbReportAnalytics style={iconStyle} />}
           >
             <Link to="/admin/report"  onClick={() => [HideActive == 1 ? setCollapsed(!collapsed) : '']} >
               รายงาน
             </Link>
-          </Menu.Item>
+          </Menu.Item> */}
         </Menu>
       </ConfigProvider>
     </div>

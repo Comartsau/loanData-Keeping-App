@@ -14,14 +14,18 @@ import { useEffect, useState } from "react";
 
 import { getNoPaid } from "../../../api/ReportApi";
 
+import { useRecoilValue } from "recoil";
+import { processStore , customerIdStore } from "../../../store/Store";
+
 const NotPaid = () => {
   const [listData, setListData] = useState([]);
+  const customerId = useRecoilValue(customerIdStore);
 
   const [searchQuery, setSearchQuery] = useState("");
 
   const fecthNotPaid = async () => {
     try {
-      const respone = await getNoPaid(searchQuery);
+      const respone = await getNoPaid( customerId ,searchQuery);
       setListData(respone);
     } catch (error) {
       toast.error(error);

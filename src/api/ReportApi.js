@@ -1,15 +1,16 @@
 import axios from "axios";
 import { HeaderAPI } from "../../headerApi";
 
-export const getNoPaid = async (searchQuery) => {
+export const getNoPaid = async (id , searchQuery) => {
     console.log(searchQuery);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_APP_API}/api/report/user?search=${searchQuery}`,
+        `${import.meta.env.VITE_APP_API}/api/report/user?process_id=${id}&search=${searchQuery}`,
         {
           ...HeaderAPI(localStorage.getItem("Token")),
         }
       );
+      console.log(response)
       return response.data;
     } catch (error) {
       console.error(error);
@@ -35,7 +36,7 @@ export const getLostCustomer = async (id) => {
     console.log(id);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_APP_API}/api/report/user/broken?search=${id}`,
+        `${import.meta.env.VITE_APP_API}/api/report/user/broken?process_id=${id}`,
         {
           ...HeaderAPI(localStorage.getItem("Token")),
         }

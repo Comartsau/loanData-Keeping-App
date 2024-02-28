@@ -1,19 +1,23 @@
 import {
   Card,
+  CardBody,
   Button,
   IconButton,
+  Input,
   Typography,
   Dialog,
   DialogBody,
   DialogHeader,
   DialogFooter,
+  List,
+  ListItem,
 } from "@material-tailwind/react";
 
 import Select from "react-select";
 
-// import DatePicker from "react-datepicker";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// import th from "date-fns/locale/th";
+import th from "date-fns/locale/th";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -26,12 +30,7 @@ import { useEffect, useState } from "react";
 
 import { useRecoilState, useRecoilValue } from "recoil";
 
-import {
-  locationStore,
-  customerStore,
-  customerIdStore,
-  processStore,
-} from "../../../store/Store";
+import { locationStore, customerStore } from "../../../store/Store";
 
 import { FaRegSave, FaExchangeAlt } from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
@@ -62,12 +61,7 @@ const Process = () => {
   const [dataProcessId, setDataProcessId] = useState([]);
   const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
   const [sumUser, setSumUser] = useState([]);
-  // const [cardId, setCardId] = useState("");
-
-  const [customerDataStore, setCustomerDataStore] =
-    useRecoilState(customerStore);
-  const customerId = useRecoilValue(customerIdStore);
-  const [dataProcessStore, setDataProcessStore] = useRecoilState(processStore);
+  const [cardId, setCardId] = useState("");
 
   const [listDataCustomer, setListDataCustomer] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
@@ -91,6 +85,8 @@ const Process = () => {
   // setSelectedShop(shop);
   // };
 
+  const [customerDataStore, setCustomerDataStore] =
+    useRecoilState(customerStore);
   const locationDataStore = useRecoilValue(locationStore);
 
   const locationOptions = locationDataStore?.map((location) => ({
@@ -119,9 +115,7 @@ const Process = () => {
 
   const fetchCustomer = async () => {
     try {
-      const response = await getCustomer(customerId, searchQuery);
-
-      console.log(response);
+      const response = await getCustomer(searchQuery);
       setCustomerDataStore(response);
     } catch (error) {
       console.error(error);
@@ -139,13 +133,13 @@ const Process = () => {
   const handleSelectCard = async (item) => {
     setOpenModalProcess(!openModalProcess);
     setSelectCard(item);
-    // setCardId(item?.id);
+    setCardId(item?.id);
     await fetchUpdateAll(item?.id);
   };
 
-  const fetchUpdateAll = async () => {
+  const fetchUpdateAll = async (cardId) => {
     try {
-      const response = await getUpdateAll(dataProcessStore?.id);
+      const response = await getUpdateAll(cardId);
       if (response?.status == 200) {
         setDataProcessId(response?.data);
       } else {
@@ -156,16 +150,11 @@ const Process = () => {
     }
   };
 
-  useEffect(()=>{
-    fetchUpdateAll()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[])
-
   const [statused, setStatused] = useState("");
 
   const fetchStatus = async (statused) => {
     try {
-      const response = await getProcessUser(dataProcessStore?.id, statused);
+      const response = await getProcessUser(cardId, statused);
       if (response?.status == 200) {
         setListDataCustomer(response?.data);
       } else {
@@ -177,16 +166,16 @@ const Process = () => {
   };
 
   useEffect(() => {
-    fetchStatus( " ");
-    // if (dataProcessStore?.id) {
-    // }
+    if (cardId) {
+      fetchStatus(" ");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataProcessStore?.id]);
+  }, [cardId]);
 
   const fetchStatus1 = async () => {
     console.log(statused);
     try {
-      const response = await getProcessUser1(dataProcessStore?.id);
+      const response = await getProcessUser1(cardId);
       console.log(response);
       if (response?.status == 200) {
         setListDataCustomer(response.data);
@@ -202,7 +191,7 @@ const Process = () => {
 
   const fetchUserList = async (id, status) => {
     try {
-      setUserId(id); 
+      setUserId(id);
       // setSumUser([]);
       const response = await getProcessUserList(id);
       if (response?.status == 200) {
@@ -328,13 +317,14 @@ const Process = () => {
     return newDate;
   };
 
-  const [hideButton, setHideButton] = useState(false);
+  const [hideButton ,setHideButton] = useState(false)
+
 
   const handleUser = async () => {
-    setSelectDisable(true);
+    setSelectDisable(true)
     try {
       let data = {
-        process_id: dataProcessStore?.id,
+        process_id: cardId,
         user_id: selectedCustomer?.id,
         price: Number(amount),
         count_day: Number(amountDate),
@@ -342,7 +332,7 @@ const Process = () => {
         // end_day: startEnd,
       };
       const response = await userUpdate(data);
-      console.log(response)
+      // console.log(response)
       if (response) {
         toast.success("เพิ่ม/อัพเดทข้อมูล ลูกค้า สำเร็จ");
         handleFetch();
@@ -351,10 +341,10 @@ const Process = () => {
         setSearchQueryStart(new Date());
         setSearchQueryEnd(new Date());
         setSelectedValue(null);
-        setSelectDisable(false);
+        setSelectDisable(false)
       } else {
         toast.error("ไม่สามารถบันทึกได้ กรุณาลองใหม่");
-        setSelectDisable(false);
+        setSelectDisable(false)
       }
     } catch (error) {
       console.log(error);
@@ -399,7 +389,7 @@ const Process = () => {
           status: changestatus,
           price: dataed?.price,
           process_user_id: userId,
-          process_id: dataProcessStore?.id,
+          process_id: cardId,
           date: dateSend,
         };
         console.log(data);
@@ -413,6 +403,7 @@ const Process = () => {
         } else {
           toast.error(response?.response?.data);
         }
+       
       }
     } catch (error) {
       toast.error(error);
@@ -444,7 +435,7 @@ const Process = () => {
     try {
       let data = {
         process_user_id: userId,
-        process_id: dataProcessStore?.id,
+        process_id: cardId,
         price: userListData?.price,
         count_day: userListData?.count_day,
       };
@@ -466,7 +457,7 @@ const Process = () => {
   };
 
   const handleFetch = () => {
-    fetchUpdateAll(dataProcessStore?.id);
+    fetchUpdateAll(cardId);
     fetchStatus1();
     fetchUserList(userId);
     fetchUserListSum(userId);
@@ -474,763 +465,77 @@ const Process = () => {
 
   console.log(sumUser);
 
-  // console.log(dataProcessStore.id);
-  // console.log(listDataCustomer)
-
   return (
     <Card>
-      <div className="flex flex-col w-full mt-5 px-2 ">
+      <div className="flex flex-col w-full mt-5 ">
         <ToastContainer className="toast " autoClose={800} theme="colored" />
-
-        <div className="flex   flex-col  overflow-auto   items-center ">
-          <div className="flex w-full flex-col md:flex-row gap-5 ">
-            <div className="flex flex-col w-full h-[85vh] md:w-4/12 xl:w-4/12 ">
-              <div className="flex  items-center gap-3 ">
-                <div>
-                  <Typography className="text-lg lg:text-xl font-bold">
-                    {dataProcessStore?.name || ""}
-                  </Typography>
-                </div>
-                <div>
-                  <Button
-                    size="sm"
-                    variant="gradient"
-                    color="green"
-                    className="text-base flex justify-center  items-center   bg-green-500"
-                    onClick={() => [
-                      setSelectDisable(0),
-                      setSelectedValue(null),
-                      setAmount(0),
-                      setAmountDate(0),
-                      setSearchQueryStart(new Date()),
-                      setSearchQueryEnd(new Date()),
-                      setUserListData([]),
-                    ]}
-                  >
-                    <span className="mr-2 text-xl">
-                      <BsPlusCircle />
-                    </span>
-                    เพิ่มการบันทึกใหม่
-                  </Button>
-                </div>
-              </div>
-              <div className=" w-full  flex flex-col justify-center mt-3  ">
-                <Select
-                  classNamePrefix="select"
-                  placeholder="เลือกลูกค้า"
-                  // isClearable={isClearable}
-                  isSearchable={isSearchable}
-                  isDisabled={selectDisable}
-                  value={selectedValue}
-                  // value={{ value: selectedCustomer?.id, label: selectedCustomer?.name }}
-                  name="color"
-                  options={customerOptions}
-                  onChange={(e) => handleCustomerSelect(e)}
-                />
-              </div>
-              <div className="flex w-full flex-col lg:flex-row justify-center mt-3 gap-3  ">
-                <div className="w-full lg:w-[50%]">
-                  <div className=" relative w-full min-w-[100px] h-10">
-                    <input
-                      type="number"
-                      min={0}
-                      value={amount}
-                      disabled={selectDisable}
-                      className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
-                      style={{ backgroundColor: "rgb(244,244,244)" }}
-                      onChange={(e) => setAmount(e.target.value)}
-                    />
-                    <label className="flex w-[100%] h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-blue-gray-500 leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] text-blue-gray-400 peer-focus:text-blue-gray-500 before:border-blue-gray-200 peer-focus:before:!border-blue-gray-500 after:border-blue-gray-200 peer-focus:after:!border-blue-gray-500">
-                      จำนวนเงิน{" "}
-                    </label>
-                  </div>
-                </div>
-                <div className="w-full lg:w-[50%]">
-                  <div className=" relative w-full min-w-[100px] h-10">
-                    <input
-                      type="number"
-                      min={0}
-                      value={amountDate}
-                      disabled={selectDisable}
-                      className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
-                      style={{ backgroundColor: "rgb(244,244,244)" }}
-                      onChange={handleDaysToAddChange}
-                    />
-                    <label className="flex w-[100%] h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-blue-gray-500 leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] text-blue-gray-400 peer-focus:text-blue-gray-500 before:border-blue-gray-200 peer-focus:before:!border-blue-gray-500 after:border-blue-gray-200 peer-focus:after:!border-blue-gray-500">
-                      จำนวนวัน{" "}
-                    </label>
-                  </div>
-                </div>
-              </div>
-              {/* <div className="flex w-full flex-col lg:flex-row justify-center mt-3 gap-3  ">
-                  <div className="w-full lg:w-[50%]">
-                    <div className=" relative w-full min-w-[100px] h-10">
-                      <DatePicker
-                        selected={searchQueryStart}
-                        disabled={selectDisable}
-                        locale={th}
-                        dateFormat="เริ่มต้น dd/MM/yyyy"
-                        onChange={handleSearchQueryStartChange}
-                        className="w-full rounded-md border border-gray-400 p-2 text-gray-600  shadow-sm focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full lg:w-[50%]">
-                    <div className=" relative w-full min-w-[100px] h-10">
-                      <DatePicker
-                        selected={searchQueryEnd}
-                        disabled
-                        locale={th}
-                        dateFormat="สิ้นสุด dd/MM/yyyy"
-                        onChange={(date) => setSearchQueryEnd(date)}
-                        className="w-full rounded-md border border-gray-400 p-2 text-gray-600  shadow-sm focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                </div> */}
-              <div className="flex w-full flex-col lg:flex-row justify-center mt-5 gap-3  ">
-                <div className="w-full ">
-                  <Button
-                    size="sm"
-                    variant="gradient"
-                    color="purple"
-                    disabled={userListData?.status == 0 ? false : true}
-                    className="text-base flex justify-center  items-center w-full   bg-green-500"
-                    onClick={handleModalReload}
-                  >
-                    <span className="mr-2 text-xl ">
-                      <TbReload />
-                    </span>
-                    รียอด
-                  </Button>
-                </div>
-                <div className="w-full">
-                  <Button
-                    size="sm"
-                    variant="gradient"
-                    color="green"
-                    disabled={selectDisable}
-                    className="text-base flex justify-center  items-center  w-full  bg-green-500"
-                    onClick={handleUser}
-                  >
-                    <span className="mr-2 text-xl ">
-                      <IoIosSave />
-                    </span>
-                    บันทึก
-                  </Button>
-                </div>
-                <div className="w-full ">
-                  <Button
-                    size="sm"
-                    variant="gradient"
-                    color="purple"
-                    disabled={userListData.status == 0 ? false : true}
-                    className="text-base flex justify-center  items-center w-full   bg-green-500"
-                    onClick={handleUpdate}
-                  >
-                    <span className="mr-2 text-xl ">
-                      <MdSmsFailed />
-                    </span>
-                    อัพเดท
-                  </Button>
-                </div>
-              </div>
-              <div className="flex w-full flex-col h-full mt-5 lg:mt-0  justify-center md:justify-end   ">
-                <div
-                  className="p-3  md:h-[260px] lg:h-[210px] items-center   "
-                  style={{ border: "3px solid black" }}
-                >
-                  <Typography className="text-xl font-bold ">
-                    ยอดรวม(ทั้งหมด)
-                  </Typography>
-                  <Typography className=" font-bold mt-5">
-                    ยอดรวม (ทั้งหมด):{" "}
-                    <sapn>
-                      {Number(dataProcessId?.total).toLocaleString() == "NaN"
-                        ? 0
-                        : Number(dataProcessId?.total).toLocaleString()}
-                    </sapn>{" "}
-                    บาท
-                  </Typography>
-                  <Typography className=" font-bold mt-3">
-                    ชำระแล้ว (ทั้งหมด):{" "}
-                    <sapn>
-                      {Number(dataProcessId?.paid).toLocaleString() == "NaN"
-                        ? 0
-                        : Number(dataProcessId?.paid).toLocaleString()}
-                    </sapn>{" "}
-                    บาท
-                  </Typography>
-                  <Typography className=" font-bold mt-3">
-                    ค้างชำระ (ทั้งหมด):{" "}
-                    <sapn>
-                      {Number(dataProcessId?.overdue).toLocaleString() == "NaN"
-                        ? 0
-                        : Number(dataProcessId?.overdue) < 0
-                        ? 0
-                        : Number(dataProcessId?.overdue).toLocaleString()}
-                    </sapn>{" "}
-                    บาท
-                  </Typography>
-                  <Typography className=" font-bold mt-3">
-                    กำไร (ทั้งหมด):{" "}
-                    <sapn>
-                      {Number(dataProcessId?.overdue).toLocaleString() == "NaN"
-                        ? 0
-                        : Number(dataProcessId?.overdue) < 0
-                        ? Math.abs(
-                            Number(dataProcessId?.overdue)
-                          ).toLocaleString()
-                        : 0}
-                    </sapn>{" "}
-                    บาท
-                  </Typography>
-                </div>
-              </div>
+        <div className="w-full flex   px-0 md:px-10">
+          <div className="w-full flex flex-col md:flex-row justify-center md:justify-start items-center gap-5">
+            <div>
+              <Input
+                type="text"
+                label="ค้นหาสถานที่"
+                //   placeholder="ค้นหา ชื่อลูกค้า"
+                color="blue-gray"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ backgroundColor: "#F4F4F4" }}
+              />
             </div>
-            <div className="flex w-full flex-col mt-24 md:mt-0 gap-3 md:w-8/12 xl:w-9/12 ">
-              <div className=" flex flex-col xl:flex-row  items-center sm:items-start  w-full justify-center md:justify-start    gap-5  ">
-                <div className="flex flex-col  xl:flex-row gap-5">
-                  <div className="flex gap-5">
-                    <div className=" justify-center">
-                      <Button
-                        size="lg"
-                        variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white ${
-                          activeCustomerMenu === "menu1"
-                            ? " bg-blue-300 "
-                            : "bg-blue-100"
-                        }`}
-                        onClick={() => [
-                          setActiveCustomerMenu("menu1"),
-                          fetchStatus1(),
-                          setDisableButton(true),
-                          setSumUser([]),
-                          setActiveRow(),
-                        ]}
-                      >
-                        ทั้งหมด
-                      </Button>
-                    </div>
-                    <div className=" justify-center">
-                      <Button
-                        size="lg"
-                        variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white `}
-                        style={{
-                          backgroundColor:
-                            activeCustomerMenu === "menu2"
-                              ? "#ff9800"
-                              : "#fdaf3d",
-                        }}
-                        onClick={() => [
-                          setActiveCustomerMenu("menu2"),
-                          fetchStatus(0),
-                          setDisableButton(true),
-                          setSumUser([]),
-                          setActiveRow(),
-                        ]}
-                      >
-                        กำลังจ่าย
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-5">
-                    <div className=" justify-center">
-                      <Button
-                        size="lg"
-                        variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                          activeCustomerMenu === "menu3"
-                            ? " bg-green-500 text-white"
-                            : "bg-green-300 text-white"
-                        }`}
-                        onClick={() => [
-                          setActiveCustomerMenu("menu3"),
-                          fetchStatus(1),
-                          setDisableButton(false),
-                          setSumUser([]),
-                          setActiveRow(),
-                        ]}
-                      >
-                        จ่ายครบแล้ว
-                      </Button>
-                    </div>
-                    <div className=" justify-center">
-                      <Button
-                        size="lg"
-                        variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                          activeCustomerMenu === "menu4"
-                            ? " bg-red-500 text-white"
-                            : "bg-red-300 text-white"
-                        }`}
-                        onClick={() => [
-                          setActiveCustomerMenu("menu4"),
-                          fetchStatus(2),
-                          setDisableButton(false),
-                          setSumUser([]),
-                          setActiveRow(),
-                        ]}
-                      >
-                        ลูกค้าเสีย
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <Card
-                  className="w-full  h-[45vh] p-2 "
-                  style={{ border: "3px solid black" }}
-                >
-                  <div className="mt-5 h-[380px] w-full overflow-auto  ">
-                    <table className="w-full min-w-max">
-                      <thead>
-                        <tr>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold leading-none opacity-70"
-                            >
-                              ลำดับ
-                            </Typography>
-                          </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold leading-none opacity-70"
-                            >
-                              ลูกค้า
-                            </Typography>
-                          </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold leading-none opacity-70"
-                            >
-                              จำนวนเงิน
-                            </Typography>
-                          </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold leading-none opacity-70"
-                            >
-                              จำนวนวัน
-                            </Typography>
-                          </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold leading-none opacity-70"
-                            >
-                              สถานะ
-                            </Typography>
-                          </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold leading-none opacity-70"
-                            >
-                              เลือก
-                            </Typography>
-                          </th>
-                        </tr>
-                      </thead>
-                      {listDataCustomer?.length == 0 ? (
-                        <tbody>
-                          <tr>
-                            <td colSpan={8}>
-                              <Typography className="mt-5 text-center">
-                                ...ไม่พบข้อมูล...
-                              </Typography>
-                            </td>
-                          </tr>
-                        </tbody>
-                      ) : (
-                        <tbody>
-                          {displayedData?.map((data, index) => {
-                            const isLast = index === displayedData?.length;
-                            const classes = isLast
-                              ? "p-2"
-                              : `p-3 border-b border-blue-gray-50 ${
-                                  index === activeRow ? "bg-gray-300" : ""
-                                }`;
-                            return (
-                              <tr key={index}>
-                                <td className={classes}>
-                                  <div className="flex items-center justify-center">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="font-normal"
-                                    >
-                                      {index + 1 || ""}
-                                    </Typography>
-                                  </div>
-                                </td>
-                                <td className={classes}>
-                                  <div className="flex items-center justify-center">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="font-normal"
-                                    >
-                                      {data?.name}
-                                    </Typography>
-                                  </div>
-                                </td>
-                                <td className={classes}>
-                                  <div className="flex items-center justify-center">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="font-normal "
-                                    >
-                                      {Number(data?.total).toLocaleString() ||
-                                        ""}
-                                    </Typography>
-                                  </div>
-                                </td>
-                                <td className={classes}>
-                                  <div className="flex items-center justify-center">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="font-normal "
-                                    >
-                                      {data?.count_day || ""}
-                                    </Typography>
-                                  </div>
-                                </td>
-                                <td className={classes}>
-                                  <div className="flex items-center justify-center">
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className={`font-normal ${
-                                        data?.status == "0"
-                                          ? "bg-yellow-300 bg-opacity-60 px-3  rounded-lg "
-                                          : data?.status == "1"
-                                          ? "bg-green-300  bg-opacity-60 px-3  rounded-lg"
-                                          : data?.status == "2"
-                                          ? "bg-red-500  bg-opacity-60 px-3   rounded-lg"
-                                          : data?.status == "3"
-                                          ? "bg-purple-500  bg-opacity-60 px-3   rounded-lg"
-                                          : ""
-                                      } `}
-                                    >
-                                      {data?.status == 0
-                                        ? "กำลังจ่าย"
-                                        : data?.status == 1
-                                        ? "จ่ายครบแล้ว"
-                                        : data?.status == 2
-                                        ? "ลูกค้าเสีย"
-                                        : data?.status == 3
-                                        ? "รียอด"
-                                        : ""}
-                                    </Typography>
-                                  </div>
-                                </td>
-                                <td className={classes}>
-                                  <div className="flex items-center justify-center">
-                                    <IconButton
-                                      variant="outlined"
-                                      color="blue"
-                                      size="sm"
-                                      className="ml-3 "
-                                      onClick={() => [
-                                        setActiveRow(index),
-                                        fetchUserList(data?.id, data?.status),
-                                        setSumUser([]),
-                                        setUserListData(data),
-                                        fetchUserListSum(data?.id),
-                                        setDisableButton(
-                                          data?.status == 1 || data?.status == 2
-                                            ? false
-                                            : true
-                                        ),
-                                        setSelectedValue(data),
-                                        setSelectedValue({
-                                          ...selectedValue,
-                                          label: data?.name,
-                                        }),
-                                        setSelectDisable(1),
-                                        setAmount(data?.total),
-                                        setAmountDate(data?.count_day),
-                                        setSearchQueryStart(
-                                          addYears(
-                                            parse(
-                                              data?.start_day,
-                                              "dd-MM-yyyy",
-                                              new Date()
-                                            ),
-                                            +543
-                                          )
-                                        ),
-                                        setSearchQueryEnd(
-                                          addYears(
-                                            parse(
-                                              data?.end_day,
-                                              "dd-MM-yyyy",
-                                              new Date()
-                                            ),
-                                            -543
-                                          )
-                                        ),
-                                      ]}
-                                    >
-                                      <BsFillEyeFill className="h-5 w-5  text-light-blue-700 " />
-                                    </IconButton>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      )}
-                    </table>
-                  </div>
-                </Card>
-              </div>
-              <div className=" flex flex-col sm:flex-row  items-center sm:items-start  w-full justify-center md:justify-start gap-5  ">
-                <div className="w-full md:w-[70%]">
-                  <Card
-                    className="w-full  h-[30vh]  p-2"
-                    style={{ border: "3px solid black" }}
-                  >
-                    <div className="h-[380px] overflow-auto ">
-                      <table className="w-full min-w-max  ">
-                        <thead>
-                          <tr>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                จำนวน
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                วันที่
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                ราคา
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                สถานะ
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                เลือก
-                              </Typography>
-                            </th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          {disableButton &&
-                            sumUser?.map((data, index) => {
-                              const isLast = index === sumUser?.length;
-                              const pageIndex = startIndex + index;
-                              const classes = isLast
-                                ? "p-2"
-                                : `p-3 border-b border-blue-gray-50 ${
-                                    index === activeRow2 ? "bg-gray-300" : ""
-                                  }`;
-                              return (
-                                <tr key={index}>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal"
-                                      >
-                                        {pageIndex + 1 || ""}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  {data?.date == "Invalid dateInvalid date" ? (
-                                    <td className={classes}>
-                                      <div className="flex items-center justify-center ">
-                                        <input
-                                          type="date"
-                                          className=" border-2 border-black text-center bg-gray-200 "
-                                          placeholder="ระบุวันที่ DD-MM-YYY"
-                                          onChange={(e) =>
-                                            setChangeDate(e.target.value)
-                                          }
-                                        />
-                                      </div>
-                                    </td>
-                                  ) : (
-                                    <td className={classes}>
-                                      <div className="flex items-center justify-center">
-                                        <Typography
-                                          variant="small"
-                                          color="blue-gray"
-                                          className="font-normal"
-                                        >
-                                          {data?.date}
-                                        </Typography>
-                                      </div>
-                                    </td>
-                                  )}
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal "
-                                      >
-                                        {data?.price || ""}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className={`font-normal ${
-                                          data?.status == "0"
-                                            ? "bg-red-300 bg-opacity-60 px-3   rounded-lg "
-                                            : data?.status == "1"
-                                            ? "bg-green-300 bg-opacity-60 px-3   rounded-lg"
-                                            : ""
-                                        } `}
-                                      >
-                                        {data?.status == 0
-                                          ? "ยังไม่จ่าย"
-                                          : data?.status == 1
-                                          ? "จ่ายแล้ว"
-                                          : ""}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <IconButton
-                                        variant="outlined"
-                                        color="blue"
-                                        size="sm"
-                                        className="ml-3 "
-                                        // disabled={data[data?.length -1]?.status == 1 ? false : true }
-
-                                        onClick={() => [
-                                          setActiveRow2(index),
-                                          handleChangeStatus(
-                                            data?.status == 0
-                                              ? "1"
-                                              : data?.status == 1
-                                              ? "0"
-                                              : "",
-                                            data
-                                          ),
-                                          // handleButton(),
-                                        ]}
-                                      >
-                                        <FaExchangeAlt className="h-5 w-5  text-light-blue-700 " />
-                                      </IconButton>
-                                    </div>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </Card>
-                </div>
-                <div
-                  className="flex w-full md:w-[30%] md:h-[330px] lg:h-[250px]  xl:h-[210px]  "
-                  style={{ border: "3px solid black" }}
-                >
-                  <div className="gap-3  p-3">
-                    <Typography className="text-xl font-bold">
-                      ยอดรวม ({userListData?.name})
-                    </Typography>
-                    <Typography className=" font-bold mt-5">
-                      ยอดรวม (ทั้งหมด):{" "}
-                      <sapn>
-                        {" "}
-                        {Number(userListSum?.total).toLocaleString() == "NaN"
-                          ? 0
-                          : Number(userListSum?.total).toLocaleString()}
-                      </sapn>{" "}
-                      บาท
-                    </Typography>
-                    <Typography className=" font-bold mt-3">
-                      ชำระแล้ว (ทั้งหมด):{" "}
-                      <sapn>
-                        {Number(userListSum?.paid).toLocaleString() == "NaN"
-                          ? 0
-                          : Number(userListSum?.paid).toLocaleString()}
-                      </sapn>{" "}
-                      บาท
-                    </Typography>
-                    <Typography className=" font-bold mt-3">
-                      ค้างชำระ (ทั้งหมด):{" "}
-                      <sapn>
-                        {Number(userListSum?.overdue).toLocaleString() == "NaN"
-                          ? 0
-                          : Number(userListSum?.overdue) < 0
-                          ? 0
-                          : Number(userListSum?.overdue).toLocaleString()}
-                      </sapn>{" "}
-                      บาท
-                    </Typography>
-                    <Typography className=" font-bold mt-3">
-                      กำไร (ทั้งหมด):{" "}
-                      <sapn>
-                        {Number(userListSum?.overdue).toLocaleString() == "NaN"
-                          ? 0
-                          : Number(userListSum?.overdue) < 0
-                          ? Math.abs(
-                              Number(userListSum?.overdue)
-                            ).toLocaleString()
-                          : 0}
-                      </sapn>{" "}
-                      บาท
-                    </Typography>
-                  </div>
-                </div>
-              </div>
+            <div>
+              <Button
+                size="sm"
+                variant="gradient"
+                color="green"
+                className="text-base flex justify-center  items-center   bg-green-500"
+                onClick={handleModalAddProcess}
+              >
+                <span className="mr-2 text-xl">
+                  <BsPlusCircle />
+                </span>
+                เพิ่มการบันทึกใหม่
+              </Button>
             </div>
           </div>
         </div>
+
+        {/* ------------ Card  ----------------------------------------- */}
+        <Card className="mt-5 border-1 max-h-[60vh] lg:max-h-[70vh] overflow-auto px-3">
+          <List className="flex flex-wrap  flex-row  w-full   ">
+            {listData?.map((item, index) => (
+              <ListItem
+                key={index}
+                className="flex-none w-full md:w-[300px] p-2  md:ps-10"
+                onClick={() => handleSelectCard(item)}
+              >
+                <Card className="flex w-full flex-col  ">
+                  <CardBody>
+                    <Typography variant="h5" color="blue-gray" className="mb-2">
+                      {item?.name}
+                    </Typography>
+                    <Typography>
+                      ยอดรวม: {Number(item?.total).toLocaleString()} บาท
+                    </Typography>
+                    <Typography>
+                      ชำระแล้ว: {Number(item?.paid).toLocaleString()} บาท
+                    </Typography>
+                    <Typography>
+                      ค้างชำระ:{" "}
+                      {Number(item?.overdue) < 0
+                        ? 0
+                        : Number(item?.overdue).toLocaleString()}{" "}
+                      บาท
+                    </Typography>
+                    <Typography>
+                      กำไร: {Math.abs(Number(item?.overdue)).toLocaleString()}{" "}
+                      บาท
+                    </Typography>
+                  </CardBody>
+                </Card>
+              </ListItem>
+            ))}
+          </List>
+        </Card>
       </div>
 
       {/* modal Add Process */}
@@ -1366,6 +671,7 @@ const Process = () => {
                         setSearchQueryStart(new Date()),
                         setSearchQueryEnd(new Date()),
                         setUserListData([]),
+
                       ]}
                     >
                       <span className="mr-2 text-xl">
@@ -2160,7 +1466,7 @@ const Process = () => {
               setUserListData([]),
               fetchProcess(),
               setListDataCustomer([]),
-              // setCardId(""),
+              setCardId(""),
             ]}
             className="flex mr-1 text-base"
           >

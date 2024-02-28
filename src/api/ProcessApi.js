@@ -60,6 +60,7 @@ export const getUpdateAll = async (processId) => {
         ...HeaderAPI(localStorage.getItem("Token")),
       }
     );
+    console.log(response)
     return response;
   } catch (error) {
     console.error(error);
@@ -67,6 +68,8 @@ export const getUpdateAll = async (processId) => {
 };
 
 export const getProcessUser = async (id, status) => {
+  console.log(id)
+  console.log(status)
   try {
     // let token = localStorage.getItem("Token")
     const response = await axios.get(

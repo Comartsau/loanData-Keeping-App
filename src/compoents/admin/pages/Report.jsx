@@ -5,9 +5,12 @@ import NotPaid from "./NotPaid";
 import NotPaidLocation from "./NotPaidLoation";
 import LostCustomer from "./LostCustomer";
 
+
+
 const Report = () => {
   //---------- Dialog  ดูข้อมูลผู้บริจาค -------------- //
   const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
+
 
 
   return (
@@ -33,7 +36,7 @@ const Report = () => {
                 </div>
               </div>
               <div className="flex flex-col justify-center gap-5 sm:flex-row lg:gap-5">
-                <div className="flex justify-center">
+                {/* <div className="flex justify-center">
                   <Button
                     variant="outlined"
                     size="lg"
@@ -46,7 +49,7 @@ const Report = () => {
                   >
                     ค้นหาจากสถานที่ ที่ยังจ่ายไม่ครบ
                   </Button>
-                </div>
+                </div> */}
                 <div className="flex justify-center">
                   <Button
                     size="lg"

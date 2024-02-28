@@ -1,13 +1,15 @@
 import axios from "axios";
 import { HeaderAPI } from "../../headerApi";
 
-export const getCustomer = async (searchQuery) => {
+
+export const getCustomer = async (id , searchQuery) => {
   try {
     // let token = localStorage.getItem("Token")
     const response = await axios.get(
       `${
         import.meta.env.VITE_APP_API
-      }/api/login/register?search=${searchQuery}`,
+      // }/api/login/register?search=${searchQuery}`,
+      }/api/login/register?process_id=${id}&search=${searchQuery}`,
       {
         ...HeaderAPI(localStorage.getItem("Token")),
       }

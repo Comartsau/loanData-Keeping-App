@@ -2,9 +2,11 @@ import { Card, Button } from "@material-tailwind/react";
 import { useState } from "react";
 import Customer from "./Customer";
 import Location from "./Location";
+import { useRecoilState } from "recoil";
+import { activeMenuStore } from "../../../store/Store";
 
 function Database() {
-  const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
+  const [activeCustomerMenu, setActiveCustomerMenu] = useRecoilState(activeMenuStore);
 
   return (
     <div>
@@ -12,7 +14,7 @@ function Database() {
       <Card className="w-full   px-3">
         <div className="w-full " >
           <div className=" item-center mt-5 flex w-full flex-col gap-2  lg:flex-row">
-            <div className="flex  flex-col gap-5   sm:flex-row  ">
+            {/* <div className="flex  flex-col gap-5   sm:flex-row  ">
               <div className="flex  flex-col justify-center gap-5 sm:flex-row lg:gap-20  ">
                 <div className="flex justify-center">
                   <Button
@@ -45,7 +47,7 @@ function Database() {
                   </Button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
           {activeCustomerMenu === "menu1" && (
             <div className="w-full mt-5  ">

@@ -4,7 +4,6 @@ import {
   Input,
   Typography,
   IconButton,
-  CardFooter,
   Dialog,
   DialogBody,
   DialogHeader,
@@ -18,6 +17,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { useState, useEffect } from "react";
 
 import { FaRegEdit, FaRegSave, FaCheckCircle } from "react-icons/fa";
+import { FaCircleUser } from "react-icons/fa6";
+import { TbReportAnalytics } from "react-icons/tb";
 import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle } from "react-icons/bs";
 import { IoTrashBin } from "react-icons/io5";
@@ -31,20 +32,31 @@ import {
 
 import { useRecoilState } from "recoil";
 
-import { locationStore } from "../../../store/Store";
+import { locationStore, activeMenuStore , customerIdStore , processStore } from "../../../store/Store";
+
+
+import { Link } from "react-router-dom";
 
 const Location = () => {
   //----------  Data Table --------------------//
 
   const [listData, setListData] = useState([]);
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCustomerMenu, setActiveCustomerMenu] = useRecoilState(activeMenuStore);
+  const [customerId, setCustomerId] = useRecoilState(customerIdStore);
+  const [dataProcessStore , setDataProcessStore] = useRecoilState(processStore)
+ 
+
+
+  const [searchQuery, setSearchQuery] = useState('');
   const [dataLocationStore, setDataLocationStore] =
     useRecoilState(locationStore);
 
   const fetchLocation = async () => {
     try {
       const response = await getLocation(searchQuery);
+
+      console.log(response)
       setListData(response);
       setDataLocationStore(response);
     } catch (error) {
@@ -88,10 +100,15 @@ const Location = () => {
       };
 
       const response = await addLocation(data);
-      // console.log(response);
-      setOpenModalAdd(false);
-      fetchLocation();
-      toast.success("เพิ่มข้อมูล สินค้า สำเร็จ");
+      console.log(response?.response)
+      if (response?.response?.status == 500) {
+        setOpenModalAdd(false);
+        toast.error(response?.response?.data?.message);
+      } else {
+        setOpenModalAdd(false);
+        fetchLocation();
+        toast.success("เพิ่มข้อมูล สินค้า สำเร็จ");
+      }
     } catch (error) {
       toast.error(error);
     }
@@ -231,6 +248,24 @@ const Location = () => {
                       ที่อยู่สำนักงาน
                     </Typography>
                   </th>
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1 ">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-bold leading-none opacity-70"
+                    >
+                      ลูกค้า
+                    </Typography>
+                  </th>
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1 ">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-bold leading-none opacity-70"
+                    >
+                      รายงาน
+                    </Typography>
+                  </th>
                   <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1  ">
                     <Typography
                       variant="small"
@@ -274,13 +309,17 @@ const Location = () => {
                         </td>
                         <td className={classes}>
                           <div className="flex items-center justify-center">
-                            <Typography
+                            <Link to="/admin/process" >
+                            <Button
                               variant="small"
-                              color="blue-gray"
-                              className="font-normal "
+                              // color="blue-gray"
+                              className="font-normal text-md p-2  "
+                              style={{ backgroundColor: "#ED5EF0" }}
+                              onClick={() => [setCustomerId(data?.id), setDataProcessStore(data)]}
                             >
                               {data?.name || ""}
-                            </Typography>
+                            </Button>
+                            </Link>
                           </div>
                         </td>
                         <td className={classes}>
@@ -295,7 +334,7 @@ const Location = () => {
                           </div>
                         </td>
                         <td className={classes}>
-                          <div className="flex items-center justify-center ">
+                          <div className="flex items-center justify-center  ">
                             <Typography
                               variant="small"
                               color="blue-gray"
@@ -303,6 +342,26 @@ const Location = () => {
                             >
                               {data?.address || ""}
                             </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex justify-center  px-3 gap-2 ">
+                            <Link
+                              to="/admin/customer"
+                              onClick={() => setCustomerId(data?.id)}
+                            >
+                              <FaCircleUser className="h-6 w-6  text-blue-700 " />
+                            </Link>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex justify-center  px-3 gap-2">
+                            <Link
+                              to="/admin/report"
+                              onClick={() => setCustomerId(data?.id)}
+                            >
+                              <TbReportAnalytics className="h-6 w-6  text-green-700 " />
+                            </Link>
                           </div>
                         </td>
                         <td className={classes}>

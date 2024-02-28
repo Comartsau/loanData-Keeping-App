@@ -15,7 +15,7 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 import { FaRegEdit, FaRegSave, FaCheckCircle } from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
@@ -23,40 +23,37 @@ import { BsPlusCircle } from "react-icons/bs";
 import { IoTrashBin } from "react-icons/io5";
 
 import {
-  getCustomer,
-  addCustomer,
-  editCustomer,
-  deleteCustomer,
-} from "../../../api/customerApi";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { customerStore , customerIdStore } from "../../../store/Store";
+  getLocation,
+  addLocation,
+  editLocation,
+  deleteLocation,
+} from "../../../api/locationApi";
 
-const Customer = (data) => {
+import { useRecoilState } from "recoil";
+
+import { locationStore } from "../../../store/Store";
+
+const Location = () => {
   //----------  Data Table --------------------//
+
   const [listData, setListData] = useState([]);
 
-  console.log(data)
-
   const [searchQuery, setSearchQuery] = useState("");
-  const [customerDataStore, setCustomerDataStore] = useRecoilState(customerStore);
+  const [dataLocationStore, setDataLocationStore] =
+    useRecoilState(locationStore);
 
-  const customerId = useRecoilValue(customerIdStore)
-
-  console.log(customerId)
-
-  const fetchCustomer = async () => {
+  const fetchLocation = async () => {
     try {
-      const response = await getCustomer(customerId , searchQuery);
-      console.log(response);
+      const response = await getLocation(searchQuery);
       setListData(response);
-      setCustomerDataStore(response);
+      setDataLocationStore(response);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    fetchCustomer();
+    fetchLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
@@ -73,7 +70,7 @@ const Customer = (data) => {
   const totalPages = Math.ceil(listData?.length / itemsPerPage);
 
   //------------- modal Add Product -----------------------//
-  const [newCustomer, setNewCustomer] = useState([]);
+  const [newLocation, setNewLocation] = useState([]);
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [dataAdd, setDataAdd] = useState([]);
 
@@ -82,19 +79,18 @@ const Customer = (data) => {
     setDataAdd(data);
   };
 
-  const handleAddCustomer = async () => {
+  const handleAddLocation = async () => {
     try {
       let data = {
-        name: newCustomer.name,
-        tell: newCustomer.tell,
-        address: newCustomer.address,
-        process_id: customerId
+        name: newLocation.name,
+        tell: newLocation.tell,
+        address: newLocation.address,
       };
 
-      const response = await addCustomer(data);
+      const response = await addLocation(data);
       // console.log(response);
       setOpenModalAdd(false);
-      fetchCustomer();
+      fetchLocation();
       toast.success("เพิ่มข้อมูล สินค้า สำเร็จ");
     } catch (error) {
       toast.error(error);
@@ -110,18 +106,18 @@ const Customer = (data) => {
     setDataEdit(data);
   };
 
-  const handleEditCustomer = async () => {
+  const handleEditLocation = async () => {
     try {
       let data = {
-        id: dataEdit?.id,
-        name: dataEdit?.name,
-        tell: dataEdit?.tell,
-        address: dataEdit?.address,
+        id: dataEdit.id,
+        name: dataEdit.name,
+        tell: dataEdit.tell,
+        address: dataEdit.address,
       };
-      const response = await editCustomer(data);
+      const response = await editLocation(data);
       // console.log(response);
       setOpenModalEdit(false);
-      fetchCustomer();
+      fetchLocation();
       toast.success("แก้ไขข้อมูล สินค้า สำเร็จ");
     } catch (error) {
       toast.error(error);
@@ -138,32 +134,37 @@ const Customer = (data) => {
     setDataDelete(data);
   };
 
-  const handleDeleteCustomer = async (id) => {
+  const handleDeleteLocation = async (id) => {
     try {
-      const response = await deleteCustomer(id);
+      const response = await deleteLocation(id);
+
       setOpenModalDelete(false);
-      fetchCustomer();
-      toast.success("ลบข้อมูล สินค้า สำเร็จ");
+      fetchLocation();
+      if (response == undefined) {
+        toast.error("ไม่สามารถลบสถานที่ได้ เนื่องจากถูกใช้งานแล้ว");
+      } else {
+        toast.success("ลบข้อมูล สถานที่ สำเร็จ");
+      }
     } catch (error) {
       toast.error(error);
     }
   };
 
   return (
-    <div className=" w-full sm:h-[70vh]   ">
+    <div className=" w-full  sm:h-[70vh]   ">
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
       <div className="flex flex-col w-full">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
         <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
           <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
-            <Typography className=" font-bold ">ข้อมูลลูกค้า:</Typography>
+            <Typography className=" font-bold ">ข้อมูลสถานที่:</Typography>
           </div>
           <div className="w-full md:w-[50%] flex   px-0 md:px-10">
             <div className="w-full flex flex-col md:flex-row justify-center md:justify-end items-center gap-5">
               <div>
                 <Input
                   type="text"
-                  label="ค้นหา ชื่อลูกค้า"
+                  label="ค้นหา สถานที่"
                   //   placeholder="ค้นหา ชื่อลูกค้า"
                   color="blue-gray"
                   value={searchQuery}
@@ -182,161 +183,163 @@ const Customer = (data) => {
                   <span className="mr-2 text-xl">
                     <BsPlusCircle />
                   </span>
-                  เพิ่มลูกค้า
+                  เพิ่มสถานที่
                 </Button>
               </div>
             </div>
           </div>
         </div>
         {/* ------------ table  ----------------------------------------- */}
-        <Card className="mt-5 w-full h-[35vh] sm:h-[48vh] md:h-[58vh] lg:h-[60vh] overflow-auto mb-3  border-2  ">
-          <table className="w-full min-w-max   ">
-            <thead>
-              <tr>
-                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4  w-1">
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-bold leading-none opacity-70"
-                  >
-                    ลำดับ
-                  </Typography>
-                </th>
-                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-bold leading-none opacity-70"
-                  >
-                    ชื่อ-สกุล
-                  </Typography>
-                </th>
-                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-bold leading-none opacity-70"
-                  >
-                    เบอร์โทรศัพท์
-                  </Typography>
-                </th>
-                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-bold leading-none opacity-70"
-                  >
-                    ที่อยู่
-                  </Typography>
-                </th>
-                <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1  ">
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-bold leading-none opacity-70"
-                  >
-                    แก้ไข/ลบ
-                  </Typography>
-                </th>
-              </tr>
-            </thead>
-            {listData?.length == 0 ? (
-              <tbody>
+        <Card className="mt-5 w-full h-[35vh] sm:h-[48vh] md:h-[58vh] lg:h-[60vh] overflow-auto mb-3 border-2  ">
+          <div>
+            <table className="w-full min-w-max  ">
+              <thead>
                 <tr>
-                  <td colSpan={5} className=" text-center pt-5 ">
-                    <Typography>...ไม่พบข้อมูล...</Typography>
-                  </td>
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4  w-1">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-bold leading-none opacity-70"
+                    >
+                      ลำดับ
+                    </Typography>
+                  </th>
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-bold leading-none opacity-70"
+                    >
+                      ชื่อสถานที่
+                    </Typography>
+                  </th>
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-bold leading-none opacity-70"
+                    >
+                      เบอร์โทรศัพท์
+                    </Typography>
+                  </th>
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 ">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-bold leading-none opacity-70"
+                    >
+                      ที่อยู่สำนักงาน
+                    </Typography>
+                  </th>
+                  <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 w-1  ">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-bold leading-none opacity-70"
+                    >
+                      แก้ไข/ลบ
+                    </Typography>
+                  </th>
                 </tr>
-              </tbody>
-            ) : (
-              <tbody>
-                {displayedData.map((data, index) => {
-                  const isLast = index === displayedData.length - 1;
-                  const pageIndex = startIndex + index;
-                  const classes = isLast
-                    ? "p-2"
-                    : "p-3 border-b border-blue-gray-50";
+              </thead>
+              {listData?.length == 0 ? (
+                <tbody>
+                  <tr>
+                    <td colSpan={5} className=" text-center pt-5 ">
+                      <Typography>...ไม่พบข้อมูล...</Typography>
+                    </td>
+                  </tr>
+                </tbody>
+              ) : (
+                <tbody>
+                  {displayedData.map((data, index) => {
+                    const isLast = index === displayedData.length - 1;
+                    const pageIndex = startIndex + index;
+                    const classes = isLast
+                      ? "p-2"
+                      : "p-3 border-b border-blue-gray-50";
 
-                  return (
-                    <tr key={index}>
-                      <td className={classes}>
-                        <div className="flex items-center justify-center">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal "
-                          >
-                            {pageIndex + 1 || ""}
-                          </Typography>
-                        </div>
-                      </td>
-                      <td className={classes}>
-                        <div className="flex items-center justify-center">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal "
-                          >
-                            {data?.name || ""}
-                          </Typography>
-                        </div>
-                      </td>
-                      <td className={classes}>
-                        <div className="flex items-center justify-center">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal "
-                          >
-                            {data?.tell || ""}
-                          </Typography>
-                        </div>
-                      </td>
-                      <td className={classes}>
-                        <div className="flex items-center justify-center ">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal "
-                          >
-                            {data?.address || ""}
-                          </Typography>
-                        </div>
-                      </td>
-                      <td className={classes}>
-                        <div className="flex justify-center  px-3 gap-2">
-                          <IconButton
-                            variant="outlined"
-                            size="sm"
-                            onClick={() => handleModalEdit(data)}
-                          >
-                            <FaRegEdit className="h-5 w-5  text-yellow-700 " />
-                          </IconButton>
+                    return (
+                      <tr key={index}>
+                        <td className={classes}>
+                          <div className="flex items-center justify-center">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal "
+                            >
+                              {pageIndex + 1 || ""}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center justify-center">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal "
+                            >
+                              {data?.name || ""}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center justify-center">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal "
+                            >
+                              {data?.tell || ""}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center justify-center ">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal "
+                            >
+                              {data?.address || ""}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex justify-center  px-3 gap-2">
+                            <IconButton
+                              variant="outlined"
+                              size="sm"
+                              onClick={() => handleModalEdit(data)}
+                            >
+                              <FaRegEdit className="h-5 w-5  text-yellow-700 " />
+                            </IconButton>
 
-                          <IconButton
-                            variant="outlined"
-                            color="blue"
-                            size="sm"
-                            onClick={() => handleModalDelete(data)}
-                          >
-                            <IoTrashBin className="h-5 w-5  text-red-700 " />
-                          </IconButton>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            )}
-          </table>
+                            <IconButton
+                              variant="outlined"
+                              color="blue"
+                              size="sm"
+                              onClick={() => handleModalDelete(data)}
+                            >
+                              <IoTrashBin className="h-5 w-5  text-red-700 " />
+                            </IconButton>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              )}
+            </table>
+          </div>
         </Card>
       </div>
 
-      {/* modal Add Customer */}
+      {/* modal Add Location */}
 
       <Dialog open={openModalAdd} size="xs" handler={handleModalAdd}>
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">เพิ่มข้อมูลลูกค้า</Typography>
+          <Typography variant="h5">เพิ่มข้อมูลสถานที่</Typography>
         </DialogHeader>
         <DialogBody divider className=" overflow-auto ">
           <div className=" w-full flex flex-col justify-center  gap-4 ">
@@ -344,13 +347,13 @@ const Customer = (data) => {
               <div className="flex   mt-3">
                 <Input
                   type="text"
-                  label="ชื่อลูกค้า"
+                  label="ชื่อสถานที่"
                   maxLength="50"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
+                    setNewLocation({
+                      ...newLocation,
                       name: e.target.value,
                     })
                   }
@@ -364,8 +367,8 @@ const Customer = (data) => {
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
+                    setNewLocation({
+                      ...newLocation,
                       tell: e.target.value,
                     })
                   }
@@ -373,13 +376,13 @@ const Customer = (data) => {
               </div>
               <div className="flex   mt-3">
                 <Textarea
-                  label="ที่อยู่"
+                  label="ที่อยู่สำนักงาน"
                   maxLength="100"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
+                    setNewLocation({
+                      ...newLocation,
                       address: e.target.value,
                     })
                   }
@@ -405,7 +408,7 @@ const Customer = (data) => {
             size="sm"
             variant="gradient"
             color="purple"
-            onClick={handleAddCustomer}
+            onClick={handleAddLocation}
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
@@ -416,11 +419,11 @@ const Customer = (data) => {
         </DialogFooter>
       </Dialog>
 
-      {/* modal Edit Customer */}
+      {/* modal Edit Location */}
 
       <Dialog open={openModalEdit} size="xs" handler={handleModalEdit}>
         <DialogHeader className="bg-yellow-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">แก้ไขข้อมูลลูกค้า</Typography>
+          <Typography variant="h5">แก้ไขข้อมูลสถานที่</Typography>
         </DialogHeader>
         <DialogBody divider className=" overflow-auto ">
           <div className=" w-full flex flex-col justify-center  gap-4 ">
@@ -428,7 +431,7 @@ const Customer = (data) => {
               <div className="flex   mt-3">
                 <Input
                   type="text"
-                  label="ชื่อลูกค้า"
+                  label="ชื่อสถานที่"
                   maxLength="50"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
@@ -459,7 +462,7 @@ const Customer = (data) => {
               </div>
               <div className="flex   mt-3">
                 <Textarea
-                  label="ที่อยู่"
+                  label="ที่อยู่สถานที่"
                   maxLength="100"
                   color="blue-gray"
                   style={{ backgroundColor: "#F4F4F4" }}
@@ -492,7 +495,7 @@ const Customer = (data) => {
             size="sm"
             variant="gradient"
             color="purple"
-            onClick={handleEditCustomer}
+            onClick={handleEditLocation}
             className="flex text-base mr-1"
           >
             <span className="mr-2 text-xl">
@@ -503,16 +506,16 @@ const Customer = (data) => {
         </DialogFooter>
       </Dialog>
 
-      {/* modal Delete Customer */}
+      {/* modal Delete Location */}
 
       <Dialog open={openModalDelete} size="sm" handler={handleModalDelete}>
         <DialogHeader className="bg-red-700 py-3  px-3  justify-center text-lg text-white opacity-80">
-          <Typography variant="h5">ลบลูกค้า</Typography>
+          <Typography variant="h5">ลบสถานที่</Typography>
         </DialogHeader>
         <DialogBody divider className=" overflow-auto ">
           <div className="flex flex-col w-full justify-center gap-3 ">
             <Typography variant="h5" className="text-center">
-              ต้องการลบ: {dataDelete?.name || ""}{" "}
+              ต้องการลบ สถานที่: {dataDelete?.name || ""}{" "}
             </Typography>
             <Typography variant="h5" className="text-center">
               จริงหรือไม่?{" "}
@@ -525,7 +528,7 @@ const Customer = (data) => {
               variant="gradient"
               color="red"
               size="sm"
-              onClick={() => handleDeleteCustomer(dataDelete?.id)}
+              onClick={() => handleDeleteLocation(dataDelete?.id)}
               className="flex mr-1 text-base"
             >
               <span className="text-xl mr-2">
@@ -552,4 +555,4 @@ const Customer = (data) => {
   );
 };
 
-export default Customer;
+export default Location;

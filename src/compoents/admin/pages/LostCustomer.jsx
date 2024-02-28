@@ -11,7 +11,7 @@ import Select from "react-select";
 
 import { useRecoilValue } from "recoil";
 
-import { locationStore } from "../../../store/Store";
+import { locationStore , customerIdStore } from "../../../store/Store";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,9 +21,11 @@ import { useEffect, useState } from "react";
 import { getLostCustomer } from "../../../api/ReportApi";
 
 
+
 const LostCustomer = () => {
   const [listData, setListData] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
+  const customerId = useRecoilValue(customerIdStore);
   const [sendId, setSendId] = useState("");
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
@@ -61,7 +63,7 @@ const LostCustomer = () => {
 
   const fecthLostCustomer = async () => {
     try {
-      const respone = await getLostCustomer(sendId);
+      const respone = await getLostCustomer(customerId);
       console.log(respone)
       setListData(respone);
     } catch (error) {
@@ -86,7 +88,7 @@ const LostCustomer = () => {
                 รายงานลูกค้าทั้งหมดที่ยังจ่ายเงินไม่ครบ:
               </Typography>
             </div>
-            <div className="w-full  flex   ">
+            {/* <div className="w-full  flex   ">
               <div className="w-full flex flex-col md:flex-row justify-center md:justify-end items-center gap-5">
                 <Select
                   classNamePrefix="select"
@@ -98,7 +100,7 @@ const LostCustomer = () => {
                   onChange={(e) => handleLocationSelect(e)}
                 />
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="flex flex-col lg:flex-row w-full gap-5">
             <div className="flex w-full lg:w-[80%] ">
