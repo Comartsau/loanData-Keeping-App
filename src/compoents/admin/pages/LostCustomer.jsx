@@ -11,7 +11,7 @@ import Select from "react-select";
 
 import { useRecoilValue } from "recoil";
 
-import { locationStore , customerIdStore } from "../../../store/Store";
+import { locationStore , customerIdStore , processStore } from "../../../store/Store";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -26,6 +26,7 @@ const LostCustomer = () => {
   const [listData, setListData] = useState([]);
   const [isSearchable, setIsSearchable] = useState(true);
   const customerId = useRecoilValue(customerIdStore);
+  const dataProcessStore = useRecoilValue(processStore);
   const [sendId, setSendId] = useState("");
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
@@ -85,7 +86,7 @@ const LostCustomer = () => {
           <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
             <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
               <Typography className=" font-bold ">
-                รายงานลูกค้าทั้งหมดที่ยังจ่ายเงินไม่ครบ:
+                รายงานลูกค้าทั้งหมดที่ยังจ่ายเงินไม่ครบ:  <span>{dataProcessStore?.name}</span>
               </Typography>
             </div>
             {/* <div className="w-full  flex   ">

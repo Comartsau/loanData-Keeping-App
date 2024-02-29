@@ -29,7 +29,7 @@ import {
   deleteCustomer,
 } from "../../../api/customerApi";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { customerStore , customerIdStore } from "../../../store/Store";
+import { customerStore , customerIdStore , processStore } from "../../../store/Store";
 
 const Customer = (data) => {
   //----------  Data Table --------------------//
@@ -41,6 +41,7 @@ const Customer = (data) => {
   const [customerDataStore, setCustomerDataStore] = useRecoilState(customerStore);
 
   const customerId = useRecoilValue(customerIdStore)
+  const dataProcessStore = useRecoilValue(processStore)
 
   console.log(customerId)
 
@@ -149,6 +150,7 @@ const Customer = (data) => {
     }
   };
 
+  console.log(dataProcessStore)
   return (
     <div className=" w-full sm:h-[70vh]   ">
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
@@ -156,7 +158,7 @@ const Customer = (data) => {
         {/* <p>ข้อมูลผู้บริจาค</p> */}
         <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
           <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
-            <Typography className=" font-bold ">ข้อมูลลูกค้า:</Typography>
+            <Typography className=" font-bold ">ข้อมูลลูกค้า: <span>{dataProcessStore?.name}</span></Typography>
           </div>
           <div className="w-full md:w-[50%] flex   px-0 md:px-10">
             <div className="w-full flex flex-col md:flex-row justify-center md:justify-end items-center gap-5">

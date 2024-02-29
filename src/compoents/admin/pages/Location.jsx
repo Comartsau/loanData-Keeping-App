@@ -348,7 +348,7 @@ const Location = () => {
                           <div className="flex justify-center  px-3 gap-2 ">
                             <Link
                               to="/admin/customer"
-                              onClick={() => setCustomerId(data?.id)}
+                              onClick={() => [setCustomerId(data?.id) , setDataProcessStore(data)]}
                             >
                               <FaCircleUser className="h-6 w-6  text-blue-700 " />
                             </Link>
@@ -358,7 +358,7 @@ const Location = () => {
                           <div className="flex justify-center  px-3 gap-2">
                             <Link
                               to="/admin/report"
-                              onClick={() => setCustomerId(data?.id)}
+                              onClick={() => [setCustomerId(data?.id) , setDataProcessStore(data)]}
                             >
                               <TbReportAnalytics className="h-6 w-6  text-green-700 " />
                             </Link>

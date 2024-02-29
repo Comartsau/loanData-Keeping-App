@@ -20,6 +20,7 @@ import { processStore , customerIdStore } from "../../../store/Store";
 const NotPaid = () => {
   const [listData, setListData] = useState([]);
   const customerId = useRecoilValue(customerIdStore);
+  const dataProcessStore = useRecoilValue(processStore);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -57,7 +58,7 @@ const NotPaid = () => {
           <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
             <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
               <Typography className=" font-bold ">
-                รายงานลูกค้าทั้งหมดที่ยังจ่ายเงินไม่ครบ:
+                รายงานลูกค้าทั้งหมดที่ยังจ่ายเงินไม่ครบ: <span>{dataProcessStore?.name}</span>
               </Typography>
             </div>
             <div className="w-full md:w-[50%] flex   px-0 md:px-10">
