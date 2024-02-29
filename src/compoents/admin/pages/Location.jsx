@@ -168,7 +168,7 @@ const Location = () => {
   };
 
   return (
-    <div className=" w-full  sm:h-[70vh]   ">
+    <div className=" w-full  sm:h-[80vh]   ">
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
       <div className="flex flex-col w-full">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
@@ -207,7 +207,7 @@ const Location = () => {
           </div>
         </div>
         {/* ------------ table  ----------------------------------------- */}
-        <Card className="mt-5 w-full h-[35vh] sm:h-[48vh] md:h-[58vh] lg:h-[60vh] overflow-auto mb-3 border-2  ">
+        <Card className="mt-5 w-full h-[50vh] sm:h-[48vh] md:h-[58vh] lg:h-[65vh] overflow-auto mb-3 border-2  ">
           <div>
             <table className="w-full min-w-max  ">
               <thead>
