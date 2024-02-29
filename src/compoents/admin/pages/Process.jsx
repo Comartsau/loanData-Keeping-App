@@ -479,7 +479,7 @@ const Process = () => {
 
   return (
     <Card>
-      <div className="flex flex-col w-full mt-5 px-2 ">
+      <div className="flex flex-col w-full mt-1 px-2 ">
         <ToastContainer className="toast " autoClose={800} theme="colored" />
 
         <div className="flex   flex-col  overflow-auto   items-center ">
@@ -635,9 +635,9 @@ const Process = () => {
                   </Button>
                 </div>
               </div>
-              <div className="flex w-full flex-col h-full mt-5 lg:mt-0  justify-center md:justify-end   ">
+              <div className="flex w-full flex-col h-full mt-4 lg:mt-0  justify-center md:justify-end   ">
                 <div
-                  className="p-3  md:h-[260px] lg:h-[210px] items-center rounded-md   "
+                  className="p-3  md:h-[260px] lg:h-[210px] items-center rounded-md    mb-2 "
                   style={{ border: "3px solid #b3b3b3"  }}
                 >
                   <Typography className="text-xl font-bold ">
@@ -696,7 +696,7 @@ const Process = () => {
                       <Button
                         size="sm"
                         variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white  ${
+                        className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  text-white  ${
                           activeCustomerMenu === "menu1"
                             ? " bg-blue-300 text-sm "
                             : "bg-blue-100 text-sm"
@@ -716,7 +716,7 @@ const Process = () => {
                       <Button
                         size="sm"
                         variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white text-sm `}
+                        className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  text-white text-sm `}
                         style={{
                           backgroundColor:
                             activeCustomerMenu === "menu2"
@@ -741,7 +741,7 @@ const Process = () => {
                       <Button
                         size="sm"
                         variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
+                        className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  ${
                           activeCustomerMenu === "menu3"
                             ? " bg-green-500 text-white text-sm"
                             : "bg-green-300 text-white text-sm"
@@ -761,7 +761,7 @@ const Process = () => {
                       <Button
                         size="sm"
                         variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
+                        className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  ${
                           activeCustomerMenu === "menu4"
                             ? " bg-red-500 text-white text-sm"
                             : "bg-red-300 text-white text-sm"
@@ -1496,7 +1496,7 @@ const Process = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="flex w-full flex-col h-full mt-5 lg:mt-0  justify-center md:justify-end   ">
+                <div className="flex w-full flex-col h-full mt-4 lg:mt-0  justify-center md:justify-end   ">
                   <div
                     className="p-3  md:h-[260px] lg:h-[210px] items-center   "
                     style={{ border: "3px solid black" }}
