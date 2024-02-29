@@ -86,7 +86,7 @@ const LostCustomer = () => {
           <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
             <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
               <Typography className=" font-bold ">
-                รายงานลูกค้าทั้งหมดที่ยังจ่ายเงินไม่ครบ:  <span>{dataProcessStore?.name}</span>
+                รายงานลูกค้าทั้งหมดที่ยังจ่ายเงินไม่ครบ :  <span>{dataProcessStore?.name}</span>
               </Typography>
             </div>
             {/* <div className="w-full  flex   ">
@@ -105,8 +105,8 @@ const LostCustomer = () => {
           </div>
           <div className="flex flex-col lg:flex-row w-full gap-5">
             <div className="flex w-full lg:w-[80%] ">
-              <Card className="mt-5 w-full border-2 overflow-auto ">
-                <div className="mx-5">
+              <Card className="mt-5 w-full border-2 overflow-auto shadow-lg " style={{ border: "1px solid #b3b3b3"  }}>
+                <div>
                   <table className="w-full min-w-max ">
                     <thead>
                       <tr>
@@ -318,8 +318,8 @@ const LostCustomer = () => {
             </div>
             <div className="flex w-full lg:w-[20%] flex-col h-full   justify-center md:justify-end   ">
               <div
-                className="p-3 md:h-[180px] items-center mt-5 px-5  "
-                style={{ border: "3px solid black" }}
+                className="p-3 md:h-[180px] items-center mt-5 px-5 rounded-md "
+                style={{ border: "3px solid #b3b3b3"  }}
               >
                 <Typography className=" font-bold mt-2">
                   จำนวนยืม: <sapn className="font-normal">{Number(listData?.totals?.total).toLocaleString() == "NaN" ? 0 : Number(listData?.totals?.total).toLocaleString()}</sapn> บาท

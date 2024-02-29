@@ -291,8 +291,8 @@ const Location = () => {
                     const isLast = index === displayedData.length - 1;
                     const pageIndex = startIndex + index;
                     const classes = isLast
-                      ? "p-2"
-                      : "p-3 border-b border-blue-gray-50";
+                      ? "p-1"
+                      : "p-1 text-sm border-b border-blue-gray-50";
 
                     return (
                       <tr key={index}>
@@ -301,19 +301,19 @@ const Location = () => {
                             <Typography
                               variant="small"
                               color="blue-gray"
-                              className="font-normal "
+                              className="font-normal text-sm "
                             >
                               {pageIndex + 1 || ""}
                             </Typography>
                           </div>
                         </td>
-                        <td className={classes}>
-                          <div className="flex items-center justify-center">
+                        <td className={classes}   >
+                          <div className="flex items-center justify-center ">
                             <Link to="/admin/process" >
                             <Button
                               variant="small"
                               // color="blue-gray"
-                              className="font-normal text-md p-2  "
+                              className="font-normal text-sm p-2   "
                               style={{ backgroundColor: "#ED5EF0" }}
                               onClick={() => [setCustomerId(data?.id), setDataProcessStore(data)]}
                             >
@@ -327,7 +327,7 @@ const Location = () => {
                             <Typography
                               variant="small"
                               color="blue-gray"
-                              className="font-normal "
+                              className="font-normal text-sm "
                             >
                               {data?.tell || ""}
                             </Typography>

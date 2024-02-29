@@ -485,7 +485,7 @@ const Process = () => {
         <div className="flex   flex-col  overflow-auto   items-center ">
           <div className="flex w-full flex-col md:flex-row gap-5 ">
             <div className="flex flex-col w-full h-[85vh] md:w-4/12 xl:w-4/12 ">
-              <div className="flex  items-center gap-3 ">
+              <div className="flex  items-center justify-between gap-3 ">
                 <div>
                   <Typography className="text-lg lg:text-xl font-bold">
                     {dataProcessStore?.name || ""}
@@ -496,7 +496,7 @@ const Process = () => {
                     size="sm"
                     variant="gradient"
                     color="green"
-                    className="text-base flex justify-center  items-center   bg-green-500"
+                    className="text-sm  flex justify-center  items-center   bg-green-500"
                     onClick={() => [
                       setSelectDisable(0),
                       setSelectedValue(null),
@@ -595,7 +595,7 @@ const Process = () => {
                     variant="gradient"
                     color="purple"
                     disabled={userListData?.status == 0 ? false : true}
-                    className="text-base flex justify-center  items-center w-full   bg-green-500"
+                    className="text-sm flex justify-center  items-center w-full   bg-green-500"
                     onClick={handleModalReload}
                   >
                     <span className="mr-2 text-xl ">
@@ -610,7 +610,7 @@ const Process = () => {
                     variant="gradient"
                     color="green"
                     disabled={selectDisable}
-                    className="text-base flex justify-center  items-center  w-full  bg-green-500"
+                    className="text-sm flex justify-center  items-center  w-full  bg-green-500"
                     onClick={handleUser}
                   >
                     <span className="mr-2 text-xl ">
@@ -625,7 +625,7 @@ const Process = () => {
                     variant="gradient"
                     color="purple"
                     disabled={userListData.status == 0 ? false : true}
-                    className="text-base flex justify-center  items-center w-full   bg-green-500"
+                    className="text-sm  flex justify-center  items-center w-full   bg-green-500"
                     onClick={handleUpdate}
                   >
                     <span className="mr-2 text-xl ">
@@ -637,14 +637,14 @@ const Process = () => {
               </div>
               <div className="flex w-full flex-col h-full mt-5 lg:mt-0  justify-center md:justify-end   ">
                 <div
-                  className="p-3  md:h-[260px] lg:h-[210px] items-center   "
-                  style={{ border: "3px solid black" }}
+                  className="p-3  md:h-[260px] lg:h-[210px] items-center rounded-md   "
+                  style={{ border: "3px solid #b3b3b3"  }}
                 >
                   <Typography className="text-xl font-bold ">
                     ยอดรวม(ทั้งหมด)
                   </Typography>
                   <Typography className=" font-bold mt-5">
-                    ยอดรวม (ทั้งหมด):{" "}
+                    ยอดรวม:{" "}
                     <sapn>
                       {Number(dataProcessId?.total).toLocaleString() == "NaN"
                         ? 0
@@ -653,7 +653,7 @@ const Process = () => {
                     บาท
                   </Typography>
                   <Typography className=" font-bold mt-3">
-                    ชำระแล้ว (ทั้งหมด):{" "}
+                    ชำระแล้ว:{" "}
                     <sapn>
                       {Number(dataProcessId?.paid).toLocaleString() == "NaN"
                         ? 0
@@ -662,7 +662,7 @@ const Process = () => {
                     บาท
                   </Typography>
                   <Typography className=" font-bold mt-3">
-                    ค้างชำระ (ทั้งหมด):{" "}
+                    ค้างชำระ:{" "}
                     <sapn>
                       {Number(dataProcessId?.overdue).toLocaleString() == "NaN"
                         ? 0
@@ -673,7 +673,7 @@ const Process = () => {
                     บาท
                   </Typography>
                   <Typography className=" font-bold mt-3">
-                    กำไร (ทั้งหมด):{" "}
+                    กำไร:{" "}
                     <sapn>
                       {Number(dataProcessId?.overdue).toLocaleString() == "NaN"
                         ? 0
@@ -694,12 +694,12 @@ const Process = () => {
                   <div className="flex gap-5">
                     <div className=" justify-center">
                       <Button
-                        size="lg"
+                        size="sm"
                         variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white ${
+                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white  ${
                           activeCustomerMenu === "menu1"
-                            ? " bg-blue-300 "
-                            : "bg-blue-100"
+                            ? " bg-blue-300 text-sm "
+                            : "bg-blue-100 text-sm"
                         }`}
                         onClick={() => [
                           setActiveCustomerMenu("menu1"),
@@ -714,9 +714,9 @@ const Process = () => {
                     </div>
                     <div className=" justify-center">
                       <Button
-                        size="lg"
+                        size="sm"
                         variant="outlined"
-                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white `}
+                        className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white text-sm `}
                         style={{
                           backgroundColor:
                             activeCustomerMenu === "menu2"
@@ -739,12 +739,12 @@ const Process = () => {
                   <div className="flex gap-5">
                     <div className=" justify-center">
                       <Button
-                        size="lg"
+                        size="sm"
                         variant="outlined"
                         className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
                           activeCustomerMenu === "menu3"
-                            ? " bg-green-500 text-white"
-                            : "bg-green-300 text-white"
+                            ? " bg-green-500 text-white text-sm"
+                            : "bg-green-300 text-white text-sm"
                         }`}
                         onClick={() => [
                           setActiveCustomerMenu("menu3"),
@@ -759,12 +759,12 @@ const Process = () => {
                     </div>
                     <div className=" justify-center">
                       <Button
-                        size="lg"
+                        size="sm"
                         variant="outlined"
                         className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
                           activeCustomerMenu === "menu4"
-                            ? " bg-red-500 text-white"
-                            : "bg-red-300 text-white"
+                            ? " bg-red-500 text-white text-sm"
+                            : "bg-red-300 text-white text-sm"
                         }`}
                         onClick={() => [
                           setActiveCustomerMenu("menu4"),
@@ -782,8 +782,8 @@ const Process = () => {
               </div>
               <div>
                 <Card
-                  className="w-full  h-[45vh] p-2 "
-                  style={{ border: "3px solid black" }}
+                  className="w-full  h-[45vh] p-2  shadow-lg  "
+                  style={{ border: "1px solid #cccccc" }}
                 >
                   <div className="mt-5 h-[380px] w-full overflow-auto  ">
                     <table className="w-full min-w-max">
@@ -860,12 +860,12 @@ const Process = () => {
                           {displayedData?.map((data, index) => {
                             const isLast = index === displayedData?.length;
                             const classes = isLast
-                              ? "p-2"
-                              : `p-3 border-b border-blue-gray-50 ${
+                              ? "p-2 "
+                              : `p-3 border-b border-blue-gray-50  ${
                                   index === activeRow ? "bg-gray-300" : ""
                                 }`;
                             return (
-                              <tr key={index}>
+                              <tr key={index} >
                                 <td className={classes}>
                                   <div className="flex items-center justify-center">
                                     <Typography
@@ -882,7 +882,7 @@ const Process = () => {
                                     <Typography
                                       variant="small"
                                       color="blue-gray"
-                                      className="font-normal"
+                                      className=" "
                                     >
                                       {data?.name}
                                     </Typography>
@@ -1004,8 +1004,8 @@ const Process = () => {
               <div className=" flex flex-col sm:flex-row  items-center sm:items-start  w-full justify-center md:justify-start gap-5  ">
                 <div className="w-full md:w-[70%]">
                   <Card
-                    className="w-full  h-[30vh]  p-2"
-                    style={{ border: "3px solid black" }}
+                    className="w-full  h-[30vh]  p-2 rounded-md"
+                    style={{ border: "3px solid #b3b3b3"  }}
                   >
                     <div className="h-[380px] overflow-auto ">
                       <table className="w-full min-w-max  ">
@@ -1175,15 +1175,15 @@ const Process = () => {
                   </Card>
                 </div>
                 <div
-                  className="flex w-full md:w-[30%] md:h-[330px] lg:h-[250px]  xl:h-[210px]  "
-                  style={{ border: "3px solid black" }}
+                  className="flex w-full md:w-[30%] md:h-[330px] lg:h-[250px]  xl:h-[210px] rounded-md  "
+                  style={{ border: "3px solid #b3b3b3"  }}
                 >
                   <div className="gap-3  p-3">
                     <Typography className="text-xl font-bold">
                       ยอดรวม ({userListData?.name})
                     </Typography>
                     <Typography className=" font-bold mt-5">
-                      ยอดรวม (ทั้งหมด):{" "}
+                      ยอดรวม:{" "}
                       <sapn>
                         {" "}
                         {Number(userListSum?.total).toLocaleString() == "NaN"
@@ -1193,7 +1193,7 @@ const Process = () => {
                       บาท
                     </Typography>
                     <Typography className=" font-bold mt-3">
-                      ชำระแล้ว (ทั้งหมด):{" "}
+                      ชำระแล้ว:{" "}
                       <sapn>
                         {Number(userListSum?.paid).toLocaleString() == "NaN"
                           ? 0
@@ -1202,7 +1202,7 @@ const Process = () => {
                       บาท
                     </Typography>
                     <Typography className=" font-bold mt-3">
-                      ค้างชำระ (ทั้งหมด):{" "}
+                      ค้างชำระ:{" "}
                       <sapn>
                         {Number(userListSum?.overdue).toLocaleString() == "NaN"
                           ? 0
@@ -1213,7 +1213,7 @@ const Process = () => {
                       บาท
                     </Typography>
                     <Typography className=" font-bold mt-3">
-                      กำไร (ทั้งหมด):{" "}
+                      กำไร:{" "}
                       <sapn>
                         {Number(userListSum?.overdue).toLocaleString() == "NaN"
                           ? 0
@@ -1456,7 +1456,7 @@ const Process = () => {
                       variant="gradient"
                       color="purple"
                       disabled={userListData?.status == 0 ? false : true}
-                      className="text-base flex justify-center  items-center w-full   bg-green-500"
+                      className="text-sm flex justify-center  items-center w-full   bg-green-500"
                       onClick={handleModalReload}
                     >
                       <span className="mr-2 text-xl ">
@@ -1471,7 +1471,7 @@ const Process = () => {
                       variant="gradient"
                       color="green"
                       disabled={selectDisable}
-                      className="text-base flex justify-center  items-center  w-full  bg-green-500"
+                      className="text-sm flex justify-center  items-center  w-full  bg-green-500"
                       onClick={handleUser}
                     >
                       <span className="mr-2 text-xl ">
@@ -1486,10 +1486,10 @@ const Process = () => {
                       variant="gradient"
                       color="purple"
                       disabled={userListData.status == 0 ? false : true}
-                      className="text-base flex justify-center  items-center w-full   bg-green-500"
+                      className="text-sm  flex justify-center  items-center w-full   bg-green-500"
                       onClick={handleUpdate}
                     >
-                      <span className="mr-2 text-xl ">
+                      <span className="mr-2 text-sm ">
                         <MdSmsFailed />
                       </span>
                       อัพเดท
