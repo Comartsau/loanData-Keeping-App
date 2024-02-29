@@ -324,13 +324,13 @@ const LostCustomer = () => {
                 <Typography className=" font-bold mt-2">
                   จำนวนยืม: <sapn className="font-normal">{Number(listData?.totals?.total).toLocaleString() == "NaN" ? 0 : Number(listData?.totals?.total).toLocaleString()}</sapn> บาท
                 </Typography>
-                <Typography className=" font-bold mt-3">
+                <Typography className=" font-bold mt-1">
                   จ่ายแล้ว: <sapn className="font-normal">{Number(listData?.totals?.price).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.price).toLocaleString()}</sapn> บาท
                 </Typography>
-                <Typography className=" font-bold mt-3">
+                <Typography className=" font-bold mt-1">
                   ค้างจ่าย: <sapn className="font-normal">{Number(listData?.totals?.overdue).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.overdue).toLocaleString()}</sapn> บาท
                 </Typography>
-                <Typography className=" font-bold mt-3">
+                <Typography className=" font-bold mt-1">
                   กำไร: <sapn className="font-normal">{Number(listData?.totals?.overdue).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.overdue) < 0 ?  Math.abs(Number(listData?.totals?.overdue)).toLocaleString() : 0 }</sapn> บาท
                 </Typography>
               </div>
