@@ -152,13 +152,13 @@ const Customer = (data) => {
 
   console.log(dataProcessStore)
   return (
-    <div className=" w-full sm:h-[70vh]   ">
+    <Card className=" w-full sm:h-[83vh]   ">
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full mt-5">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
         <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
           <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
-            <Typography className=" font-bold ">ข้อมูลลูกค้า: <span>{dataProcessStore?.name}</span></Typography>
+            <Typography className=" font-bold ">ข้อมูลลูกค้า : <span>{dataProcessStore?.name}</span></Typography>
           </div>
           <div className="w-full md:w-[50%] flex   px-0 md:px-10">
             <div className="w-full flex flex-col md:flex-row justify-center md:justify-end items-center gap-5">
@@ -191,7 +191,7 @@ const Customer = (data) => {
           </div>
         </div>
         {/* ------------ table  ----------------------------------------- */}
-        <Card className="mt-5 w-full h-[35vh] sm:h-[48vh] md:h-[58vh] lg:h-[60vh] overflow-auto mb-3  border-2  ">
+        <Card className="mt-5  h-[35vh] sm:h-[48vh] md:h-[58vh] lg:h-[65vh] overflow-auto mb-3  border-2 mx-3   ">
           <table className="w-full min-w-max   ">
             <thead>
               <tr>
@@ -550,7 +550,7 @@ const Customer = (data) => {
           </div>
         </DialogFooter>
       </Dialog>
-    </div>
+    </Card>
   );
 };
 

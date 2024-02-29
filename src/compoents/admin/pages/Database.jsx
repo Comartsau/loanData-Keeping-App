@@ -49,13 +49,13 @@ function Database() {
               </div>
             </div> */}
           </div>
-          {activeCustomerMenu === "menu1" && (
-            <div className="w-full mt-5  ">
+          {/* {activeCustomerMenu === "menu1" && (
+            <div className="w-full   ">
               <Customer />
             </div>
-          )}
+          )} */}
           {activeCustomerMenu === "menu2" && (
-            <div className="w-full mt-5 ">
+            <div className="w-full  ">
               <Location />
             </div>
           )}

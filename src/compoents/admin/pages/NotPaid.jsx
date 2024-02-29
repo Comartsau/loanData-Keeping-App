@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { getNoPaid } from "../../../api/ReportApi";
 
 import { useRecoilValue } from "recoil";
-import { processStore , customerIdStore } from "../../../store/Store";
+import { processStore, customerIdStore } from "../../../store/Store";
 
 const NotPaid = () => {
   const [listData, setListData] = useState([]);
@@ -26,7 +26,7 @@ const NotPaid = () => {
 
   const fecthNotPaid = async () => {
     try {
-      const respone = await getNoPaid( customerId ,searchQuery);
+      const respone = await getNoPaid(customerId, searchQuery);
       setListData(respone);
     } catch (error) {
       toast.error(error);
@@ -58,29 +58,30 @@ const NotPaid = () => {
           <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
             <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
               <Typography className=" font-bold ">
-                รายงานลูกค้าทั้งหมดที่ยังจ่ายเงินไม่ครบ : <span>{dataProcessStore?.name}</span>
+                รายงานลูกค้าทั้งหมดที่ยังจ่ายเงินไม่ครบ :{" "}
+                <span>{dataProcessStore?.name}</span>
               </Typography>
             </div>
-            <div className="w-full md:w-[50%] flex   px-0 md:px-10">
-              <div className="w-full flex flex-col md:flex-row justify-center md:justify-end items-center gap-5">
-                <div>
-                  <Input
-                    type="text"
-                    label="ค้นหา ลูกค้าที่ต้องการ"
-                    //   placeholder="ค้นหา ชื่อลูกค้า"
-                    color="blue-gray"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    style={{ backgroundColor: "#F4F4F4" }}
-                  />
-                </div>
-              </div>
+            <div className=" w-full lg:w-[20%] flex flex-col md:flex-row items-center gap-5">
+              <Input
+                type="text"
+                label="ค้นหา ลูกค้าที่ต้องการ"
+                className="  "
+                //   placeholder="ค้นหา ชื่อลูกค้า"
+                color="blue-gray"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ backgroundColor: "#F4F4F4" }}
+              />
             </div>
           </div>
           <div className="flex flex-col lg:flex-row w-full gap-5">
             <div className="flex w-full lg:w-[80%] ">
-              <Card className="mt-5 w-full border-2 overflow-auto shadow-lg "  style={{ border: "1px solid #cccccc" }}>
-                <div >
+              <Card
+                className="mt-5 w-full border-2 overflow-auto shadow-lg "
+                style={{ border: "1px solid #cccccc" }}
+              >
+                <div>
                   <table className="w-full min-w-max ">
                     <thead>
                       <tr>
@@ -208,8 +209,7 @@ const NotPaid = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {Number(data?.total).toLocaleString() ||
-                                      ""}
+                                    {Number(data?.total).toLocaleString() || ""}
                                   </Typography>
                                 </div>
                               </td>
@@ -231,7 +231,9 @@ const NotPaid = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {Number(data?.overdue) < 0 ? "0" : Number(data?.overdue).toLocaleString() }
+                                    {Number(data?.overdue) < 0
+                                      ? "0"
+                                      : Number(data?.overdue).toLocaleString()}
                                   </Typography>
                                 </div>
                               </td>
@@ -242,7 +244,11 @@ const NotPaid = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {Number(data?.overdue) < 0 ?  Math.abs(Number(data?.overdue)).toLocaleString() : 0 }
+                                    {Number(data?.overdue) < 0
+                                      ? Math.abs(
+                                          Number(data?.overdue)
+                                        ).toLocaleString()
+                                      : 0}
                                   </Typography>
                                 </div>
                               </td>
@@ -293,19 +299,47 @@ const NotPaid = () => {
             <div className="flex w-full lg:w-[20%] flex-col h-full   justify-center md:justify-end    ">
               <div
                 className="p-3 md:h-[180px] items-center mt-2 md:mt-5 px-5 rounded-md  "
-                style={{ border: "3px solid #b3b3b3"  }}
+                style={{ border: "3px solid #b3b3b3" }}
               >
                 <Typography className=" font-bold mt-2">
-                  จำนวนยืม: <sapn className="font-normal">{Number(listData?.totals?.total).toLocaleString() == "NaN" ? 0 : Number(listData?.totals?.total).toLocaleString()}</sapn> บาท
+                  จำนวนยืม:{" "}
+                  <sapn className="font-normal">
+                    {Number(listData?.totals?.total).toLocaleString() == "NaN"
+                      ? 0
+                      : Number(listData?.totals?.total).toLocaleString()}
+                  </sapn>{" "}
+                  บาท
                 </Typography>
-                <Typography className=" font-bold mt-3">
-                  จ่ายแล้ว: <sapn className="font-normal">{Number(listData?.totals?.price).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.price).toLocaleString()}</sapn> บาท
+                <Typography className=" font-bold mt-1">
+                  จ่ายแล้ว:{" "}
+                  <sapn className="font-normal">
+                    {Number(listData?.totals?.price).toLocaleString() == "NaN"
+                      ? 0
+                      : Number(listData?.totals?.price).toLocaleString()}
+                  </sapn>{" "}
+                  บาท
                 </Typography>
-                <Typography className=" font-bold mt-3">
-                  ค้างจ่าย: <sapn className="font-normal">{Number(listData?.totals?.overdue).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.overdue).toLocaleString()}</sapn> บาท
+                <Typography className=" font-bold mt-1">
+                  ค้างจ่าย:{" "}
+                  <sapn className="font-normal">
+                    {Number(listData?.totals?.overdue).toLocaleString() == "NaN"
+                      ? 0
+                      : Number(listData?.totals?.overdue).toLocaleString()}
+                  </sapn>{" "}
+                  บาท
                 </Typography>
-                <Typography className=" font-bold mt-3">
-                  กำไร: <sapn className="font-normal">{Number(listData?.totals?.overdue).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.overdue) < 0 ?  Math.abs(Number(listData?.totals?.overdue)).toLocaleString() : 0 }</sapn> บาท
+                <Typography className=" font-bold mt-1">
+                  กำไร:{" "}
+                  <sapn className="font-normal">
+                    {Number(listData?.totals?.overdue).toLocaleString() == "NaN"
+                      ? 0
+                      : Number(listData?.totals?.overdue) < 0
+                      ? Math.abs(
+                          Number(listData?.totals?.overdue)
+                        ).toLocaleString()
+                      : 0}
+                  </sapn>{" "}
+                  บาท
                 </Typography>
               </div>
             </div>

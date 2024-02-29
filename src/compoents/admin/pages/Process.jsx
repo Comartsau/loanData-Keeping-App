@@ -638,12 +638,12 @@ const Process = () => {
               <div className="flex w-full flex-col h-full mt-4 lg:mt-0  justify-center md:justify-end   ">
                 <div
                   className="p-3  md:h-[260px] lg:h-[210px] items-center rounded-md    mb-2 "
-                  style={{ border: "3px solid #b3b3b3"  }}
+                  style={{ border: "2px solid #b3b3b3"  }}
                 >
                   <Typography className="text-xl font-bold ">
                     ยอดรวม(ทั้งหมด)
                   </Typography>
-                  <Typography className=" font-bold mt-5">
+                  <Typography className=" font-bold mt-3">
                     ยอดรวม:{" "}
                     <sapn>
                       {Number(dataProcessId?.total).toLocaleString() == "NaN"
@@ -652,7 +652,7 @@ const Process = () => {
                     </sapn>{" "}
                     บาท
                   </Typography>
-                  <Typography className=" font-bold mt-3">
+                  <Typography className=" font-bold mt-1">
                     ชำระแล้ว:{" "}
                     <sapn>
                       {Number(dataProcessId?.paid).toLocaleString() == "NaN"
@@ -661,7 +661,7 @@ const Process = () => {
                     </sapn>{" "}
                     บาท
                   </Typography>
-                  <Typography className=" font-bold mt-3">
+                  <Typography className=" font-bold mt-1">
                     ค้างชำระ:{" "}
                     <sapn>
                       {Number(dataProcessId?.overdue).toLocaleString() == "NaN"
@@ -672,7 +672,7 @@ const Process = () => {
                     </sapn>{" "}
                     บาท
                   </Typography>
-                  <Typography className=" font-bold mt-3">
+                  <Typography className=" font-bold mt-1">
                     กำไร:{" "}
                     <sapn>
                       {Number(dataProcessId?.overdue).toLocaleString() == "NaN"
@@ -1005,7 +1005,7 @@ const Process = () => {
                 <div className="w-full md:w-[70%]">
                   <Card
                     className="w-full  h-[30vh]  p-2 rounded-md"
-                    style={{ border: "3px solid #b3b3b3"  }}
+                    style={{ border: "2px solid #b3b3b3"  }}
                   >
                     <div className="h-[380px] overflow-auto ">
                       <table className="w-full min-w-max  ">
@@ -1176,13 +1176,13 @@ const Process = () => {
                 </div>
                 <div
                   className="flex w-full md:w-[30%] md:h-[330px] lg:h-[250px]  xl:h-[210px] rounded-md  "
-                  style={{ border: "3px solid #b3b3b3"  }}
+                  style={{ border: "2px solid #b3b3b3"  }}
                 >
                   <div className="gap-3  p-3">
                     <Typography className="text-xl font-bold">
                       ยอดรวม ({userListData?.name})
                     </Typography>
-                    <Typography className=" font-bold mt-5">
+                    <Typography className=" font-bold mt-3">
                       ยอดรวม:{" "}
                       <sapn>
                         {" "}
@@ -1192,7 +1192,7 @@ const Process = () => {
                       </sapn>{" "}
                       บาท
                     </Typography>
-                    <Typography className=" font-bold mt-3">
+                    <Typography className=" font-bold mt-1">
                       ชำระแล้ว:{" "}
                       <sapn>
                         {Number(userListSum?.paid).toLocaleString() == "NaN"
@@ -1201,7 +1201,7 @@ const Process = () => {
                       </sapn>{" "}
                       บาท
                     </Typography>
-                    <Typography className=" font-bold mt-3">
+                    <Typography className=" font-bold mt-1">
                       ค้างชำระ:{" "}
                       <sapn>
                         {Number(userListSum?.overdue).toLocaleString() == "NaN"
@@ -1212,7 +1212,7 @@ const Process = () => {
                       </sapn>{" "}
                       บาท
                     </Typography>
-                    <Typography className=" font-bold mt-3">
+                    <Typography className=" font-bold mt-1">
                       กำไร:{" "}
                       <sapn>
                         {Number(userListSum?.overdue).toLocaleString() == "NaN"

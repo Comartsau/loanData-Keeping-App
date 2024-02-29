@@ -168,13 +168,13 @@ const Location = () => {
   };
 
   return (
-    <div className=" w-full  sm:h-[80vh]   ">
+    <div className=" w-full  sm:h-[80vh]    ">
       <ToastContainer className="mt-10" autoClose={800} theme="colored" />
       <div className="flex flex-col w-full">
         {/* <p>ข้อมูลผู้บริจาค</p> */}
         <div className="w-full  flex  flex-col-reverse items-center md:flex-row justify-center sm:justify-between  ">
           <div className="w-full md:w-[50%] flex mt-5   px-0 md:mx-10 ">
-            <Typography className=" font-bold ">ข้อมูลสถานที่:</Typography>
+            <Typography className=" font-bold ">ข้อมูลสถานที่</Typography>
           </div>
           <div className="w-full md:w-[50%] flex   px-0 md:px-10">
             <div className="w-full flex flex-col md:flex-row justify-center md:justify-end items-center gap-5">
@@ -309,16 +309,16 @@ const Location = () => {
                         </td>
                         <td className={classes}   >
                           <div className="flex items-center justify-center ">
-                            <Link to="/admin/process" >
-                            <Button
+                            <Link to="/admin/process" className="text-purple-500 font-bold" onClick={() => [setCustomerId(data?.id), setDataProcessStore(data)]} >
+                            {/* <Button
                               variant="small"
                               // color="blue-gray"
                               className="font-normal text-sm p-2   "
                               style={{ backgroundColor: "#ED5EF0" }}
                               onClick={() => [setCustomerId(data?.id), setDataProcessStore(data)]}
                             >
-                              {data?.name || ""}
-                            </Button>
+                          </Button> */}
+                          {data?.name || ""}
                             </Link>
                           </div>
                         </td>
