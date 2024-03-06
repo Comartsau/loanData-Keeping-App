@@ -38,7 +38,7 @@ import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle, BsFillEyeFill } from "react-icons/bs";
 import { IoIosSave } from "react-icons/io";
 import { TbReload } from "react-icons/tb";
-import { MdSmsFailed } from "react-icons/md";
+import { MdSmsFailed , MdCancel  } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
 
 import {
@@ -50,6 +50,7 @@ import {
   userUpdate,
   getProcessUserList,
   changeStatus,
+  changeCancel,
   getProcessUserListSum,
   sendUpdate,
   sendReload,
@@ -75,6 +76,7 @@ const Process = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeRow, setActiveRow] = useState();
   const [activeRow2, setActiveRow2] = useState(0);
+  const [price,setPrice] = useState(0)
 
   const [selectDisable, setSelectDisable] = useState(0);
   const [userListSum, setUserListSum] = useState([]);
@@ -209,7 +211,7 @@ const Process = () => {
         setSumUser(response?.data);
         setDisableButton(
           status == "1" ||
-            status == "2" ||
+            // status == "2" ||
             response?.data[response?.data?.length - 1]?.status == "1"
             ? false
             : true
@@ -386,21 +388,24 @@ const Process = () => {
   const startEnd = moment(searchQueryEnd).format("YYYY-MM-DD");
   const dateSend = moment(changeDate).format("YYYY-MM-DD");
 
-  // console.log(dateSend);
 
+  // console.log(changeDate)
+  // console.log(dateCancel)
+  
+ 
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
       console.log(dateSend);
-      if (dateSend == "Invalid date") {
-        toast.error("กรุณาระบบวันที่");
+      if (dateSend == "Invalid date" || price <= 0) {
+        toast.error("กรุณาระบบวันที่ และ  จำนวนเงิน");
       } else {
         let data = {
           id: dataed?.id,
           status: changestatus,
-          price: dataed?.price,
+          price: price ,
           process_user_id: userId,
           process_id: dataProcessStore?.id,
-          date: dateSend,
+          date: dateSend ,
         };
         console.log(data);
 
@@ -419,12 +424,44 @@ const Process = () => {
     }
   };
 
+
+  const handleChangeCancel = async (changestatus, dataed) => {
+    try {
+        let data = {
+          id: dataed?.id,
+          status: Number(changestatus),
+          price: price <= 0 ? dataed?.price : price,
+          process_user_id: userId,
+          process_id: dataProcessStore?.id,
+          date: moment(dataed?.date,"DD-MM-YYYY").add(-543, 'years').format("YYYY-MM-DD")
+        }
+        const response = await changeCancel(data);
+        console.log(response);
+        if (response.status == 200) {
+          toast.success("เปลี่ยนสถานะ สำเร็จ");
+          setChangeDate("");
+          handleFetch();
+        } else {
+          toast.error(response?.response?.data);
+        }
+
+        
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+  console.log(userListData)
+
   const handleUpdate = async () => {
     try {
       let data = {
         id: userId,
-        status: 2,
+        process_id: dataProcessStore?.id ,
+        status: userListData?.status == 0 ? 2 : userListData?.status == 2 ? 0 : ''  ,
+        price: Number(userListData?.price),
+        date: Number(userListData?.count_day)
       };
+      console.log(data)
       const response = await sendUpdate(data);
       console.log(response);
       if (response?.status == 200) {
@@ -476,6 +513,7 @@ const Process = () => {
 
   // console.log(dataProcessStore.id);
   // console.log(listDataCustomer)
+  console.log(price)
 
   return (
     <Card>
@@ -624,7 +662,7 @@ const Process = () => {
                     size="sm"
                     variant="gradient"
                     color="purple"
-                    disabled={userListData.status == 0 ? false : true}
+                    // disabled={userListData.status == 0 ? false : true}
                     className="text-sm  flex justify-center  items-center w-full   bg-green-500"
                     onClick={handleUpdate}
                   >
@@ -635,9 +673,9 @@ const Process = () => {
                   </Button>
                 </div>
               </div>
-              <div className="flex w-full flex-col h-full mt-4 lg:mt-0  justify-center md:justify-end   ">
+              <div className="flex w-full flex-col h-full mt-4 2xl:mt-[130px]     ">
                 <div
-                  className="p-3  md:h-[260px] lg:h-[210px] items-center rounded-md    mb-2 "
+                  className=" lg:mt-[145px] xl:mt-[90px] sm:mt-0 md:mt-[18px] md:h-[400px]  2xl:mt-0 p-3   lg:h-[350px] xl:h-[273px] 2xl:h-[250px] items-center rounded-md    mb-2 "
                   style={{ border: "2px solid #b3b3b3"  }}
                 >
                   <Typography className="text-xl font-bold ">
@@ -688,7 +726,7 @@ const Process = () => {
                 </div>
               </div>
             </div>
-            <div className="flex w-full flex-col mt-24 md:mt-0 gap-3 md:w-8/12 xl:w-9/12 ">
+            <div className="flex w-full flex-col  gap-3 md:w-8/12 xl:w-9/12 ">
               <div className=" flex flex-col xl:flex-row  items-center sm:items-start  w-full justify-center md:justify-start    gap-5  ">
                 <div className="flex flex-col  xl:flex-row gap-5">
                   <div className="flex gap-5">
@@ -782,14 +820,14 @@ const Process = () => {
               </div>
               <div>
                 <Card
-                  className="w-full  h-[45vh] p-2  shadow-lg  "
+                  className="w-full  h-[38vh]  shadow-lg  "
                   style={{ border: "1px solid #cccccc" }}
                 >
-                  <div className="mt-5 h-[380px] w-full overflow-auto  ">
-                    <table className="w-full min-w-max">
+                  <div className="mt-0 h-[380px] w-full overflow-auto  ">
+                    <table className="w-full min-w-max " >
                       <thead>
                         <tr>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2">
                             <Typography
                               variant="small"
                               color="blue-gray"
@@ -798,7 +836,7 @@ const Process = () => {
                               ลำดับ
                             </Typography>
                           </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2">
                             <Typography
                               variant="small"
                               color="blue-gray"
@@ -807,7 +845,7 @@ const Process = () => {
                               ลูกค้า
                             </Typography>
                           </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2">
                             <Typography
                               variant="small"
                               color="blue-gray"
@@ -816,7 +854,7 @@ const Process = () => {
                               จำนวนเงิน
                             </Typography>
                           </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2">
                             <Typography
                               variant="small"
                               color="blue-gray"
@@ -825,7 +863,7 @@ const Process = () => {
                               จำนวนวัน
                             </Typography>
                           </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2">
                             <Typography
                               variant="small"
                               color="blue-gray"
@@ -834,7 +872,7 @@ const Process = () => {
                               สถานะ
                             </Typography>
                           </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2">
                             <Typography
                               variant="small"
                               color="blue-gray"
@@ -860,8 +898,8 @@ const Process = () => {
                           {displayedData?.map((data, index) => {
                             const isLast = index === displayedData?.length;
                             const classes = isLast
-                              ? "p-2 "
-                              : `p-3 border-b border-blue-gray-50  ${
+                              ? " "
+                              : ` border-b border-blue-gray-50  ${
                                   index === activeRow ? "bg-gray-300" : ""
                                 }`;
                             return (
@@ -941,12 +979,11 @@ const Process = () => {
                                   </div>
                                 </td>
                                 <td className={classes}>
-                                  <div className="flex items-center justify-center">
+                                  <div className="flex justify-center ">
                                     <IconButton
                                       variant="outlined"
                                       color="blue"
                                       size="sm"
-                                      className="ml-3 "
                                       onClick={() => [
                                         setActiveRow(index),
                                         fetchUserList(data?.id, data?.status),
@@ -954,7 +991,7 @@ const Process = () => {
                                         setUserListData(data),
                                         fetchUserListSum(data?.id),
                                         setDisableButton(
-                                          data?.status == 1 || data?.status == 2
+                                          data?.status == 1 || data?.status == 6
                                             ? false
                                             : true
                                         ),
@@ -1001,17 +1038,17 @@ const Process = () => {
                   </div>
                 </Card>
               </div>
-              <div className=" flex flex-col sm:flex-row  items-center sm:items-start  w-full justify-center md:justify-start gap-5  ">
+              <div className=" flex flex-col md:flex-row  items-center sm:items-start  w-full justify-center md:justify-start gap-5  ">
                 <div className="w-full md:w-[70%]">
                   <Card
-                    className="w-full  h-[30vh]  p-2 rounded-md"
+                    className="w-full md:h-[58.5vh] lg:h-[51vh] xl:h-[40vh]  2xl:h-[35.9vh]  p-2 rounded-md"
                     style={{ border: "2px solid #b3b3b3"  }}
                   >
                     <div className="h-[380px] overflow-auto ">
                       <table className="w-full min-w-max  ">
                         <thead>
                           <tr>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-1 ">
                               <Typography
                                 variant="small"
                                 color="blue-gray"
@@ -1020,7 +1057,7 @@ const Process = () => {
                                 จำนวน
                               </Typography>
                             </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-1 ">
                               <Typography
                                 variant="small"
                                 color="blue-gray"
@@ -1029,7 +1066,7 @@ const Process = () => {
                                 วันที่
                               </Typography>
                             </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-1 ">
                               <Typography
                                 variant="small"
                                 color="blue-gray"
@@ -1038,7 +1075,7 @@ const Process = () => {
                                 ราคา
                               </Typography>
                             </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-1 ">
                               <Typography
                                 variant="small"
                                 color="blue-gray"
@@ -1047,13 +1084,13 @@ const Process = () => {
                                 สถานะ
                               </Typography>
                             </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-1">
                               <Typography
                                 variant="small"
                                 color="blue-gray"
                                 className="font-bold leading-none opacity-70"
                               >
-                                เลือก
+                                บันทึก/ยกเลิก
                               </Typography>
                             </th>
                           </tr>
@@ -1065,8 +1102,8 @@ const Process = () => {
                               const isLast = index === sumUser?.length;
                               const pageIndex = startIndex + index;
                               const classes = isLast
-                                ? "p-2"
-                                : `p-3 border-b border-blue-gray-50 ${
+                                ? "p-1"
+                                : `p-1 border-b border-blue-gray-50 ${
                                     index === activeRow2 ? "bg-gray-300" : ""
                                   }`;
                               return (
@@ -1108,7 +1145,34 @@ const Process = () => {
                                       </div>
                                     </td>
                                   )}
-                                  <td className={classes}>
+                                  {data?.price == null || data?.price == 0 ? (
+                                    <td className={classes}>
+                                      <div className="flex items-center justify-center ">
+                                        <input
+                                          type="number"
+                                          min="0"
+                                          className=" border-2 w-24 border-black text-center bg-gray-200 "
+                                          placeholder="ใส่ราคา"
+                                          onChange={(e) =>
+                                            setPrice(e.target.value)
+                                          }
+                                        />
+                                      </div>
+                                    </td>
+                                  ) : (
+                                    <td className={classes}>
+                                      <div className="flex items-center justify-center">
+                                        <Typography
+                                          variant="small"
+                                          color="blue-gray"
+                                          className="font-normal"
+                                        >
+                                          {data?.price}
+                                        </Typography>
+                                      </div>
+                                    </td>
+                                  )}
+                                  {/* <td className={classes}>
                                     <div className="flex items-center justify-center">
                                       <Typography
                                         variant="small"
@@ -1118,7 +1182,7 @@ const Process = () => {
                                         {data?.price || ""}
                                       </Typography>
                                     </div>
-                                  </td>
+                                  </td> */}
                                   <td className={classes}>
                                     <div className="flex items-center justify-center">
                                       <Typography
@@ -1144,11 +1208,10 @@ const Process = () => {
                                     <div className="flex items-center justify-center">
                                       <IconButton
                                         variant="outlined"
-                                        color="blue"
+                                        color="green"
                                         size="sm"
                                         className="ml-3 "
-                                        // disabled={data[data?.length -1]?.status == 1 ? false : true }
-
+                                        disabled={data?.status == 0 ? false : true }
                                         onClick={() => [
                                           setActiveRow2(index),
                                           handleChangeStatus(
@@ -1162,7 +1225,29 @@ const Process = () => {
                                           // handleButton(),
                                         ]}
                                       >
-                                        <FaExchangeAlt className="h-5 w-5  text-light-blue-700 " />
+                                        <FaRegSave className="h-5 w-5  text-green-700 " />
+                                      </IconButton>
+                                      <IconButton
+                                        variant="outlined"
+                                        color="red"
+                                        size="sm"
+                                        className="ml-1  "
+                                        disabled={data?.status == 1 ? false : true }
+
+                                        onClick={() => [
+                                          setActiveRow2(index),
+                                          handleChangeCancel(
+                                            data?.status == 0
+                                              ? "1"
+                                              : data?.status == 1
+                                              ? "0"
+                                              : "",
+                                            data
+                                          ),
+                                          // handleButton(),
+                                        ]}
+                                      >
+                                        <MdCancel  className="h-6 w-6  text-light-red-700 " />
                                       </IconButton>
                                     </div>
                                   </td>
@@ -1175,14 +1260,35 @@ const Process = () => {
                   </Card>
                 </div>
                 <div
-                  className="flex w-full md:w-[30%] md:h-[330px] lg:h-[250px]  xl:h-[210px] rounded-md  "
+                  className="flex w-full  md:w-[30%] md:h-[400px] lg:h-[350px]  xl:h-[275px] 2xl:h-[250px] rounded-md  "
                   style={{ border: "2px solid #b3b3b3"  }}
                 >
-                  <div className="gap-3  p-3">
+                  <div className="w-full gap-3  p-3">
                     <Typography className="text-xl font-bold">
                       ยอดรวม ({userListData?.name})
                     </Typography>
                     <Typography className=" font-bold mt-3">
+                      ระยะเวลา:{" "}
+                      <sapn>
+                        {" "}
+                        {Number(userListSum?.count_day).toLocaleString() == "NaN"
+                          ? 0
+                          : Number(userListSum?.count_day).toLocaleString()}
+                      </sapn>{" "}
+                      วัน
+                    </Typography>
+                    <Typography className=" font-bold mt-1  " >
+                      ชำระแล้ว:{" "}
+                      <sapn>
+                        {" "}
+                        {Number(userListSum?.pay_date).toLocaleString() == "NaN"
+                          ? 0
+                          : Number(userListSum?.pay_date).toLocaleString()}
+                      </sapn>{" "}
+                      วัน
+                    </Typography>
+                    <hr className="h-0.5 bg-gray-400 mt-1.5"/>
+                    <Typography className=" font-bold mt-1">
                       ยอดรวม:{" "}
                       <sapn>
                         {" "}
@@ -1335,839 +1441,6 @@ const Process = () => {
               <FaRegSave />
             </span>
             บันทึก
-          </Button>
-        </DialogFooter>
-      </Dialog>
-
-      {/* modal Process */}
-
-      <Dialog open={openModalProcess} size="xxl">
-        <DialogBody divider className=" h-[90vh]   overflow-auto">
-          <div className="flex   flex-col  overflow-auto   items-center ">
-            <div className="flex w-full flex-col md:flex-row gap-5 ">
-              <div className="flex flex-col w-full h-[85vh] md:w-4/12 xl:w-4/12 ">
-                <div className="flex  items-center gap-3">
-                  <div>
-                    <Typography className="text-lg lg:text-xl font-bold">
-                      {selectCard?.name || ""}
-                    </Typography>
-                  </div>
-                  <div>
-                    <Button
-                      size="sm"
-                      variant="gradient"
-                      color="green"
-                      className="text-base flex justify-center  items-center   bg-green-500"
-                      onClick={() => [
-                        setSelectDisable(0),
-                        setSelectedValue(null),
-                        setAmount(0),
-                        setAmountDate(0),
-                        setSearchQueryStart(new Date()),
-                        setSearchQueryEnd(new Date()),
-                        setUserListData([]),
-                      ]}
-                    >
-                      <span className="mr-2 text-xl">
-                        <BsPlusCircle />
-                      </span>
-                      เพิ่มการบันทึกใหม่
-                    </Button>
-                  </div>
-                </div>
-                <div className=" w-full  flex flex-col justify-center mt-3  ">
-                  <Select
-                    classNamePrefix="select"
-                    placeholder="เลือกลูกค้า"
-                    // isClearable={isClearable}
-                    isSearchable={isSearchable}
-                    isDisabled={selectDisable}
-                    value={selectedValue}
-                    // value={{ value: selectedCustomer?.id, label: selectedCustomer?.name }}
-                    name="color"
-                    options={customerOptions}
-                    onChange={(e) => handleCustomerSelect(e)}
-                  />
-                </div>
-                <div className="flex w-full flex-col lg:flex-row justify-center mt-3 gap-3  ">
-                  <div className="w-full lg:w-[50%]">
-                    <div className=" relative w-full min-w-[100px] h-10">
-                      <input
-                        type="number"
-                        min={0}
-                        value={amount}
-                        disabled={selectDisable}
-                        className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
-                        style={{ backgroundColor: "rgb(244,244,244)" }}
-                        onChange={(e) => setAmount(e.target.value)}
-                      />
-                      <label className="flex w-[100%] h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-blue-gray-500 leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] text-blue-gray-400 peer-focus:text-blue-gray-500 before:border-blue-gray-200 peer-focus:before:!border-blue-gray-500 after:border-blue-gray-200 peer-focus:after:!border-blue-gray-500">
-                        จำนวนเงิน{" "}
-                      </label>
-                    </div>
-                  </div>
-                  <div className="w-full lg:w-[50%]">
-                    <div className=" relative w-full min-w-[100px] h-10">
-                      <input
-                        type="number"
-                        min={0}
-                        value={amountDate}
-                        disabled={selectDisable}
-                        className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
-                        style={{ backgroundColor: "rgb(244,244,244)" }}
-                        onChange={handleDaysToAddChange}
-                      />
-                      <label className="flex w-[100%] h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-blue-gray-500 leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] text-blue-gray-400 peer-focus:text-blue-gray-500 before:border-blue-gray-200 peer-focus:before:!border-blue-gray-500 after:border-blue-gray-200 peer-focus:after:!border-blue-gray-500">
-                        จำนวนวัน{" "}
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                {/* <div className="flex w-full flex-col lg:flex-row justify-center mt-3 gap-3  ">
-                  <div className="w-full lg:w-[50%]">
-                    <div className=" relative w-full min-w-[100px] h-10">
-                      <DatePicker
-                        selected={searchQueryStart}
-                        disabled={selectDisable}
-                        locale={th}
-                        dateFormat="เริ่มต้น dd/MM/yyyy"
-                        onChange={handleSearchQueryStartChange}
-                        className="w-full rounded-md border border-gray-400 p-2 text-gray-600  shadow-sm focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full lg:w-[50%]">
-                    <div className=" relative w-full min-w-[100px] h-10">
-                      <DatePicker
-                        selected={searchQueryEnd}
-                        disabled
-                        locale={th}
-                        dateFormat="สิ้นสุด dd/MM/yyyy"
-                        onChange={(date) => setSearchQueryEnd(date)}
-                        className="w-full rounded-md border border-gray-400 p-2 text-gray-600  shadow-sm focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                </div> */}
-                <div className="flex w-full flex-col lg:flex-row justify-center mt-5 gap-3  ">
-                  <div className="w-full ">
-                    <Button
-                      size="sm"
-                      variant="gradient"
-                      color="purple"
-                      disabled={userListData?.status == 0 ? false : true}
-                      className="text-sm flex justify-center  items-center w-full   bg-green-500"
-                      onClick={handleModalReload}
-                    >
-                      <span className="mr-2 text-xl ">
-                        <TbReload />
-                      </span>
-                      รียอด
-                    </Button>
-                  </div>
-                  <div className="w-full">
-                    <Button
-                      size="sm"
-                      variant="gradient"
-                      color="green"
-                      disabled={selectDisable}
-                      className="text-sm flex justify-center  items-center  w-full  bg-green-500"
-                      onClick={handleUser}
-                    >
-                      <span className="mr-2 text-xl ">
-                        <IoIosSave />
-                      </span>
-                      บันทึก
-                    </Button>
-                  </div>
-                  <div className="w-full ">
-                    <Button
-                      size="sm"
-                      variant="gradient"
-                      color="purple"
-                      disabled={userListData.status == 0 ? false : true}
-                      className="text-sm  flex justify-center  items-center w-full   bg-green-500"
-                      onClick={handleUpdate}
-                    >
-                      <span className="mr-2 text-sm ">
-                        <MdSmsFailed />
-                      </span>
-                      อัพเดท
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex w-full flex-col h-full mt-4 lg:mt-0  justify-center md:justify-end   ">
-                  <div
-                    className="p-3  md:h-[260px] lg:h-[210px] items-center   "
-                    style={{ border: "3px solid black" }}
-                  >
-                    <Typography className="text-xl font-bold ">
-                      ยอดรวม(ทั้งหมด)
-                    </Typography>
-                    <Typography className=" font-bold mt-5">
-                      ยอดรวม (ทั้งหมด):{" "}
-                      <sapn>
-                        {Number(dataProcessId?.total).toLocaleString() == "NaN"
-                          ? 0
-                          : Number(dataProcessId?.total).toLocaleString()}
-                      </sapn>{" "}
-                      บาท
-                    </Typography>
-                    <Typography className=" font-bold mt-3">
-                      ชำระแล้ว (ทั้งหมด):{" "}
-                      <sapn>
-                        {Number(dataProcessId?.paid).toLocaleString() == "NaN"
-                          ? 0
-                          : Number(dataProcessId?.paid).toLocaleString()}
-                      </sapn>{" "}
-                      บาท
-                    </Typography>
-                    <Typography className=" font-bold mt-3">
-                      ค้างชำระ (ทั้งหมด):{" "}
-                      <sapn>
-                        {Number(dataProcessId?.overdue).toLocaleString() ==
-                        "NaN"
-                          ? 0
-                          : Number(dataProcessId?.overdue) < 0
-                          ? 0
-                          : Number(dataProcessId?.overdue).toLocaleString()}
-                      </sapn>{" "}
-                      บาท
-                    </Typography>
-                    <Typography className=" font-bold mt-3">
-                      กำไร (ทั้งหมด):{" "}
-                      <sapn>
-                        {Number(dataProcessId?.overdue).toLocaleString() ==
-                        "NaN"
-                          ? 0
-                          : Number(dataProcessId?.overdue) < 0
-                          ? Math.abs(
-                              Number(dataProcessId?.overdue)
-                            ).toLocaleString()
-                          : 0}
-                      </sapn>{" "}
-                      บาท
-                    </Typography>
-                  </div>
-                </div>
-              </div>
-              <div className="flex w-full flex-col mt-24 md:mt-0 gap-3 md:w-8/12 xl:w-9/12 ">
-                <div className=" flex flex-col xl:flex-row  items-center sm:items-start  w-full justify-center md:justify-start    gap-5  ">
-                  <div className="flex flex-col  xl:flex-row gap-5">
-                    <div className="flex gap-5">
-                      <div className=" justify-center">
-                        <Button
-                          size="lg"
-                          variant="outlined"
-                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white ${
-                            activeCustomerMenu === "menu1"
-                              ? " bg-blue-300 "
-                              : "bg-blue-100"
-                          }`}
-                          onClick={() => [
-                            setActiveCustomerMenu("menu1"),
-                            fetchStatus1(),
-                            setDisableButton(true),
-                            setSumUser([]),
-                            setActiveRow(),
-                          ]}
-                        >
-                          ทั้งหมด
-                        </Button>
-                      </div>
-                      <div className=" justify-center">
-                        <Button
-                          size="lg"
-                          variant="outlined"
-                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  text-white `}
-                          style={{
-                            backgroundColor:
-                              activeCustomerMenu === "menu2"
-                                ? "#ff9800"
-                                : "#fdaf3d",
-                          }}
-                          onClick={() => [
-                            setActiveCustomerMenu("menu2"),
-                            fetchStatus(0),
-                            setDisableButton(true),
-                            setSumUser([]),
-                            setActiveRow(),
-                          ]}
-                        >
-                          กำลังจ่าย
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-5">
-                      <div className=" justify-center">
-                        <Button
-                          size="lg"
-                          variant="outlined"
-                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                            activeCustomerMenu === "menu3"
-                              ? " bg-green-500 text-white"
-                              : "bg-green-300 text-white"
-                          }`}
-                          onClick={() => [
-                            setActiveCustomerMenu("menu3"),
-                            fetchStatus(1),
-                            setDisableButton(false),
-                            setSumUser([]),
-                            setActiveRow(),
-                          ]}
-                        >
-                          จ่ายครบแล้ว
-                        </Button>
-                      </div>
-                      <div className=" justify-center">
-                        <Button
-                          size="lg"
-                          variant="outlined"
-                          className={`w-[150px] rounded-md py-3  px-4 shadow-lg border border-gray-400  ${
-                            activeCustomerMenu === "menu4"
-                              ? " bg-red-500 text-white"
-                              : "bg-red-300 text-white"
-                          }`}
-                          onClick={() => [
-                            setActiveCustomerMenu("menu4"),
-                            fetchStatus(2),
-                            setDisableButton(false),
-                            setSumUser([]),
-                            setActiveRow(),
-                          ]}
-                        >
-                          ลูกค้าเสีย
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <Card
-                    className="w-full  h-[45vh] p-2 "
-                    style={{ border: "3px solid black" }}
-                  >
-                    <div className="mt-5 h-[380px] w-full overflow-auto  ">
-                      <table className="w-full min-w-max">
-                        <thead>
-                          <tr>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                ลำดับ
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                ลูกค้า
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                จำนวนเงิน
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                จำนวนวัน
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                วันที่เริ่มต้น
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                วันที่สิ้นสุด
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                สถานะ
-                              </Typography>
-                            </th>
-                            <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                              <Typography
-                                variant="small"
-                                color="blue-gray"
-                                className="font-bold leading-none opacity-70"
-                              >
-                                เลือก
-                              </Typography>
-                            </th>
-                          </tr>
-                        </thead>
-                        {listDataCustomer?.length == 0 ? (
-                          <tbody>
-                            <tr>
-                              <td colSpan={8}>
-                                <Typography className="mt-5 text-center">
-                                  ...ไม่พบข้อมูล...
-                                </Typography>
-                              </td>
-                            </tr>
-                          </tbody>
-                        ) : (
-                          <tbody>
-                            {displayedData?.map((data, index) => {
-                              const isLast = index === displayedData?.length;
-                              const classes = isLast
-                                ? "p-2"
-                                : `p-3 border-b border-blue-gray-50 ${
-                                    index === activeRow ? "bg-gray-300" : ""
-                                  }`;
-                              return (
-                                <tr key={index}>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal"
-                                      >
-                                        {index + 1 || ""}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal"
-                                      >
-                                        {data?.name}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal "
-                                      >
-                                        {Number(data?.total).toLocaleString() ||
-                                          ""}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal "
-                                      >
-                                        {data?.count_day || ""}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal "
-                                      >
-                                        {data?.start_day || ""}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal "
-                                      >
-                                        {data?.end_day || ""}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className={`font-normal ${
-                                          data?.status == "0"
-                                            ? "bg-yellow-300 bg-opacity-60 px-3  rounded-lg "
-                                            : data?.status == "1"
-                                            ? "bg-green-300  bg-opacity-60 px-3  rounded-lg"
-                                            : data?.status == "2"
-                                            ? "bg-red-500  bg-opacity-60 px-3   rounded-lg"
-                                            : data?.status == "3"
-                                            ? "bg-purple-500  bg-opacity-60 px-3   rounded-lg"
-                                            : ""
-                                        } `}
-                                      >
-                                        {data?.status == 0
-                                          ? "กำลังจ่าย"
-                                          : data?.status == 1
-                                          ? "จ่ายครบแล้ว"
-                                          : data?.status == 2
-                                          ? "ลูกค้าเสีย"
-                                          : data?.status == 3
-                                          ? "รียอด"
-                                          : ""}
-                                      </Typography>
-                                    </div>
-                                  </td>
-                                  <td className={classes}>
-                                    <div className="flex items-center justify-center">
-                                      <IconButton
-                                        variant="outlined"
-                                        color="blue"
-                                        size="sm"
-                                        className="ml-3 "
-                                        onClick={() => [
-                                          setActiveRow(index),
-                                          fetchUserList(data?.id, data?.status),
-                                          setSumUser([]),
-                                          setUserListData(data),
-                                          fetchUserListSum(data?.id),
-                                          setDisableButton(
-                                            data?.status == 1 ||
-                                              data?.status == 2
-                                              ? false
-                                              : true
-                                          ),
-                                          setSelectedValue(data),
-                                          setSelectedValue({
-                                            ...selectedValue,
-                                            label: data?.name,
-                                          }),
-                                          setSelectDisable(1),
-                                          setAmount(data?.total),
-                                          setAmountDate(data?.count_day),
-                                          setSearchQueryStart(
-                                            addYears(
-                                              parse(
-                                                data?.start_day,
-                                                "dd-MM-yyyy",
-                                                new Date()
-                                              ),
-                                              -543
-                                            )
-                                          ),
-                                          setSearchQueryEnd(
-                                            addYears(
-                                              parse(
-                                                data?.end_day,
-                                                "dd-MM-yyyy",
-                                                new Date()
-                                              ),
-                                              -543
-                                            )
-                                          ),
-                                        ]}
-                                      >
-                                        <BsFillEyeFill className="h-5 w-5  text-light-blue-700 " />
-                                      </IconButton>
-                                    </div>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        )}
-                      </table>
-                    </div>
-                  </Card>
-                </div>
-                <div className=" flex flex-col sm:flex-row  items-center sm:items-start  w-full justify-center md:justify-start gap-5  ">
-                  <div className="w-full md:w-[70%]">
-                    <Card
-                      className="w-full  h-[30vh]  p-2"
-                      style={{ border: "3px solid black" }}
-                    >
-                      <div className="h-[380px] overflow-auto ">
-                        <table className="w-full min-w-max  ">
-                          <thead>
-                            <tr>
-                              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                                <Typography
-                                  variant="small"
-                                  color="blue-gray"
-                                  className="font-bold leading-none opacity-70"
-                                >
-                                  จำนวน
-                                </Typography>
-                              </th>
-                              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                                <Typography
-                                  variant="small"
-                                  color="blue-gray"
-                                  className="font-bold leading-none opacity-70"
-                                >
-                                  วันที่
-                                </Typography>
-                              </th>
-                              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                                <Typography
-                                  variant="small"
-                                  color="blue-gray"
-                                  className="font-bold leading-none opacity-70"
-                                >
-                                  ราคา
-                                </Typography>
-                              </th>
-                              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                                <Typography
-                                  variant="small"
-                                  color="blue-gray"
-                                  className="font-bold leading-none opacity-70"
-                                >
-                                  สถานะ
-                                </Typography>
-                              </th>
-                              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                                <Typography
-                                  variant="small"
-                                  color="blue-gray"
-                                  className="font-bold leading-none opacity-70"
-                                >
-                                  เลือก
-                                </Typography>
-                              </th>
-                            </tr>
-                          </thead>
-
-                          <tbody>
-                            {disableButton &&
-                              sumUser?.map((data, index) => {
-                                const isLast = index === sumUser?.length;
-                                const pageIndex = startIndex + index;
-                                const classes = isLast
-                                  ? "p-2"
-                                  : `p-3 border-b border-blue-gray-50 ${
-                                      index === activeRow2 ? "bg-gray-300" : ""
-                                    }`;
-                                return (
-                                  <tr key={index}>
-                                    <td className={classes}>
-                                      <div className="flex items-center justify-center">
-                                        <Typography
-                                          variant="small"
-                                          color="blue-gray"
-                                          className="font-normal"
-                                        >
-                                          {pageIndex + 1 || ""}
-                                        </Typography>
-                                      </div>
-                                    </td>
-                                    {data?.date ==
-                                    "Invalid dateInvalid date" ? (
-                                      <td className={classes}>
-                                        <div className="flex items-center justify-center ">
-                                          <input
-                                            type="date"
-                                            className=" border-2 border-black text-center bg-gray-200 "
-                                            placeholder="ระบุวันที่ DD-MM-YYY"
-                                            onChange={(e) =>
-                                              setChangeDate(e.target.value)
-                                            }
-                                          />
-                                        </div>
-                                      </td>
-                                    ) : (
-                                      <td className={classes}>
-                                        <div className="flex items-center justify-center">
-                                          <Typography
-                                            variant="small"
-                                            color="blue-gray"
-                                            className="font-normal"
-                                          >
-                                            {data?.date}
-                                          </Typography>
-                                        </div>
-                                      </td>
-                                    )}
-                                    <td className={classes}>
-                                      <div className="flex items-center justify-center">
-                                        <Typography
-                                          variant="small"
-                                          color="blue-gray"
-                                          className="font-normal "
-                                        >
-                                          {data?.price || ""}
-                                        </Typography>
-                                      </div>
-                                    </td>
-                                    <td className={classes}>
-                                      <div className="flex items-center justify-center">
-                                        <Typography
-                                          variant="small"
-                                          color="blue-gray"
-                                          className={`font-normal ${
-                                            data?.status == "0"
-                                              ? "bg-red-300 bg-opacity-60 px-3   rounded-lg "
-                                              : data?.status == "1"
-                                              ? "bg-green-300 bg-opacity-60 px-3   rounded-lg"
-                                              : ""
-                                          } `}
-                                        >
-                                          {data?.status == 0
-                                            ? "ยังไม่จ่าย"
-                                            : data?.status == 1
-                                            ? "จ่ายแล้ว"
-                                            : ""}
-                                        </Typography>
-                                      </div>
-                                    </td>
-                                    <td className={classes}>
-                                      <div className="flex items-center justify-center">
-                                        <IconButton
-                                          variant="outlined"
-                                          color="blue"
-                                          size="sm"
-                                          className="ml-3 "
-                                          // disabled={data[data?.length -1]?.status == 1 ? false : true }
-
-                                          onClick={() => [
-                                            setActiveRow2(index),
-                                            handleChangeStatus(
-                                              data?.status == 0
-                                                ? "1"
-                                                : data?.status == 1
-                                                ? "0"
-                                                : "",
-                                              data
-                                            ),
-                                            // handleButton(),
-                                          ]}
-                                        >
-                                          <FaExchangeAlt className="h-5 w-5  text-light-blue-700 " />
-                                        </IconButton>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </Card>
-                  </div>
-                  <div
-                    className="flex w-full md:w-[30%] md:h-[330px] lg:h-[250px]  xl:h-[210px]  "
-                    style={{ border: "3px solid black" }}
-                  >
-                    <div className="gap-3  p-3">
-                      <Typography className="text-xl font-bold">
-                        ยอดรวม ({userListData?.name})
-                      </Typography>
-                      <Typography className=" font-bold mt-5">
-                        ยอดรวม (ทั้งหมด):{" "}
-                        <sapn>
-                          {" "}
-                          {Number(userListSum?.total).toLocaleString() == "NaN"
-                            ? 0
-                            : Number(userListSum?.total).toLocaleString()}
-                        </sapn>{" "}
-                        บาท
-                      </Typography>
-                      <Typography className=" font-bold mt-3">
-                        ชำระแล้ว (ทั้งหมด):{" "}
-                        <sapn>
-                          {Number(userListSum?.paid).toLocaleString() == "NaN"
-                            ? 0
-                            : Number(userListSum?.paid).toLocaleString()}
-                        </sapn>{" "}
-                        บาท
-                      </Typography>
-                      <Typography className=" font-bold mt-3">
-                        ค้างชำระ (ทั้งหมด):{" "}
-                        <sapn>
-                          {Number(userListSum?.overdue).toLocaleString() ==
-                          "NaN"
-                            ? 0
-                            : Number(userListSum?.overdue) < 0
-                            ? 0
-                            : Number(userListSum?.overdue).toLocaleString()}
-                        </sapn>{" "}
-                        บาท
-                      </Typography>
-                      <Typography className=" font-bold mt-3">
-                        กำไร (ทั้งหมด):{" "}
-                        <sapn>
-                          {Number(userListSum?.overdue).toLocaleString() ==
-                          "NaN"
-                            ? 0
-                            : Number(userListSum?.overdue) < 0
-                            ? Math.abs(
-                                Number(userListSum?.overdue)
-                              ).toLocaleString()
-                            : 0}
-                        </sapn>{" "}
-                        บาท
-                      </Typography>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </DialogBody>
-        <DialogFooter>
-          <Button
-            variant="text"
-            color="red"
-            size="sm"
-            onClick={() => [
-              setOpenModalProcess(false),
-              setDataProcessId([]),
-              setActiveRow(),
-              setSumUser([]),
-              setUserId(""),
-              setUserListSum([]),
-              setSelectDisable(0),
-              setSelectedValue(null),
-              setAmount(0),
-              setAmountDate(0),
-              setSearchQueryStart(new Date()),
-              setSearchQueryEnd(new Date()),
-              setUserListData([]),
-              fetchProcess(),
-              setListDataCustomer([]),
-              // setCardId(""),
-            ]}
-            className="flex mr-1 text-base"
-          >
-            <span className="text-xl mr-2">
-              <AiOutlineStop />
-            </span>
-            ยกเลิก
           </Button>
         </DialogFooter>
       </Dialog>

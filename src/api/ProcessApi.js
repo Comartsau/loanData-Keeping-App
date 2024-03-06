@@ -172,6 +172,22 @@ export const changeStatus = async (data) => {
   }
 };
 
+export const changeCancel = async (data) => {
+  try {
+    const response = await axios.put(
+      `${import.meta.env.VITE_APP_API}/api/process/user/list/cancel`,
+      data,
+      {
+        ...HeaderAPI(localStorage.getItem("Token")),
+      }
+    );
+    // console.log(response)
+    return response;
+  } catch (error) {
+    return error
+  }
+};
+
 export const sendUpdate = async (data) => {
 
   try {
