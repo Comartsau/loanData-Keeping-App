@@ -324,6 +324,8 @@ const NotPaid = () => {
                   <sapn className="font-normal">
                     {Number(listData?.totals?.overdue).toLocaleString() == "NaN"
                       ? 0
+                      :  Number(listData?.totals?.overdue) < 0 
+                      ? 0
                       : Number(listData?.totals?.overdue).toLocaleString()}
                   </sapn>{" "}
                   บาท

@@ -77,6 +77,8 @@ const LostCustomer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendId]);
 
+  console.log(listData)
+
   return (
     <div>
       <div className=" h-[74vh]  ">
@@ -328,7 +330,7 @@ const LostCustomer = () => {
                   จ่ายแล้ว: <sapn className="font-normal">{Number(listData?.totals?.price).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.price).toLocaleString()}</sapn> บาท
                 </Typography>
                 <Typography className=" font-bold mt-1">
-                  ค้างจ่าย: <sapn className="font-normal">{Number(listData?.totals?.overdue).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.overdue).toLocaleString()}</sapn> บาท
+                  ค้างจ่าย: <sapn className="font-normal">{Number(listData?.totals?.overdue).toLocaleString() == 'NaN'  ? 0 : Number(listData?.totals?.overdue) < 0 ? 0 : Number(listData?.totals?.overdue).toLocaleString()}</sapn> บาท
                 </Typography>
                 <Typography className=" font-bold mt-1">
                   กำไร: <sapn className="font-normal">{Number(listData?.totals?.overdue).toLocaleString() == 'NaN' ? 0 : Number(listData?.totals?.overdue) < 0 ?  Math.abs(Number(listData?.totals?.overdue)).toLocaleString() : 0 }</sapn> บาท

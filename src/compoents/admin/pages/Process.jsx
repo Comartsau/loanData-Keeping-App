@@ -123,7 +123,7 @@ const Process = () => {
     try {
       const response = await getCustomer(customerId, searchQuery);
 
-      console.log(response);
+      // console.log(response);
       setCustomerDataStore(response);
     } catch (error) {
       console.error(error);
@@ -186,10 +186,9 @@ const Process = () => {
   }, [dataProcessStore?.id]);
 
   const fetchStatus1 = async () => {
-    console.log(statused);
     try {
       const response = await getProcessUser1(dataProcessStore?.id);
-      console.log(response);
+      // console.log(response);
       if (response?.status == 200) {
         setListDataCustomer(response.data);
       } else {
@@ -208,11 +207,10 @@ const Process = () => {
       // setSumUser([]);
       const response = await getProcessUserList(id);
       if (response?.status == 200) {
+        // console.log(response?.data);
         setSumUser(response?.data);
         setDisableButton(
-          status == "1" ||
-            // status == "2" ||
-            response?.data[response?.data?.length - 1]?.status == "1"
+          status == "1" 
             ? false
             : true
         );
@@ -277,7 +275,7 @@ const Process = () => {
       };
 
       const response = await addProcess(data);
-      console.log(response);
+      // console.log(response);
       if (response == undefined) {
         toast.error("สถานที่นี้ถูกสร้างไปแล้ว");
       } else {
@@ -307,7 +305,7 @@ const Process = () => {
   const [selectedValue, setSelectedValue] = useState(null);
 
   const handleCustomerSelect = (e) => {
-    console.log(e);
+    // console.log(e);
     // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
     const customer = customerDataStore.find(
       (customer) => customer.id === e.value
@@ -344,7 +342,7 @@ const Process = () => {
         // end_day: startEnd,
       };
       const response = await userUpdate(data);
-      console.log(response)
+      // console.log(response)
       if (response) {
         toast.success("เพิ่ม/อัพเดทข้อมูล ลูกค้า สำเร็จ");
         handleFetch();
@@ -395,7 +393,7 @@ const Process = () => {
  
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
-      console.log(dateSend);
+      // console.log(dateSend);
       if (dateSend == "Invalid date" || price <= 0) {
         toast.error("กรุณาระบบวันที่ และ  จำนวนเงิน");
       } else {
@@ -407,10 +405,10 @@ const Process = () => {
           process_id: dataProcessStore?.id,
           date: dateSend ,
         };
-        console.log(data);
+        // console.log(data);
 
         const response = await changeStatus(data);
-        console.log(response);
+        // console.log(response);
         if (response.status == 200) {
           toast.success("เปลี่ยนสถานะ สำเร็จ");
           setChangeDate("");
@@ -436,7 +434,7 @@ const Process = () => {
           date: moment(dataed?.date,"DD-MM-YYYY").add(-543, 'years').format("YYYY-MM-DD")
         }
         const response = await changeCancel(data);
-        console.log(response);
+        // console.log(response);
         if (response.status == 200) {
           toast.success("เปลี่ยนสถานะ สำเร็จ");
           setChangeDate("");
@@ -450,9 +448,9 @@ const Process = () => {
       toast.error(error);
     }
   };
-  console.log(userListData)
-
+  
   const handleUpdate = async () => {
+    // console.log(userListData)
     try {
       let data = {
         id: userId,
@@ -467,6 +465,14 @@ const Process = () => {
       if (response?.status == 200) {
         toast.success("เปลี่ยนสถานะ สำเร็จ");
         handleFetch();
+        setSelectDisable(0),
+        setSelectedValue(null),
+        setAmount(0),
+        setAmountDate(0),
+        setSearchQueryStart(new Date()),
+        setSearchQueryEnd(new Date()),
+        setUserListData([])
+        // setDisableButton(false)
       } else {
         toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
       }
@@ -487,7 +493,7 @@ const Process = () => {
       };
 
       const response = await sendReload(data);
-      console.log(response?.response?.data);
+      // console.log(response?.response?.data);
       if (response?.status == 200) {
         toast.success("รียอด สำเร็จ");
         setReturnReload(response?.data);
@@ -509,11 +515,11 @@ const Process = () => {
     fetchUserListSum(userId);
   };
 
-  console.log(sumUser);
-
+  
   // console.log(dataProcessStore.id);
-  // console.log(listDataCustomer)
-  console.log(price)
+  console.log(listDataCustomer)
+  console.log(sumUser);
+  // console.log(price)
 
   return (
     <Card>
@@ -642,6 +648,23 @@ const Process = () => {
                     รียอด
                   </Button>
                 </div>
+   
+                <div className="w-full ">
+                  <Button
+                    size="sm"
+                    variant="gradient"
+                    color="purple"
+                    // disabled={!selectDisable}
+                    disabled={userListData?.status == 0 || userListData?.status == 2  ? false : true}
+                    className="text-sm  flex justify-center  items-center w-full   bg-green-500"
+                    onClick={handleUpdate}
+                  >
+                    <span className="mr-2 text-xl ">
+                      <MdSmsFailed />
+                    </span>
+                    อัพเดท
+                  </Button>
+                </div>
                 <div className="w-full">
                   <Button
                     size="sm"
@@ -657,25 +680,10 @@ const Process = () => {
                     บันทึก
                   </Button>
                 </div>
-                <div className="w-full ">
-                  <Button
-                    size="sm"
-                    variant="gradient"
-                    color="purple"
-                    // disabled={userListData.status == 0 ? false : true}
-                    className="text-sm  flex justify-center  items-center w-full   bg-green-500"
-                    onClick={handleUpdate}
-                  >
-                    <span className="mr-2 text-xl ">
-                      <MdSmsFailed />
-                    </span>
-                    อัพเดท
-                  </Button>
-                </div>
               </div>
-              <div className="flex w-full flex-col h-full mt-4 2xl:mt-[130px]     ">
+              <div className="flex w-full flex-col h-full mt-4 2xl:mt-[97px]     ">
                 <div
-                  className=" lg:mt-[145px] xl:mt-[90px] sm:mt-0 md:mt-[18px] md:h-[400px]  2xl:mt-0 p-3   lg:h-[350px] xl:h-[273px] 2xl:h-[250px] items-center rounded-md    mb-2 "
+                  className=" lg:mt-[145px] xl:mt-[90px] sm:mt-0 md:mt-[18px] md:h-[400px]  2xl:mt-0 p-3   lg:h-[350px] xl:h-[273px] 2xl:h-[290px] items-center rounded-md    mb-2 "
                   style={{ border: "2px solid #b3b3b3"  }}
                 >
                   <Typography className="text-xl font-bold ">
@@ -820,7 +828,7 @@ const Process = () => {
               </div>
               <div>
                 <Card
-                  className="w-full  h-[38vh]  shadow-lg  "
+                  className="w-full  h-[33vh]  shadow-lg  "
                   style={{ border: "1px solid #cccccc" }}
                 >
                   <div className="mt-0 h-[380px] w-full overflow-auto  ">
@@ -990,11 +998,11 @@ const Process = () => {
                                         setSumUser([]),
                                         setUserListData(data),
                                         fetchUserListSum(data?.id),
-                                        setDisableButton(
-                                          data?.status == 1 || data?.status == 6
-                                            ? false
-                                            : true
-                                        ),
+                                        // setDisableButton(
+                                        //   data?.status == 2 
+                                        //     ? false
+                                        //     : true
+                                        // ),
                                         setSelectedValue(data),
                                         setSelectedValue({
                                           ...selectedValue,
@@ -1041,7 +1049,7 @@ const Process = () => {
               <div className=" flex flex-col md:flex-row  items-center sm:items-start  w-full justify-center md:justify-start gap-5  ">
                 <div className="w-full md:w-[70%]">
                   <Card
-                    className="w-full md:h-[58.5vh] lg:h-[51vh] xl:h-[40vh]  2xl:h-[35.9vh]  p-2 rounded-md"
+                    className="w-full md:h-[66vh] lg:h-[60vh] xl:h-[40vh]  2xl:h-[42vh]  p-2 rounded-md"
                     style={{ border: "2px solid #b3b3b3"  }}
                   >
                     <div className="h-[380px] overflow-auto ">
@@ -1260,7 +1268,7 @@ const Process = () => {
                   </Card>
                 </div>
                 <div
-                  className="flex w-full  md:w-[30%] md:h-[400px] lg:h-[350px]  xl:h-[275px] 2xl:h-[250px] rounded-md  "
+                  className="flex w-full  md:w-[30%] md:h-[450px] lg:h-[400px]  xl:h-[295px] 2xl:h-[291px] rounded-md  "
                   style={{ border: "2px solid #b3b3b3"  }}
                 >
                   <div className="w-full gap-3  p-3">
@@ -1284,6 +1292,16 @@ const Process = () => {
                         {Number(userListSum?.pay_date).toLocaleString() == "NaN"
                           ? 0
                           : Number(userListSum?.pay_date).toLocaleString()}
+                      </sapn>{" "}
+                      วัน
+                    </Typography>
+                    <Typography className=" font-bold mt-1  " >
+                      คงเหลือ:{" "}
+                      <sapn>
+                        {" "}
+                        {Number(userListSum?.pay_date).toLocaleString() == "NaN"
+                          ? 0
+                          : Number(userListSum?.count_day - userListSum?.pay_date).toLocaleString()}
                       </sapn>{" "}
                       วัน
                     </Typography>
