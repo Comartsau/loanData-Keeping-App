@@ -414,6 +414,7 @@ const Process = () => {
           toast.success("เปลี่ยนสถานะ สำเร็จ");
           setChangeDate("");
           handleFetch();
+          setPrice(null)
         } else {
           toast.error(response?.response?.data);
         }
@@ -440,7 +441,6 @@ const Process = () => {
           toast.success("เปลี่ยนสถานะ สำเร็จ");
           setChangeDate("");
           handleFetch();
-          setPrice(0)
         } else {
           toast.error(response?.response?.data);
         }
