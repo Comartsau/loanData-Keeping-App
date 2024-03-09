@@ -76,7 +76,7 @@ const Process = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeRow, setActiveRow] = useState();
   const [activeRow2, setActiveRow2] = useState(0);
-  const [price,setPrice] = useState(0)
+  const [price,setPrice] = useState(null)
 
   const [selectDisable, setSelectDisable] = useState(0);
   const [userListSum, setUserListSum] = useState([]);
@@ -394,7 +394,7 @@ const Process = () => {
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
       // console.log(dateSend);
-      if (dateSend == "Invalid date" || price < 0) {
+      if (dateSend == "Invalid date" || price == null || price < 0 ) {
         toast.error("กรุณาระบบวันที่ และ  จำนวนเงิน");
       } else {
         let data = {
@@ -406,6 +406,7 @@ const Process = () => {
           date: dateSend ,
         };
         console.log(data);
+        console.log(price);
 
         const response = await changeStatus(data);
         // console.log(response);
@@ -439,6 +440,7 @@ const Process = () => {
           toast.success("เปลี่ยนสถานะ สำเร็จ");
           setChangeDate("");
           handleFetch();
+          setPrice(0)
         } else {
           toast.error(response?.response?.data);
         }
