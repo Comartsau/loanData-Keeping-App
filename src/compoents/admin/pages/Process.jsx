@@ -394,7 +394,7 @@ const Process = () => {
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
       // console.log(dateSend);
-      if (dateSend == "Invalid date" || price <= 0) {
+      if (dateSend == "Invalid date" || price < 0) {
         toast.error("กรุณาระบบวันที่ และ  จำนวนเงิน");
       } else {
         let data = {
@@ -405,7 +405,7 @@ const Process = () => {
           process_id: dataProcessStore?.id,
           date: dateSend ,
         };
-        // console.log(data);
+        console.log(data);
 
         const response = await changeStatus(data);
         // console.log(response);
@@ -1153,7 +1153,7 @@ const Process = () => {
                                       </div>
                                     </td>
                                   )}
-                                  {data?.price == null || data?.price == 0 ? (
+                                  {data?.price == null || data?.price < 0 ? (
                                     <td className={classes}>
                                       <div className="flex items-center justify-center ">
                                         <input
