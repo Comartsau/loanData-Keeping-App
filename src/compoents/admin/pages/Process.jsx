@@ -1479,20 +1479,6 @@ const Process = () => {
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
           <Typography variant="h5">ยืนยันการสร้าง</Typography>
         </DialogHeader>
-        {/* <DialogBody divider className=" h-[47vh]">
-          <div className=" w-full  flex flex-col justify-center mt-3  ">
-            <Select
-              className="  max-h-0"
-              classNamePrefix="select"
-              placeholder="เลือกบริษัท"
-              // isClearable={isClearable}
-              isSearchable={isSearchable}
-              name="color"
-              options={locationOptions}
-              onChange={(e) => handleLocationSelect(e)}
-            />
-          </div>
-        </DialogBody> */}
         <DialogFooter className="flex justify-center gap-5 mt-3">
           <Button
             variant="text"
