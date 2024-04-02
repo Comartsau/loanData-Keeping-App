@@ -223,7 +223,7 @@ const Process = () => {
       // setSumUser([]);
       const response = await getProcessUserList(id);
       if (response?.status == 200) {
-        console.log(response?.data);
+        // console.log(response?.data);
         setSumUser(response?.data);
         setDisableButton(
           status == "1" 
@@ -528,7 +528,7 @@ const Process = () => {
       };
 
       const response = await sendReload(data);
-      // console.log(response?.response?.data);
+      console.log(response?.data);
       if (response?.status == 200) {
         toast.success("รียอด สำเร็จ");
         setReturnReload(response?.data);
@@ -552,8 +552,8 @@ const Process = () => {
 
   
   // console.log(dataProcessStore.id);
-  console.log(listDataCustomer)
-  console.log(sumUser);
+  // console.log(listDataCustomer)
+  // console.log(sumUser);
   // console.log(price)
 
   return (
@@ -1560,6 +1560,10 @@ const Process = () => {
             <Typography className=" text-xl font-bold">
               ยอดกู้ใหม่{" "}
               <span>{Number(returnReload?.newSum).toLocaleString()}</span> บาท
+            </Typography>
+            <Typography className=" text-xl font-bold">
+            จำนวนเงินที่จ่ายเกิน{" "}
+              <span>{Number(returnReload?.qty_overpay).toLocaleString()}</span> บาท
             </Typography>
             {/* <Typography className=" text-xl font-bold">
               หักจากยอดเก่าคงเหลือ{" "}
