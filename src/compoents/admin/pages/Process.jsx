@@ -33,7 +33,7 @@ import {
   processStore,
 } from "../../../store/Store";
 
-import { FaRegSave, FaExchangeAlt } from "react-icons/fa";
+import { FaRegSave} from "react-icons/fa";
 import { AiOutlineStop } from "react-icons/ai";
 import { BsPlusCircle, BsFillEyeFill } from "react-icons/bs";
 import { IoIosSave } from "react-icons/io";
@@ -480,7 +480,7 @@ const Process = () => {
   };
 
 
-  
+  // const [dateUpdate ,setDateUpdate] = useState('')
   const handleUpdate = async () => {
     console.log(statusValue.value)
     try {
@@ -491,7 +491,8 @@ const Process = () => {
         status: Number(statusValue.value)  ,
         // price: Number(userListData?.price),
         price: Number(amount),
-        date: Number(userListData?.count_day)
+        // date: Number(userListData?.count_day)
+        date: Number(amountDate)
       };
       console.log(data)
       const response = await sendUpdate(data);
@@ -509,7 +510,8 @@ const Process = () => {
         setUserListData([])
         // setDisableButton(false)
       } else {
-        toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
+        // toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
+        toast.error(response?.response?.data);
       }
     } catch (error) {
       toast.error(error);
@@ -563,7 +565,7 @@ const Process = () => {
 
         <div className="flex   flex-col  overflow-auto   items-center ">
           <div className="flex w-full flex-col md:flex-row gap-5 ">
-            <div className="flex flex-col w-full h-[85vh] md:w-4/12 xl:w-4/12 ">
+            <div className="flex flex-col w-full h-[85vh] md:w-4/12 xl:w-4/12  ">
               <div className="flex  items-center justify-between gap-3 ">
                 <div>
                   <Typography className="text-lg lg:text-xl font-bold">
@@ -630,7 +632,7 @@ const Process = () => {
                       type="number"
                       min={0}
                       value={amountDate}
-                      disabled={selectDisable}
+                      // disabled={selectDisable}
                       className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
                       style={{ backgroundColor: "rgb(244,244,244)" }}
                       onChange={handleDaysToAddChange}
@@ -734,9 +736,9 @@ const Process = () => {
                 </div>
               </div>
 
-              <div className="flex w-full flex-col h-full mt-4 2xl:mt-[97px]     ">
+              <div className="flex w-full flex-col h-full mt-4 2xl:mt-[20px]   ">
                 <div
-                  className=" lg:mt-[145px] xl:mt-[90px] sm:mt-0 md:mt-[18px] md:h-[400px]  2xl:mt-0 p-3   lg:h-[350px] xl:h-[273px] 2xl:h-[290px] items-center rounded-md    mb-2 "
+                  className=" lg:mt-[145px] xl:mt-[4px] sm:mt-0 md:mt-[18px] md:h-[400px]  2xl:mt-0 p-3   lg:h-[350px] xl:h-[273px] 2xl:h-[290px] items-center rounded-md    mb-2 "
                   style={{ border: "2px solid #b3b3b3"  }}
                 >
                   <Typography className="text-xl font-bold ">
@@ -1326,7 +1328,7 @@ const Process = () => {
                   </Card>
                 </div>
                 <div
-                  className="flex w-full  md:w-[30%] md:h-[450px] lg:h-[400px]  xl:h-[295px] 2xl:h-[291px] rounded-md  "
+                  className="flex w-full  md:w-[30%] md:h-[450px] lg:h-[400px]  xl:h-[279px] 2xl:h-[291px]  rounded-md  "
                   style={{ border: "2px solid #b3b3b3"  }}
                 >
                   <div className="w-full gap-3  p-3">
