@@ -8,8 +8,9 @@ import {
   DialogHeader,
   DialogFooter,
   Input,
+  Switch
 } from "@material-tailwind/react";
-import { Switch } from "antd";
+// import { Switch } from "antd";
 
 import Select from "react-select";
 
@@ -1370,12 +1371,12 @@ const Process = () => {
                                   <td className={classes}>
                                     <div className="flex items-center justify-center">
                                       <Switch
-                                        // color="green"
+                                        color="blue"
                                         // className="bg-green-500"
                                         // checked={data?.status_count}
                                         checked={data.status_count == "1"}
                                         onChange={(e) =>
-                                          handleChangeSwitch(index, e)
+                                          handleChangeSwitch(index, e.target.checked)
                                         }
                                         disabled={
                                           data?.status == 1 ? true : false
