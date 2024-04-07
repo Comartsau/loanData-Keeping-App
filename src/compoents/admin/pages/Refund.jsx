@@ -210,7 +210,7 @@ const Refund = () => {
                     {listData?.length == 0 ? (
                       <tbody>
                         <tr>
-                          <td colSpan={6} className=" text-center pt-5 ">
+                          <td colSpan={9} className=" text-center pt-5 ">
                             <Typography>...ไม่พบข้อมูล...</Typography>
                           </td>
                         </tr>
