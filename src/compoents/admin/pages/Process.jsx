@@ -194,7 +194,6 @@ const Process = () => {
       );
       if (response?.status == 200) {
         setListDataCustomer(response?.data);
-        setRows(response?.data);
       } else {
         toast.error("ดึงข้อมูลไม่สำเร็จ  กรุณาลองใหม่");
       }
@@ -1376,7 +1375,10 @@ const Process = () => {
                                         // checked={data?.status_count}
                                         checked={data.status_count == "1"}
                                         onChange={(e) =>
-                                          handleChangeSwitch(index, e.target.checked)
+                                          handleChangeSwitch(
+                                            index,
+                                            e.target.checked
+                                          )
                                         }
                                         disabled={
                                           data?.status == 1 ? true : false
