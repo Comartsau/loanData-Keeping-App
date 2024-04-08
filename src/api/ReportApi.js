@@ -10,7 +10,7 @@ export const getNoPaid = async (id , searchQuery) => {
           ...HeaderAPI(localStorage.getItem("Token")),
         }
       );
-      console.log(response)
+      // console.log(response)
       return response.data;
     } catch (error) {
       console.error(error);
@@ -91,7 +91,7 @@ export const getLostCustomer = async (id) => {
           ...HeaderAPI(localStorage.getItem("Token")),
         }
       );
-      console.log(response)
+      // console.log(response)
       return response.data;
     } catch (error) {
       console.error(error);

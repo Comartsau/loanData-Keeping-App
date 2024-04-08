@@ -93,7 +93,7 @@ const Refund = () => {
   const handleModalReceiptSubFull = () => {
     setOpenModalReceiptSubFull(!openModalReceiptSubFull);
   };
-  console.log(tableView);
+  // console.log(tableView);
 
   const fecthPdf = async () => {
     try {
@@ -104,17 +104,19 @@ const Refund = () => {
       };
 
       const respone = await getPDF(data);
-      console.log(respone);
+      // console.log(respone);
       setDataPdf(respone);
     } catch (error) {
       toast.error(error);
     }
   };
 
-  useEffect(() => {
-    fecthPdf();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, searchQuery1]);
+  // useEffect(() => {
+  //   fecthPdf();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [searchQuery, searchQuery1]);
+
+  console.log(dataPdf)
 
   return (
     <div>
@@ -162,7 +164,7 @@ const Refund = () => {
             </div>
           </div>
           <div className="flex flex-col lg:flex-row w-full gap-5">
-            <div className="flex w-full lg:w-[80%] ">
+            <div className="flex w-full lg:px-5 ">
               <Card
                 className="mt-5 w-full border-2 overflow-auto shadow-lg "
                 style={{ border: "1px solid #cccccc" }}

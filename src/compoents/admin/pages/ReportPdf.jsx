@@ -77,13 +77,11 @@ const styles = StyleSheet.create({
     right: "0",
     height: "20px",
   },
-  signature: {
-    fontSize: 12,
-    textAlign: "left",
-  },
   flexrow: {
     display: "flex",
     flexDirection: "row",
+    textAlign:'left'
+    
   },
   flexcol: {
     display: "flex",
@@ -100,7 +98,8 @@ const styles = StyleSheet.create({
   flexrowaround: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-around",
+    // justifyContent: "space-around",
+    justifyContent: "space-evenly",
     wordBreak: "break-word",
   },
   flexrowcenter: {
@@ -145,6 +144,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Sarabun",
   },
+  text13b: {
+    fontSize: 13,
+    fontFamily: "Sarabun",
+    marginBottom: "15",
+  },
+  text14b: {
+    fontSize: 14,
+    fontFamily: "Sarabun",
+    marginBottom: "15",
+  },
+  gap100: {
+    gap:'100',
+  },
   imageContainer: {
     alignSelf: "center",
     marginTop: 20,
@@ -167,13 +179,30 @@ const styles = StyleSheet.create({
     marginTop: 10,
     wordBreak: "break-word",
   },
+  space44: {
+    marginRight: 62,
+  },
+  space100: {
+    marginRight: 99,
+  },
+  space118: {
+    marginRight: 118,
+  },
   underlineText: {
     textDecoration: "underline",
     textDecorationStyle: "dot",
   },
+  underlineCenter: {
+    borderBottom: "1",
+    marginBottom: "10",
+  },
+  underline1Center: {
+    borderBottom: "1",
+    paddingBottom: "15",
+  },
   table: {
-    // display: "table",
-    // width: "100%",
+    display: "table",
+    width: "100%",
     // alignItems: "flex-start",
     // borderStyle: "solid",
     // borderWidth: 1,
@@ -249,6 +278,16 @@ const styles = StyleSheet.create({
     width: "15%", // แบ่งเป็น 3 ส่วนเท่า ๆ กัน (ขนาดเท่ากัน)
     height: "100%",
   },
+  tableCell4: {
+    margin: "auto",
+    fontSize: 10,
+    padding: 5,
+    borderWidth: 1,
+    borderColor: "#000",
+    textAlign: "right",
+    width: "30%", // แบ่งเป็น 3 ส่วนเท่า ๆ กัน (ขนาดเท่ากัน)
+    height: "100%",
+  },
 });
 
 export const ReportPdf = ({
@@ -297,14 +336,25 @@ export const ReportPdf = ({
           <Document>
             {pages?.map((pageData, index) => (
               <Page key={index} size="A4" style={styles.page}>
-                <View style={[styles.flexrowaround, styles.mtsm20]}>
-                  <View style={[styles.flexrow]}>
-                    <Text style={[styles.text11b, styles.spacesm]}>
+                <View
+                  style={[
+                    styles.flexrowcenter,
+                    styles.underlineText,
+                    styles.underlineCenter,
+                  ]}
+                >
+                  <Text style={[styles.text14b, styles.spacesm]}>
+                    รายงานประวัติการรียอด{"  "}
+                  </Text>
+                </View>
+                <View style={[styles.flexrow, styles.mtsm20 ]}>
+                  <View style={[styles.flexrow  , {width:'220px'} ]}>
+                    <Text style={[styles.text11b]}>
                       ลูกค้า :{"  "}
                     </Text>
                     <Text style={[styles.text11]}>{pageData[0]?.user} </Text>
                   </View>
-                  <View style={[styles.flexrow]}>
+                  <View style={[styles.flexrow , {width:'200px'} ]}>
                     <Text style={[styles.text11b, styles.spacesm]}>
                       จำนวนเงินยืม :{"  "}
                     </Text>
@@ -318,40 +368,29 @@ export const ReportPdf = ({
                       จำนวนวัน :{"  "}
                     </Text>
                     <Text style={[styles.text11, styles.spacesm]}>
-                      {Number(pageData[0]?.count_day).toLocaleString()}{" "}
+                      {pageData[0]?.data_list?.length}{" "}
                     </Text>
                     <Text style={[styles.text11]}>วัน</Text>
                   </View>
                 </View>
-                <View style={[styles.flexrowaround]}>
-                  <View style={[styles.flexrow, styles.mt10]}>
-                    <Text style={[styles.text11b, styles.spacesm]}>
-                      จ่ายแล้ว :{"  "}
-                    </Text>
-                    <Text style={[styles.text11]}>
-                      {Number(pageData[0]?.price_pay).toLocaleString()}{" "}
-                    </Text>
-                    <Text style={[styles.text11]}>บาท</Text>
-                  </View>
-                  <View style={[styles.flexrow, styles.mt10]}>
+                <View style={[styles.flexrow, styles.underline1Center , styles.gap30]}>
+                  <View style={[styles.flexrow, styles.mt10 , {width:'220px'}  ]}>
                     <Text style={[styles.text11b, styles.spacesm]}>
                       วันที่รียอด :{"  "}
                     </Text>
-                    <Text style={[styles.text11, styles.spacesm]}>
-                      {moment(pageData?.date)
+                    <Text style={[styles.text11,]}>
+                      {moment(pageData?.[0]?.date)
                         .add(543, "years")
                         .format("DD-MM-YYYY")}{" "}
                     </Text>
-                    <Text style={[styles.flexrowcenter, styles.text11]}>
-                      บาท
-                    </Text>
                   </View>
-                  <View style={[styles.flexrow, styles.mt10]}>
-                    <Text style={[styles.text11b, styles.spacesm]}>
-                      ได้รับสุทธิ :{"  "}
+                  <View style={[styles.flexrow, styles.mt10 , {width:'200px'} ]}>
+                    <Text style={[styles.text11b]}>
+                      ได้รับสุทธิ :{" "}
                     </Text>
                     <Text style={[styles.text11, styles.spacesm]}>
                       {Number(pageData[0]?.total_sum).toLocaleString()}{" "}
+               
                     </Text>
                     <Text style={[styles.flexrowcenter, styles.text11]}>
                       บาท
@@ -369,45 +408,52 @@ export const ReportPdf = ({
                     </Text>
                   </View>
                 </View>
-                  {/*-----------  หัวตาราง ---------------------  */}
-                  <View style={[styles.flexcol, { marginTop: "20" }]}>
-                    <View style={styles.tableRow}>
-                      <Text style={[styles.tableCellHead1, styles.colorHead]}>
-                        งวดที่ {""}
-                      </Text>
-                      <Text style={[styles.tableCellHead2, styles.colorHead]}>
-                        วันที่ {""}
-                      </Text>
-                      <Text style={[styles.tableCellHead3, styles.colorHead]}>
-                        จำนวนเงิน {""}
-                      </Text>
-                    </View>
-                    {pageData[0]?.data_list?.map((item, itemIndex) => {
-                      return (
-                        <>
-                          <View key={itemIndex} style={styles.tableRow}>
-                            <Text style={styles.tableCell1}>
-                              {itemIndex + 1 || ""} {""}
-                            </Text>
-                            <Text
-                              style={[styles.tableCell2, { textAlign: "left" }]}
-                            >
-                              {" "}
-                              {moment(pageData?.date)
-                                .add(543, "years")
-                                .format("DD-MM-YYYY")}{" "}
-                              {""}
-                            </Text>
-                            <Text style={styles.tableCell3}>
-                              {" "}
-                              {Number(item?.price).toLocaleString() || ""} {""}
-                            </Text>
-                          </View>
-                        </>
-                      );
-                    })}
+                {/*-----------  หัวตาราง ---------------------  */}
+                <View style={[styles.flexcol, { marginTop: "10" }]}>
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCellHead1, styles.colorHead]}>
+                      งวดที่ {""}
+                    </Text>
+                    <Text style={[styles.tableCellHead2, styles.colorHead]}>
+                      วันที่ {""}
+                    </Text>
+                    <Text style={[styles.tableCellHead3, styles.colorHead]}>
+                      จำนวนเงิน {""}
+                    </Text>
                   </View>
-       
+                  {pageData[0]?.data_list?.map((item, itemIndex) => {
+                    return (
+                      <>
+                        <View key={itemIndex} style={styles.tableRow}>
+                          <Text style={styles.tableCell1}>
+                            {itemIndex + 1 || ""} {""}
+                          </Text>
+                          <Text
+                            style={[styles.tableCell2, { textAlign: "left" }]}
+                          >
+                            {" "}
+                            {moment(pageData?.date)
+                              .add(543, "years")
+                              .format("DD-MM-YYYY")}{" "}
+                            {""}
+                          </Text>
+                          <Text style={styles.tableCell3}>
+                            {" "}
+                            {Number(item?.price).toLocaleString() || ""} {""}
+                          </Text>
+                        </View>
+                      </>
+                    );
+                  })}
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell4,styles.text11b, styles.spacesm]}>
+                      จ่ายแล้ว{"  "}
+                    </Text>
+                    <Text style={[styles.tableCell2, styles.text11]}>
+                      {Number(pageData[0]?.price_pay).toLocaleString()}{" "}
+                    </Text>
+                  </View>
+                </View>
               </Page>
             ))}
           </Document>
