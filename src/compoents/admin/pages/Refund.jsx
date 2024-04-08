@@ -11,6 +11,8 @@ import {
   DialogFooter,
 } from "@material-tailwind/react";
 
+import moment from "moment";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -19,22 +21,30 @@ import { AiOutlineStop } from "react-icons/ai";
 
 import { useEffect, useState } from "react";
 
-import { getNoPaid } from "../../../api/ReportApi";
+import { getRefund, getRefundTable, getPDF } from "../../../api/ReportApi";
 
 import { useRecoilValue } from "recoil";
-import { processStore, customerIdStore } from "../../../store/Store";
+import { processStore } from "../../../store/Store";
+
+import ReportPdf from "./ReportPdf";
 
 const Refund = () => {
   const [listData, setListData] = useState([]);
-  const customerId = useRecoilValue(customerIdStore);
   const dataProcessStore = useRecoilValue(processStore);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchQuery1, setSearchQuery1] = useState("");
 
-  const fecthNotPaid = async () => {
+  const fecthRefund = async () => {
     try {
-      const respone = await getNoPaid(customerId, searchQuery);
+      let data = {
+        process_id: dataProcessStore?.id,
+        date: searchQuery,
+        search: searchQuery1,
+      };
+
+      const respone = await getRefund(data);
+      console.log(respone);
       setListData(respone);
     } catch (error) {
       toast.error(error);
@@ -42,9 +52,20 @@ const Refund = () => {
   };
 
   useEffect(() => {
-    fecthNotPaid();
+    fecthRefund();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery]);
+  }, [searchQuery, searchQuery1]);
+
+  const [tableView, setTableView] = useState([]);
+  const fecthRefundDetail = async (id) => {
+    try {
+      const respone = await getRefundTable(id);
+      console.log(respone);
+      setTableView(respone.data);
+    } catch (error) {
+      toast.error(error);
+    }
+  };
 
   //----- จัดการแสดงข้อมูล / หน้า -------------- //
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,8 +73,8 @@ const Refund = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const displayedData = Array.isArray(listData?.data)
-    ? listData?.data?.slice(startIndex, endIndex)
+  const displayedData = Array.isArray(listData)
+    ? listData.slice(startIndex, endIndex)
     : [];
 
   const totalPages = Math.ceil(listData?.data?.length / itemsPerPage);
@@ -66,6 +87,35 @@ const Refund = () => {
     setOpenModalView(!openModalView);
     setDataView(data);
   };
+  const [dataPdf,setDataPdf] = useState([])
+  //------------- open Receipt A4 Sub  -----------------------//
+  const [openModalReceiptSubFull, setOpenModalReceiptSubFull] = useState(false);
+  const handleModalReceiptSubFull = () => {
+    setOpenModalReceiptSubFull(!openModalReceiptSubFull);
+  };
+  console.log(tableView);
+
+  const fecthPdf = async () => {
+    try {
+      let data = {
+        process_id: dataProcessStore?.id,
+        date: searchQuery,
+        search: searchQuery1,
+      };
+
+      const respone = await getPDF(data);
+      console.log(respone);
+      setDataPdf(respone);
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fecthPdf();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, searchQuery1]);
+
   return (
     <div>
       <div className=" h-[74vh]  ">
@@ -91,24 +141,21 @@ const Refund = () => {
                 style={{ backgroundColor: "#F4F4F4" }}
               />
             </div>
-            <div className=" w-full mt-5 lg:mt-0 lg:w-[20%] flex flex-col md:flex-row items-center gap-5">
+            <div className=" w-full mt-5 lg:mt-0 lg:w-[20%]  flex flex-col md:flex-row items-center gap-5">
               <Input
                 type="text"
                 label="ค้นหา ลูกค้าที่ต้องการ"
-                className="  "
-                //   placeholder="ค้นหา ชื่อลูกค้า"
                 color="blue-gray"
                 value={searchQuery1}
                 onChange={(e) => setSearchQuery1(e.target.value)}
                 style={{ backgroundColor: "#F4F4F4" }}
               />
             </div>
-            <div className=" w-full lg:w-[20%] flex flex-col md:flex-row items-center gap-5">
+            <div className=" w-full mt-5 lg:mt-0 lg:w-[20%]  flex flex-col md:flex-row items-center gap-5">
               <Button
                 color="purple"
-                class="select-none rounded-lg w-[100px] py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                type="button"
-                value={searchQuery1}
+                className="w-[200px] lg:w-[150px]"
+                onClick={() => [setOpenModalReceiptSubFull(true) , fecthPdf()]}
               >
                 PDF
               </Button>
@@ -244,7 +291,7 @@ const Refund = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {data?.name || ""}
+                                    {data?.user || ""}
                                   </Typography>
                                 </div>
                               </td>
@@ -255,7 +302,7 @@ const Refund = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {data?.house_name || ""}
+                                    {Number(data?.price).toLocaleString() || ""}
                                   </Typography>
                                 </div>
                               </td>
@@ -266,7 +313,8 @@ const Refund = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {Number(data?.total).toLocaleString() || ""}
+                                    {Number(data?.count_day).toLocaleString() ||
+                                      ""}
                                   </Typography>
                                 </div>
                               </td>
@@ -277,7 +325,8 @@ const Refund = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {Number(data?.paid).toLocaleString() || ""}
+                                    {Number(data?.price_pay).toLocaleString() ||
+                                      ""}
                                   </Typography>
                                 </div>
                               </td>
@@ -288,9 +337,9 @@ const Refund = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {Number(data?.overdue) < 0
-                                      ? "0"
-                                      : Number(data?.overdue).toLocaleString()}
+                                    {moment(data?.date)
+                                      .add(543, "years")
+                                      .format("DD-MM-YYYY")}
                                   </Typography>
                                 </div>
                               </td>
@@ -301,11 +350,7 @@ const Refund = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {Number(data?.overdue) < 0
-                                      ? Math.abs(
-                                          Number(data?.overdue)
-                                        ).toLocaleString()
-                                      : 0}
+                                    {Number(data?.total_sum).toLocaleString()}
                                   </Typography>
                                 </div>
                               </td>
@@ -316,11 +361,7 @@ const Refund = () => {
                                     color="blue-gray"
                                     className="font-normal "
                                   >
-                                    {Number(data?.overdue) < 0
-                                      ? Math.abs(
-                                          Number(data?.overdue)
-                                        ).toLocaleString()
-                                      : 0}
+                                    {Number(data?.qty_overpay).toLocaleString()}
                                   </Typography>
                                 </div>
                               </td>
@@ -329,7 +370,10 @@ const Refund = () => {
                                   <IconButton
                                     variant="outlined"
                                     size="sm"
-                                    onClick={() => handleModalView(data)}
+                                    onClick={() => [
+                                      handleModalView(data),
+                                      fecthRefundDetail(data?.id),
+                                    ]}
                                   >
                                     <TbDatabaseSearch className="h-6 w-6  text-blue-700 " />
                                   </IconButton>
@@ -379,7 +423,7 @@ const Refund = () => {
                 </CardFooter>
               </Card>
             </div>
-            <div className="flex w-full lg:w-[20%] flex-col h-full   justify-center md:justify-end    ">
+            {/* <div className="flex w-full lg:w-[20%] flex-col h-full   justify-center md:justify-end    ">
               <div
                 className="p-3 md:h-[180px] items-center mt-2 md:mt-5 px-5 rounded-md  "
                 style={{ border: "3px solid #b3b3b3" }}
@@ -427,14 +471,14 @@ const Refund = () => {
                   บาท
                 </Typography>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
 
       {/* modal View */}
 
-      <Dialog open={openModalView} size="sm" handler={handleModalView}>
+      <Dialog open={openModalView} size="md" handler={handleModalView}>
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
           <Typography variant="h5">ดูรายการ</Typography>
         </DialogHeader>
@@ -442,25 +486,46 @@ const Refund = () => {
           <div className=" w-full flex flex-col  lg:flex-row  justify-center  gap-4 ">
             <Card className="w-full lg:w-5/12  rounded-lg border-black p-3 ps-5">
               <Typography className="font-bold ">
-                จำนวนคนยืม : <span className=" font-normal">5000 บาท</span> 
+                จำนวนเงินยืม :{" "}
+                <span className=" font-normal">
+                  {Number(dataView?.price).toLocaleString()} บาท
+                </span>
               </Typography>
               <Typography className="font-bold">
-                จำนวนวันที่ยืม : <span className=" font-normal">12 วัน</span> 
+                จำนวนวันที่ยืม :{" "}
+                <span className=" font-normal">
+                  {Number(dataView?.count_day).toLocaleString()} วัน
+                </span>
               </Typography>
               <Typography className="font-bold">
-                จ่ายแล้ว : <span className=" font-normal">3000 บาท</span> 
+                จ่ายแล้ว :{" "}
+                <span className=" font-normal">
+                  {Number(dataView?.price_pay).toLocaleString()} บาท
+                </span>
               </Typography>
               <Typography className="font-bold">
-                วันที่รียอด : <span className=" font-normal">10-10-2567</span>{" "}
+                {/* วันที่รียอด : <span className=" font-normal">{moment(dataView?.date).format("DD-MM-YYYY")}</span>{" "} */}
+                วันที่รียอด :{" "}
+                <span className=" font-normal">
+                  {moment(dataView?.date)
+                    .add(543, "years")
+                    .format("DD-MM-YYYY")}
+                </span>{" "}
               </Typography>
               <Typography className="font-bold">
-                ได้รับสุทธิ : <span className=" font-normal">1200 บาท</span> 
+                ได้รับสุทธิ :{" "}
+                <span className=" font-normal">
+                  {Number(dataView?.total_sum).toLocaleString()} บาท
+                </span>
               </Typography>
               <Typography className="font-bold">
-                จ่ายเกิน : <span className=" font-normal">100 บาท</span> 
+                จ่ายเกิน :{" "}
+                <span className=" font-normal">
+                  {Number(dataView?.qty_overpay).toLocaleString()} บาท
+                </span>
               </Typography>
             </Card>
-            <Card className="w-full lg:w-7/12  rounded-lg border-black p-3">
+            <Card className="w-full lg:w-7/12 h-[300px] rounded-lg border-black p-3 overflow-auto ">
               <table className="w-full min-w-max ">
                 <thead>
                   <tr>
@@ -503,7 +568,7 @@ const Refund = () => {
                   </tbody>
                 ) : (
                   <tbody>
-                    {displayedData.map((data, index) => {
+                    {tableView.map((data, index) => {
                       const isLast = index === displayedData.length - 1;
                       const pageIndex = startIndex + index;
                       const classes = isLast
@@ -530,7 +595,11 @@ const Refund = () => {
                                 color="blue-gray"
                                 className="font-normal "
                               >
-                                {data?.name || ""}
+                                {data?.date == "Invalid dateInvalid date"
+                                  ? ""
+                                  : moment(data?.date)
+                                      .add(543, "years")
+                                      .format("DD-MM-YYYY") || ""}
                               </Typography>
                             </div>
                           </td>
@@ -541,7 +610,7 @@ const Refund = () => {
                                 color="blue-gray"
                                 className="font-normal "
                               >
-                                {data?.house_name || ""}
+                                {data?.price || ""}
                               </Typography>
                             </div>
                           </td>
@@ -568,6 +637,17 @@ const Refund = () => {
           </Button>
         </DialogFooter>
       </Dialog>
+
+      {/* open PDF A4  Sub */}
+      {openModalReceiptSubFull == true ? (
+        <ReportPdf
+          openModalReceiptSubFull={openModalReceiptSubFull}
+          handleModalReceiptSubFull={handleModalReceiptSubFull}
+          dataPdf={dataPdf}
+        />
+      ) : (
+        ""
+      )}
     </div>
   );
 };

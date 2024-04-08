@@ -1266,9 +1266,7 @@ const Process = () => {
                               const pageIndex = startIndex + index;
                               const classes = isLast
                                 ? "p-1"
-                                : `p-1 border-b border-blue-gray-50 ${
-                                    index === activeRow2 ? "bg-gray-300" : ""
-                                  }`;
+                                : `p-1 border-b border-blue-gray-50 ${data?.status == 1 ? "bg-gray-300" : ''} `;
                               return (
                                 <tr key={index}>
                                   <td className={classes}>
