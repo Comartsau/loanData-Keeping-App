@@ -433,7 +433,7 @@ const Process = () => {
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
       // console.log(dateSend);
-      if (dateSend == "Invalid date" || price == null || price < 0) {
+      if (dateSend == "Invalid date" && price == null || price < 0  || price == null || price < 0) {
         toast.error("กรุณาระบบวันที่ และ  จำนวนเงิน");
       } else {
         let data = {
@@ -442,11 +442,10 @@ const Process = () => {
           price: price,
           process_user_id: userId,
           process_id: dataProcessStore?.id,
-          date: dateSend,
+          date: dateSend == 'Invalid date' ? null : dateSend ,
           status_count: dataed?.status_count,
         };
         console.log(data);
-        console.log(price);
 
         const response = await changeStatus(data);
         // console.log(response);
