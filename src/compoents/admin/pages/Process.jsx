@@ -414,13 +414,15 @@ const Process = () => {
 
   // Handle change for daysToAdd
   const handleDaysToAddChange = (event) => {
-    const inputValue = event.target.value || 0;
+    const inputValue = event.target.value  || 0;
     const newDaysToAdd = parseInt(inputValue, 10);
     setAmountDate(newDaysToAdd);
 
-    if (searchQueryStart) {
-      setSearchQueryEnd(addDays(searchQueryStart, newDaysToAdd));
-    }
+
+
+    // if (searchQueryStart) {
+    //   setSearchQueryEnd(addDays(searchQueryStart, newDaysToAdd));
+    // }
   };
   const [changeDate, setChangeDate] = useState("");
 
@@ -558,11 +560,13 @@ const Process = () => {
   const [returnReload, setReturnReload] = useState([]);
 
   const handleReload = async () => {
+
+    console.log(userListData)
     try {
       let data = {
         process_user_id: userId,
-        process_id: dataProcessStore?.id,
-        price: userListData?.price,
+        process_id: dataProcessStore?.id, 
+        price: userListData?.total,
         count_day: userListData?.count_day,
       };
 
@@ -690,7 +694,7 @@ const Process = () => {
                       min={0}
                       value={amountDate}
                       // disabled={selectDisable}
-                      disabled={disableInput }
+                      disabled={disableInput}
                       className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
                       style={{ backgroundColor: "rgb(244,244,244)" }}
                       onChange={handleDaysToAddChange}

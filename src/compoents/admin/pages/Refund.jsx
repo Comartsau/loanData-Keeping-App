@@ -74,10 +74,12 @@ const Refund = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const displayedData = Array.isArray(listData)
-    ? listData.slice(startIndex, endIndex)
+    ? listData?.slice(startIndex, endIndex)
     : [];
 
-  const totalPages = Math.ceil(listData?.data?.length / itemsPerPage);
+  const totalPages = Math.ceil(listData?.length / itemsPerPage);
+
+  console.log(listData)
 
   //------------- modal View -----------------------//
   const [openModalView, setOpenModalView] = useState(false);
@@ -116,7 +118,8 @@ const Refund = () => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [searchQuery, searchQuery1]);
 
-  console.log(dataPdf)
+  // console.log(dataPdf)
+  console.log(totalPages)
 
   return (
     <div>
@@ -397,7 +400,7 @@ const Refund = () => {
                   >
                     ก่อนหน้า
                   </Button>
-                  <div className="flex items-center gap-2">
+                   <div className="flex items-center gap-2">
                     {Array.from({ length: totalPages }, (_, i) => (
                       <IconButton
                         key={i}
