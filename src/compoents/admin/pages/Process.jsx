@@ -69,6 +69,8 @@ const Process = () => {
   const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
   const [sumUser, setSumUser] = useState([]);
 
+  const [disableInput ,setDisableInput] = useState(false)
+
   const [customerDataStore, setCustomerDataStore] =
     useRecoilState(customerStore);
   const customerId = useRecoilValue(customerIdStore);
@@ -252,10 +254,10 @@ const Process = () => {
     }
   };
 
-  const [fatchId, setFetchId] = useState("");
+  // const [fatchId, setFetchId] = useState("");
 
   const fetchUserListSum = async (id) => {
-    setFetchId(id);
+    // setFetchId(id);
     try {
       const response = await getProcessUserListSum(id);
       console.log(response);
@@ -429,6 +431,7 @@ const Process = () => {
 
   // console.log(changeDate)
   // console.log(dateCancel)
+  console.log(listDataCustomer)
 
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
@@ -611,6 +614,7 @@ const Process = () => {
   };
 
   console.log(sumUser);
+  console.log(disableButton)
 
   return (
     <Card>
@@ -669,7 +673,7 @@ const Process = () => {
                       type="number"
                       min={0}
                       value={amount}
-                      // disabled={selectDisable}
+                      disabled={disableInput }
                       className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
                       style={{ backgroundColor: "rgb(244,244,244)" }}
                       onChange={(e) => setAmount(e.target.value)}
@@ -686,6 +690,7 @@ const Process = () => {
                       min={0}
                       value={amountDate}
                       // disabled={selectDisable}
+                      disabled={disableInput }
                       className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
                       style={{ backgroundColor: "rgb(244,244,244)" }}
                       onChange={handleDaysToAddChange}
@@ -1135,11 +1140,16 @@ const Process = () => {
                                         setSumUser([]),
                                         setUserListData(data),
                                         fetchUserListSum(data?.id),
-                                        // setDisableButton(
-                                        //   data?.status == 2
-                                        //     ? false
-                                        //     : true
-                                        // ),
+                                        setDisableInput(
+                                          data?.status == 2
+                                            ? true
+                                            : false
+                                        ),
+                                        setDisableButton(
+                                          data?.status == 2
+                                            ? true
+                                            : false
+                                        ),
                                         setSelectedValue(data),
                                         setStatusValue({
                                           ...statusValue,
