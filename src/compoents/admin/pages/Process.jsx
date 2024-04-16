@@ -624,7 +624,7 @@ const Process = () => {
   return (
     <Card>
       <div className="flex flex-col w-full mt-1 px-2 ">
-        <ToastContainer className="toast " autoClose={800} theme="colored" />
+        <ToastContainer className="toast " autoClose={2500} theme="colored" />
         <div className="flex   flex-col  overflow-auto   items-center ">
           <div className="flex w-full flex-col md:flex-row gap-5 ">
             <div className="flex flex-col w-full h-[85vh] md:w-4/12 xl:w-3/12  ">
