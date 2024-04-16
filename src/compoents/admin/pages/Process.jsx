@@ -537,7 +537,7 @@ const Process = () => {
       let data = {
         process_user_id: userId,
         process_id: dataProcessStore?.id,
-        price: userListData?.price,
+        price: userListData?.total,
         count_day: userListData?.count_day,
       };
 
@@ -546,6 +546,7 @@ const Process = () => {
       if (response?.status == 200) {
         toast.success("ปิดยอด สำเร็จ");
         setReturnReload(response?.data);
+        fetchUserList()
         // handleModalDataReload();
         handleFetch();
       } else {
