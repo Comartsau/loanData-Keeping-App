@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogFooter,
   Input,
-  Switch
+  Switch,
 } from "@material-tailwind/react";
 // import { Switch } from "antd";
 
@@ -25,7 +25,7 @@ import moment from "moment/min/moment-with-locales";
 
 import { parse, addYears } from "date-fns";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { useRecoilState, useRecoilValue } from "recoil";
 
@@ -60,16 +60,17 @@ import {
   sendClose,
 } from "../../../api/ProcessApi";
 import { getCustomer } from "../../../api/customerApi";
+import { editLocation } from "../../../api/locationApi";
 
 const Process = () => {
   //----------  Data Table --------------------//
   const [listData, setListData] = useState([]);
   const [searchQuery1, setSearchQuery1] = useState("");
   const [dataProcessId, setDataProcessId] = useState([]);
-  const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu1");
+  const [activeCustomerMenu, setActiveCustomerMenu] = useState("menu2");
   const [sumUser, setSumUser] = useState([]);
 
-  const [disableInput ,setDisableInput] = useState(false)
+  const [disableInput, setDisableInput] = useState(false);
 
   const [customerDataStore, setCustomerDataStore] =
     useRecoilState(customerStore);
@@ -88,16 +89,6 @@ const Process = () => {
   const [userListSum, setUserListSum] = useState([]);
   const [userListData, setUserListData] = useState([]);
   const [disableButton, setDisableButton] = useState(true);
-
-  // const [selectedShop, setSelectedShop] = useState(null);
-
-  // const handleShopSelect = (e) => {
-  // ค้นหาข้อมูลลูกค้าที่ถูกเลือกจาก customerDataStore
-  // const shop = shopDataStore.find((shop) => shop.id === e.value);
-  // เซ็ตข้อมูลลูกค้าที่ถูกเลือกใน state
-  // console.log(shop);
-  // setSelectedShop(shop);
-  // };
 
   const locationDataStore = useRecoilValue(locationStore);
 
@@ -211,29 +202,27 @@ const Process = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataProcessStore?.id, searchQuery1]);
 
-  const fetchStatus1 = async () => {
-    try {
-      const response = await getProcessUser1(
-        dataProcessStore?.id,
-        searchQuery1
-      );
-      // console.log(response);
-      if (response?.status == 200) {
-        setListDataCustomer(response.data);
-      } else {
-        return;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const fetchStatus1 = async () => {
+  //   try {
+  //     const response = await getProcessUser1(
+  //       dataProcessStore?.id,
+  //       searchQuery1
+  //     );
+  //     // console.log(response);
+  //     if (response?.status == 200) {
+  //       setListDataCustomer(response.data);
+  //     } else {
+  //       return;
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchStatus1();
-    // if (dataProcessStore?.id) {
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataProcessStore?.id, searchQuery1]);
+  // useEffect(() => {
+  //   fetchStatus1();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [dataProcessStore?.id, searchQuery1]);
 
   const [userId, setUserId] = useState("");
 
@@ -414,11 +403,9 @@ const Process = () => {
 
   // Handle change for daysToAdd
   const handleDaysToAddChange = (event) => {
-    const inputValue = event.target.value  || 0;
+    const inputValue = event.target.value || 0;
     const newDaysToAdd = parseInt(inputValue, 10);
     setAmountDate(newDaysToAdd);
-
-
 
     // if (searchQueryStart) {
     //   setSearchQueryEnd(addDays(searchQueryStart, newDaysToAdd));
@@ -433,12 +420,18 @@ const Process = () => {
 
   // console.log(changeDate)
   // console.log(dateCancel)
-  console.log(listDataCustomer)
+  console.log(listDataCustomer);
 
   const handleChangeStatus = async (changestatus, dataed) => {
     try {
       // console.log(dateSend);
-      if (dateSend == "Invalid date" && price == null || price < 0  || price == null || price < 0) {
+      if (
+        dateSend == "Invalid date" ||
+        ("" && price == null) ||
+        price < 0 ||
+        price == null ||
+        price < 0
+      ) {
         toast.error("กรุณาระบบวันที่ และ  จำนวนเงิน");
       } else {
         let data = {
@@ -447,7 +440,7 @@ const Process = () => {
           price: price,
           process_user_id: userId,
           process_id: dataProcessStore?.id,
-          date: dateSend == 'Invalid date' ? null : dateSend ,
+          date: dateSend == "Invalid date" ? null : dateSend,
           status_count: dataed?.status_count,
         };
         console.log(data);
@@ -546,7 +539,7 @@ const Process = () => {
       if (response?.status == 200) {
         toast.success("ปิดยอด สำเร็จ");
         setReturnReload(response?.data);
-        fetchUserList()
+        fetchUserList();
         // handleModalDataReload();
         handleFetch();
       } else {
@@ -559,18 +552,19 @@ const Process = () => {
   };
 
   const [returnReload, setReturnReload] = useState([]);
+  const [newPrice, setNewPrice] = useState(0);
 
   const handleReload = async () => {
-
-    console.log(userListData)
+    console.log(userListData);
     try {
       let data = {
         process_user_id: userId,
-        process_id: dataProcessStore?.id, 
+        process_id: dataProcessStore?.id,
         price: userListData?.total,
+        new_price: Number(newPrice) || userListData?.total,
         count_day: userListData?.count_day,
       };
-
+      console.log(data);
       const response = await sendReload(data);
       console.log(response?.data);
       if (response?.status == 200) {
@@ -578,6 +572,7 @@ const Process = () => {
         setReturnReload(response?.data);
         handleModalDataReload();
         handleFetch();
+        setNewPrice(0);
       } else {
         toast.error(response?.response?.data);
         handleModalReload();
@@ -589,7 +584,8 @@ const Process = () => {
 
   const handleFetch = () => {
     fetchUpdateAll(dataProcessStore?.id);
-    fetchStatus1();
+    // fetchStatus1();
+    fetchStatus(0);
     fetchUserList(userId);
     fetchUserListSum(userId);
   };
@@ -619,7 +615,58 @@ const Process = () => {
   };
 
   console.log(sumUser);
-  console.log(disableButton)
+  // console.log(disableButton);
+
+  const checkInputDate = (e, index) => {
+    const date = moment(e.target.value).add(+543, "years").format("DD-MM-YYYY");
+    if (sumUser.some((item) => item.date === date)) {
+      toast.error(`วันที่ ${date} มีอยู่แล้ว`);
+      const newInputDates = [...changeDate];
+      newInputDates[index] = "";
+      document.getElementById("myInput").value = "";
+      setChangeDate("");
+    } else {
+      // const newInputDates = [...changeDate];
+      // newInputDates[index] =e.target.value
+      // console.log(newInputDates[index])
+      setChangeDate(e.target.value);
+    }
+  };
+
+  const dragItem = useRef(null);
+  const dragItemOver = useRef(null);
+
+  // handle drag sorting
+  const handleSort = () => {
+    // duplicate items
+    let _listDataCustomer = [...listDataCustomer];
+
+    //remove and save the dragged item  contect
+    const graggedItemContent = _listDataCustomer.splice(dragItem.current, 1)[0];
+
+    // switch the position
+    _listDataCustomer.splice(dragItemOver.current, 0, graggedItemContent);
+
+    // reset the position
+    dragItem.current = null;
+    dragItemOver.current = null;
+
+    // update the actual array
+    setListDataCustomer(_listDataCustomer);
+    // reset Status
+
+    // handleFetch();
+    setSelectDisable(0),
+      setSelectedValue(null),
+      setStatusValue(null),
+      setAmount(0),
+      setAmountDate(0),
+      setSearchQueryStart(new Date()),
+      setSearchQueryEnd(new Date()),
+      setUserListData([]);
+    setSumUser([]);
+    setActiveRow("");
+  };
 
   return (
     <Card>
@@ -678,7 +725,7 @@ const Process = () => {
                       type="number"
                       min={0}
                       value={amount}
-                      disabled={disableInput }
+                      disabled={disableInput}
                       className="peer w-[100%] h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent placeholder:opacity-0 focus:placeholder:opacity-100 text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-blue-gray-500 "
                       style={{ backgroundColor: "rgb(244,244,244)" }}
                       onChange={(e) => setAmount(e.target.value)}
@@ -723,32 +770,6 @@ const Process = () => {
                 />
               </div>
 
-              {/* <div className="flex w-full flex-col lg:flex-row justify-center mt-3 gap-3  ">
-                  <div className="w-full lg:w-[50%]">
-                    <div className=" relative w-full min-w-[100px] h-10">
-                      <DatePicker
-                        selected={searchQueryStart}
-                        disabled={selectDisable}
-                        locale={th}
-                        dateFormat="เริ่มต้น dd/MM/yyyy"
-                        onChange={handleSearchQueryStartChange}
-                        className="w-full rounded-md border border-gray-400 p-2 text-gray-600  shadow-sm focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full lg:w-[50%]">
-                    <div className=" relative w-full min-w-[100px] h-10">
-                      <DatePicker
-                        selected={searchQueryEnd}
-                        disabled
-                        locale={th}
-                        dateFormat="สิ้นสุด dd/MM/yyyy"
-                        onChange={(date) => setSearchQueryEnd(date)}
-                        className="w-full rounded-md border border-gray-400 p-2 text-gray-600  shadow-sm focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                </div> */}
               <div className="flex flex-col w-full justify-center mt-5 gap-3  ">
                 <div className="flex gap-5 ">
                   <div className="w-full ">
@@ -870,8 +891,8 @@ const Process = () => {
             <div className="flex w-full flex-col  gap-3 md:w-8/12 xl:w-9/12 ">
               <div className=" flex flex-col xl:flex-row  items-center sm:items-start  w-full justify-center md:justify-start    gap-5  ">
                 <div className="flex flex-col  xl:flex-row gap-5">
-                  <div className="flex gap-5">
-                    <div className=" justify-center">
+                  <div className="flex gap-5 lg:ml-5">
+                    {/* <div className=" justify-center">
                       <Button
                         size="sm"
                         variant="outlined"
@@ -890,7 +911,7 @@ const Process = () => {
                       >
                         ทั้งหมด
                       </Button>
-                    </div>
+                    </div> */}
                     <div className=" justify-center">
                       <Button
                         size="sm"
@@ -1058,7 +1079,16 @@ const Process = () => {
                                   index === activeRow ? "bg-gray-300" : ""
                                 }`;
                             return (
-                              <tr key={index}>
+                              <tr
+                                key={index}
+                                draggable
+                                onDragStart={() => (dragItem.current = index)}
+                                onDragEnter={() =>
+                                  (dragItemOver.current = index)
+                                }
+                                onDragEnd={handleSort}
+                                onDragOver={(e) => e.preventDefault}
+                              >
                                 <td className={classes}>
                                   <div className="flex items-center justify-center">
                                     <Typography
@@ -1075,7 +1105,56 @@ const Process = () => {
                                     <Typography
                                       variant="small"
                                       color="blue-gray"
-                                      className=" "
+                                      className=" font-bold text-purple-500 cursor-pointer"
+                                      onClick={() => [
+                                        setActiveRow(index),
+                                        fetchUserList(data?.id, data?.status),
+                                        setSumUser([]),
+                                        setUserListData(data),
+                                        fetchUserListSum(data?.id),
+                                        setDisableInput(
+                                          data?.status == 2 ? true : false
+                                        ),
+                                        setDisableButton(
+                                          data?.status == 2 ? true : false
+                                        ),
+                                        setSelectedValue(data),
+                                        setStatusValue({
+                                          ...statusValue,
+                                          value: data?.status,
+                                          label:
+                                            data?.status == 0
+                                              ? "กำลังจ่าย"
+                                              : "ลูกค้าเสีย",
+                                        }),
+                                        setSelectedValue({
+                                          ...selectedValue,
+                                          label: data?.name,
+                                        }),
+                                        setSelectDisable(1),
+                                        setAmount(data?.total),
+                                        setAmountDate(data?.count_day),
+                                        setSearchQueryStart(
+                                          addYears(
+                                            parse(
+                                              data?.start_day,
+                                              "dd-MM-yyyy",
+                                              new Date()
+                                            ),
+                                            +543
+                                          )
+                                        ),
+                                        setSearchQueryEnd(
+                                          addYears(
+                                            parse(
+                                              data?.end_day,
+                                              "dd-MM-yyyy",
+                                              new Date()
+                                            ),
+                                            -543
+                                          )
+                                        ),
+                                      ]}
                                     >
                                       {data?.name}
                                     </Typography>
@@ -1146,14 +1225,10 @@ const Process = () => {
                                         setUserListData(data),
                                         fetchUserListSum(data?.id),
                                         setDisableInput(
-                                          data?.status == 2
-                                            ? true
-                                            : false
+                                          data?.status == 2 ? true : false
                                         ),
                                         setDisableButton(
-                                          data?.status == 2
-                                            ? true
-                                            : false
+                                          data?.status == 2 ? true : false
                                         ),
                                         setSelectedValue(data),
                                         setStatusValue({
@@ -1280,7 +1355,9 @@ const Process = () => {
                               const pageIndex = startIndex + index;
                               const classes = isLast
                                 ? "p-1"
-                                : `p-1 border-b border-blue-gray-50 ${data?.status == 1 ? "bg-gray-300" : ''} `;
+                                : `p-1 border-b border-blue-gray-50 ${
+                                    data?.status == 1 ? "bg-gray-300" : ""
+                                  } `;
                               return (
                                 <tr key={index}>
                                   <td className={classes}>
@@ -1299,10 +1376,15 @@ const Process = () => {
                                       <div className="flex items-center justify-center ">
                                         <input
                                           type="date"
+                                          id="myInput"
                                           className=" border-2 border-black text-center bg-gray-200 "
                                           placeholder="ระบุวันที่ DD-MM-YYY"
+                                          // value={data?.date || ''}
+                                          // onChange={(e) =>
+                                          //   setChangeDate(e.target.value)
+                                          // }
                                           onChange={(e) =>
-                                            setChangeDate(e.target.value)
+                                            checkInputDate(e, index)
                                           }
                                         />
                                       </div>
@@ -1643,12 +1725,31 @@ const Process = () => {
         open={openModalReload}
         handler={handleModalReload}
         size="xs"
-        className="h-[20vh] "
+        className="h-[25vh] "
       >
         <DialogHeader className="bg-purple-700 py-3  px-3  justify-center text-lg text-white opacity-80">
           <Typography variant="h5">ยืนยันการรียอด</Typography>
         </DialogHeader>
-        <DialogFooter className="flex justify-center gap-5 mt-3">
+        <DialogBody>
+          <div className="flex gap-3 justify-center ">
+            <Typography>จำนวนเงิน:</Typography>
+
+            <input
+              type="number"
+              className=" border-2 w-[150px] border-black text-center bg-gray-200 rounded-lg "
+              value={newPrice || userListData?.total}
+              min="0"
+              // onChange={(e) =>
+              //   setUserListData({
+              //     ...userListData,
+              //     total: Number(e.target.value),
+              //   })
+              // }
+              onChange={(e) => setNewPrice(e.target.value)}
+            />
+          </div>
+        </DialogBody>
+        <DialogFooter className="flex justify-center gap-5 ">
           <Button
             variant="text"
             color="red"
