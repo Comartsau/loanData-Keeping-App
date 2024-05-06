@@ -573,6 +573,18 @@ const Process = () => {
         handleModalDataReload();
         handleFetch();
         setNewPrice(0);
+
+        // reset
+        setSelectDisable(0),
+        setSelectedValue(null),
+        setStatusValue(null),
+        setAmount(0),
+        setAmountDate(0),
+        setSearchQueryStart(new Date()),
+        setSearchQueryEnd(new Date()),
+        setUserListData([]);
+        setSumUser([]);
+        setActiveRow("");
       } else {
         toast.error(response?.response?.data);
         handleModalReload();
