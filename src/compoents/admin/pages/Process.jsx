@@ -9,6 +9,7 @@ import {
   DialogFooter,
   Input,
   Switch,
+  Radio,
 } from "@material-tailwind/react";
 // import { Switch } from "antd";
 
@@ -202,22 +203,22 @@ const Process = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataProcessStore?.id, searchQuery1]);
 
-  // const fetchStatus1 = async () => {
-  //   try {
-  //     const response = await getProcessUser1(
-  //       dataProcessStore?.id,
-  //       searchQuery1
-  //     );
-  //     // console.log(response);
-  //     if (response?.status == 200) {
-  //       setListDataCustomer(response.data);
-  //     } else {
-  //       return;
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+  const fetchStatus1 = async () => {
+    try {
+      const response = await getProcessUser1(
+        dataProcessStore?.id,
+        searchQuery1
+      );
+      // console.log(response);
+      if (response?.status == 200) {
+        setListDataCustomer(response.data);
+      } else {
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   // useEffect(() => {
   //   fetchStatus1();
@@ -515,9 +516,10 @@ const Process = () => {
           setSearchQueryStart(new Date()),
           setSearchQueryEnd(new Date()),
           setUserListData([]);
-        // setDisableButton(false)
+
+        // setSumUser([]);
+        // setActiveRow("");
       } else {
-        // toast.error("เปลี่ยนสถานะ ไม่สำเร็จ");
         toast.error(response?.response?.data);
       }
     } catch (error) {
@@ -553,6 +555,8 @@ const Process = () => {
 
   const [returnReload, setReturnReload] = useState([]);
   const [newPrice, setNewPrice] = useState(0);
+  const [radio, setRadio] = useState(0);
+  console.log(radio);
 
   const handleReload = async () => {
     console.log(userListData);
@@ -563,6 +567,7 @@ const Process = () => {
         price: userListData?.total,
         new_price: Number(newPrice) || userListData?.total,
         count_day: userListData?.count_day,
+        // status: Number(radio)
       };
       console.log(data);
       const response = await sendReload(data);
@@ -571,20 +576,24 @@ const Process = () => {
         toast.success("รียอด สำเร็จ");
         setReturnReload(response?.data);
         handleModalDataReload();
-        handleFetch();
+        // handleFetch();
         setNewPrice(0);
+        fetchStatus(0);
+        fetchUserListSum(userId);
+        fetchUpdateAll(dataProcessStore?.id)
 
         // reset
-        setSelectDisable(0),
-        setSelectedValue(null),
-        setStatusValue(null),
-        setAmount(0),
-        setAmountDate(0),
-        setSearchQueryStart(new Date()),
-        setSearchQueryEnd(new Date()),
-        setUserListData([]);
         setSumUser([]);
+        setSelectDisable(0),
+          setSelectedValue(null),
+          setStatusValue(null),
+          setAmount(0),
+          setAmountDate(0),
+          setSearchQueryStart(new Date()),
+          setSearchQueryEnd(new Date()),
+          setUserListData([]);
         setActiveRow("");
+        setRadio(0);
       } else {
         toast.error(response?.response?.data);
         handleModalReload();
@@ -626,7 +635,6 @@ const Process = () => {
     // ทำอะไรสิ่งที่คุณต้องการต่อที่นี่ เช่น ส่งข้อมูลไปยัง backend
   };
 
-  console.log(sumUser);
   // console.log(disableButton);
 
   const checkInputDate = (e, index) => {
@@ -692,6 +700,7 @@ const Process = () => {
                   <Typography className="text-lg lg:text-xl font-bold">
                     {dataProcessStore?.name || ""}
                   </Typography>
+                  {/* <button onClick={() => fetchUpdateAll(dataProcessStore?.id)}>test</button> */}
                 </div>
                 <div>
                   <Button
@@ -1743,22 +1752,40 @@ const Process = () => {
           <Typography variant="h5">ยืนยันการรียอด</Typography>
         </DialogHeader>
         <DialogBody>
-          <div className="flex gap-3 justify-center ">
-            <Typography>จำนวนเงิน:</Typography>
-
-            <input
-              type="number"
-              className=" border-2 w-[150px] border-black text-center bg-gray-200 rounded-lg "
-              value={newPrice || userListData?.total}
-              min="0"
-              // onChange={(e) =>
-              //   setUserListData({
-              //     ...userListData,
-              //     total: Number(e.target.value),
-              //   })
-              // }
-              onChange={(e) => setNewPrice(e.target.value)}
-            />
+          <div className="flex flex-col justify-center items-center ">
+            <div className="flex gap-3 justify-center   ">
+              <Typography>จำนวนเงิน:</Typography>
+              <input
+                type="number"
+                className=" border-2 w-[100px] border-black text-center bg-gray-200  "
+                value={newPrice || userListData?.total}
+                min="0"
+                // onChange={(e) =>
+                //   setUserListData({
+                //     ...userListData,
+                //     total: Number(e.target.value),
+                //   })
+                // }
+                onChange={(e) => setNewPrice(e.target.value)}
+              />
+            </div>
+            {/* <div className="flex gap-10  justify-center mt-3  ">
+              <Radio
+                name="type"
+                label="ปกติ"
+                color="green"
+                onClick={() => setRadio(0)}
+                className="bg-gray-300 items-center border-b-2 "
+                defaultChecked
+              />
+              <Radio
+                name="type"
+                label="ชำระล่วงหน้า"
+                color="green"
+                onClick={() => setRadio(1)}
+                className="bg-gray-300 items-center border-b-2"
+              />
+            </div> */}
           </div>
         </DialogBody>
         <DialogFooter className="flex justify-center gap-5 ">

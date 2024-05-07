@@ -598,10 +598,10 @@ const Refund = () => {
                               <Typography
                                 variant="small"
                                 color="blue-gray"
-                                className="font-normal "
+                                className={`font-normal ${data?.date == "0000-00-00" ? "bg-purple-500 px-2 py-1 text-purple-500  rounded-md bg-opacity-20" : '' } `}
                               >
-                                {data?.date == "Invalid dateInvalid date"
-                                  ? ""
+                                {data?.date == "0000-00-00"
+                                  ? "จ่ายล่วงหน้า"
                                   : moment(data?.date)
                                       .add(543, "years")
                                       .format("DD-MM-YYYY") || ""}
