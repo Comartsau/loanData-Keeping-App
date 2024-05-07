@@ -233,3 +233,19 @@ export const sendReload = async (data) => {
     return error
   }
 };
+
+export const sortUser = async (data ,id) => {
+  console.log(data)
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_APP_API}/api/process/user/sort?process_id=${id}`,
+      data,
+      {
+        ...HeaderAPI(localStorage.getItem("Token")),
+      }
+    );
+    return response;
+  } catch (error) {
+    return error
+  }
+};

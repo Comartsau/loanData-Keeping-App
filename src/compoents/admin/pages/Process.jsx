@@ -44,6 +44,8 @@ import { IoIosSave } from "react-icons/io";
 import { TbReload } from "react-icons/tb";
 import { MdSmsFailed, MdCancel } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
+import { LuTimerReset } from "react-icons/lu";
+import { RiShutDownLine } from "react-icons/ri";
 
 import {
   getProcess,
@@ -59,6 +61,7 @@ import {
   sendUpdate,
   sendReload,
   sendClose,
+  sortUser,
 } from "../../../api/ProcessApi";
 import { getCustomer } from "../../../api/customerApi";
 import { editLocation } from "../../../api/locationApi";
@@ -203,22 +206,22 @@ const Process = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataProcessStore?.id, searchQuery1]);
 
-  const fetchStatus1 = async () => {
-    try {
-      const response = await getProcessUser1(
-        dataProcessStore?.id,
-        searchQuery1
-      );
-      // console.log(response);
-      if (response?.status == 200) {
-        setListDataCustomer(response.data);
-      } else {
-        return;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const fetchStatus1 = async () => {
+  //   try {
+  //     const response = await getProcessUser1(
+  //       dataProcessStore?.id,
+  //       searchQuery1
+  //     );
+  //     // console.log(response);
+  //     if (response?.status == 200) {
+  //       setListDataCustomer(response.data);
+  //     } else {
+  //       return;
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   // useEffect(() => {
   //   fetchStatus1();
@@ -555,11 +558,11 @@ const Process = () => {
 
   const [returnReload, setReturnReload] = useState([]);
   const [newPrice, setNewPrice] = useState(0);
-  const [radio, setRadio] = useState(0);
-  console.log(radio);
+  // const [radio, setRadio] = useState(0);
+  // console.log(radio);
 
   const handleReload = async () => {
-    console.log(userListData);
+    // console.log(userListData);
     try {
       let data = {
         process_user_id: userId,
@@ -580,7 +583,7 @@ const Process = () => {
         setNewPrice(0);
         fetchStatus(0);
         fetchUserListSum(userId);
-        fetchUpdateAll(dataProcessStore?.id)
+        fetchUpdateAll(dataProcessStore?.id);
 
         // reset
         setSumUser([]);
@@ -593,7 +596,7 @@ const Process = () => {
           setSearchQueryEnd(new Date()),
           setUserListData([]);
         setActiveRow("");
-        setRadio(0);
+        // setRadio(0);
       } else {
         toast.error(response?.response?.data);
         handleModalReload();
@@ -657,35 +660,52 @@ const Process = () => {
   const dragItemOver = useRef(null);
 
   // handle drag sorting
-  const handleSort = () => {
-    // duplicate items
-    let _listDataCustomer = [...listDataCustomer];
+  const handleSort = async () => {
+    try {
+      // duplicate items
+      let _listDataCustomer = [...listDataCustomer];
 
-    //remove and save the dragged item  contect
-    const graggedItemContent = _listDataCustomer.splice(dragItem.current, 1)[0];
+      //remove and save the dragged item  contect
+      const graggedItemContent = _listDataCustomer.splice(
+        dragItem.current,
+        1
+      )[0];
 
-    // switch the position
-    _listDataCustomer.splice(dragItemOver.current, 0, graggedItemContent);
+      // switch the position
+      _listDataCustomer.splice(dragItemOver.current, 0, graggedItemContent);
 
-    // reset the position
-    dragItem.current = null;
-    dragItemOver.current = null;
+      // reset the position
+      dragItem.current = null;
+      dragItemOver.current = null;
 
-    // update the actual array
-    setListDataCustomer(_listDataCustomer);
-    // reset Status
+      // update the actual array
 
-    // handleFetch();
-    setSelectDisable(0),
-      setSelectedValue(null),
-      setStatusValue(null),
-      setAmount(0),
-      setAmountDate(0),
-      setSearchQueryStart(new Date()),
-      setSearchQueryEnd(new Date()),
-      setUserListData([]);
-    setSumUser([]);
-    setActiveRow("");
+      const data = {
+        sort_data: _listDataCustomer.map((item, index) => ({
+          index: index + 1,
+          id: item.id,
+        })),
+      };
+      const response = await sortUser(data, dataProcessStore?.id);
+      console.log(response?.status);
+      if (response?.status == 200) {
+        fetchStatus();
+        toast.success("ทำรายการสำเร็จ");
+        // reset Status
+        setSelectDisable(0),
+          setSelectedValue(null),
+          setStatusValue(null),
+          setAmount(0),
+          setAmountDate(0),
+          setSearchQueryStart(new Date()),
+          setSearchQueryEnd(new Date()),
+          setUserListData([]);
+        setSumUser([]);
+        setActiveRow("");
+      }
+    } catch (error) {
+      // toast.error(error);
+    }
   };
 
   return (
@@ -693,9 +713,9 @@ const Process = () => {
       <div className="flex flex-col w-full mt-1 px-2 ">
         <ToastContainer className="toast " autoClose={2500} theme="colored" />
         <div className="flex   flex-col  overflow-auto   items-center ">
-          <div className="flex w-full flex-col md:flex-row gap-5 ">
-            <div className="flex flex-col w-full h-[85vh] md:w-4/12 xl:w-3/12  ">
-              <div className="flex  items-center justify-between gap-3 ">
+          <div className="flex w-full flex-col lg:flex-row gap-5 ">
+            <div className="flex flex-col w-full h-[85vh] lg:w-4/12 xl:w-3/12    ">
+              <div className="flex  items-center justify-between gap-3  ">
                 <div>
                   <Typography className="text-lg lg:text-xl font-bold">
                     {dataProcessStore?.name || ""}
@@ -791,7 +811,7 @@ const Process = () => {
                 />
               </div>
 
-              <div className="flex flex-col w-full justify-center mt-5 gap-3  ">
+              <div className="flex flex-col  w-full justify-center mt-5 gap-3  ">
                 <div className="flex gap-5 ">
                   <div className="w-full ">
                     <Button
@@ -830,7 +850,7 @@ const Process = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-5 ">
+                <div className="flex gap-5 flex-col xl:flex-row ">
                   <div className="w-full ">
                     <Button
                       size="sm"
@@ -846,7 +866,7 @@ const Process = () => {
                       onClick={handleClose}
                     >
                       <span className="mr-2 text-xl ">
-                        <MdSmsFailed />
+                        <RiShutDownLine />
                       </span>
                       ปิดยอด
                     </Button>
@@ -871,7 +891,7 @@ const Process = () => {
 
               <div className="flex w-full flex-col h-full mt-4 2xl:mt-[20px]   ">
                 <div
-                  className=" lg:mt-[145px] xl:mt-[4px] sm:mt-0 md:mt-[18px] md:h-[400px]  2xl:mt-0 p-3   lg:h-[350px] xl:h-[273px] 2xl:h-[240px] items-center rounded-md    mb-2 "
+                  className=" lg:mt-[15px] xl:mt-[4px] sm:mt-0 md:mt-[18px]  md:h-[180px]  2xl:mt-0 p-3   lg:h-[300px] xl:h-[228px] 2xl:h-[240px] items-center rounded-md    mb-2 "
                   style={{ border: "2px solid #b3b3b3" }}
                 >
                   <Typography className="text-xl font-bold ">
@@ -909,11 +929,11 @@ const Process = () => {
                 </div>
               </div>
             </div>
-            <div className="flex w-full flex-col  gap-3 md:w-8/12 xl:w-9/12 ">
-              <div className=" flex flex-col xl:flex-row  items-center sm:items-start  w-full justify-center md:justify-start    gap-5  ">
-                <div className="flex flex-col  xl:flex-row gap-5">
-                  <div className="flex gap-5 lg:ml-5">
-                    {/* <div className=" justify-center">
+            <div className="flex w-full flex-col  gap-3  lg:w-8/12 xl:w-9/12 ">
+              <div className=" flex flex-col xl:flex-row  items-center sm:items-start  w-full justify-center md:justify-start   gap-5  ">
+                {/* <div className="flex flex-col  xl:flex-row gap-5"> */}
+                  {/* <div className="flex gap-5 lg:ml-5 ">
+                    <div className=" justify-center">
                       <Button
                         size="sm"
                         variant="outlined"
@@ -932,8 +952,10 @@ const Process = () => {
                       >
                         ทั้งหมด
                       </Button>
-                    </div> */}
-                    <div className=" justify-center">
+                    </div>
+                  </div> */}
+                  <div className="flex w-full flex-col justify-center lg:justify-start lg:ml-3 sm:mt-5 sm:flex-row md:mt-16 lg:mt-0   gap-5">
+                    <div className=" flex justify-center">
                       <Button
                         size="sm"
                         variant="outlined"
@@ -955,10 +977,7 @@ const Process = () => {
                         กำลังจ่าย
                       </Button>
                     </div>
-                  </div>
-
-                  <div className="flex gap-5">
-                    <div className=" justify-center">
+                    <div className=" flex justify-center">
                       <Button
                         size="sm"
                         variant="outlined"
@@ -978,7 +997,7 @@ const Process = () => {
                         จ่ายครบแล้ว
                       </Button>
                     </div>
-                    <div className=" justify-center">
+                    <div className=" flex justify-center">
                       <Button
                         size="sm"
                         variant="outlined"
@@ -999,7 +1018,7 @@ const Process = () => {
                       </Button>
                     </div>
                   </div>
-                </div>
+                {/* </div> */}
               </div>
               <div>
                 <Card
@@ -1060,7 +1079,7 @@ const Process = () => {
                               จำนวนวัน
                             </Typography>
                           </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2">
+                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2 w-[100px]">
                             <Typography
                               variant="small"
                               color="blue-gray"
@@ -1069,13 +1088,22 @@ const Process = () => {
                               สถานะ
                             </Typography>
                           </th>
-                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2">
+                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2 w-1">
                             <Typography
                               variant="small"
                               color="blue-gray"
                               className="font-bold leading-none opacity-70"
                             >
                               เลือก
+                            </Typography>
+                          </th>
+                          <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-2 w-[70px] ">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-bold leading-none opacity-70"
+                            >
+                              เครียร์ค่า
                             </Typography>
                           </th>
                         </tr>
@@ -1290,6 +1318,18 @@ const Process = () => {
                                       ]}
                                     >
                                       <BsFillEyeFill className="h-5 w-5  text-light-blue-700 " />
+                                    </IconButton>
+                                  </div>
+                                </td>
+                                <td className={classes}>
+                                  <div className="flex justify-center ">
+                                    <IconButton
+                                      variant="outlined"
+                                      color="blue"
+                                      size="sm"
+                                      onClick={() => [setActiveRow(index)]}
+                                    >
+                                      <LuTimerReset className="h-5 w-5  text-red-500 " />
                                     </IconButton>
                                   </div>
                                 </td>
