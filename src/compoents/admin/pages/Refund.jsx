@@ -120,6 +120,7 @@ const Refund = () => {
 
   // console.log(dataPdf)
   console.log(totalPages)
+  console.log(tableView)
 
   return (
     <div>

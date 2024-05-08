@@ -45,7 +45,7 @@ import { TbReload } from "react-icons/tb";
 import { MdSmsFailed, MdCancel } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
 import { LuTimerReset } from "react-icons/lu";
-import { RiShutDownLine } from "react-icons/ri";
+import { RiShutDownLine, RiDeleteBin6Fill } from "react-icons/ri";
 
 import {
   getProcess,
@@ -62,6 +62,7 @@ import {
   sendReload,
   sendClose,
   sortUser,
+  clearUser,
 } from "../../../api/ProcessApi";
 import { getCustomer } from "../../../api/customerApi";
 import { editLocation } from "../../../api/locationApi";
@@ -272,12 +273,13 @@ const Process = () => {
 
   const totalPages = Math.ceil(listDataCustomer?.length / itemsPerPage);
 
-  //------------- modal Add Process -----------------------//
+  //------------- modal  -----------------------//
 
   const [openModalAddProcess, setOpenModalAddProcess] = useState(false);
   const [openModalConfirm, setOpenModalConfirm] = useState(false);
   const [openModalReload, setOpenModalReload] = useState(false);
   const [openModalDataReload, setOpenModalDataReload] = useState(false);
+  const [openModalClearUser, setOpenModalClearUser] = useState(false);
 
   const handleModalAddProcess = () => {
     setOpenModalAddProcess(!openModalAddProcess);
@@ -296,6 +298,15 @@ const Process = () => {
     setOpenModalDataReload(!openModalDataReload);
     // setOpenModalAddProcess(false);
   };
+
+  const [userData, setUserData] = useState([]);
+
+  const handleModalClearUser = (data) => {
+    setOpenModalClearUser(!openModalClearUser);
+    setUserData(data);
+  };
+
+  console.log(userData);
 
   const handleAddProcess = async () => {
     try {
@@ -422,8 +433,6 @@ const Process = () => {
   const startEnd = moment(searchQueryEnd).format("YYYY-MM-DD");
   const dateSend = moment(changeDate).format("YYYY-MM-DD");
 
-  // console.log(changeDate)
-  // console.log(dateCancel)
   console.log(listDataCustomer);
 
   const handleChangeStatus = async (changestatus, dataed) => {
@@ -491,7 +500,6 @@ const Process = () => {
     }
   };
 
-  // const [dateUpdate ,setDateUpdate] = useState('')
   const handleUpdate = async () => {
     console.log(statusValue.value);
     try {
@@ -614,11 +622,6 @@ const Process = () => {
     fetchUserListSum(userId);
   };
 
-  // console.log(dataProcessStore.id);
-  // console.log(listDataCustomer)
-  // console.log(sumUser);
-  // console.log(price)
-
   const handleChangeSwitch = (index, checked) => {
     // คัดลอก sumUser และอัพเดทค่า status_count ตาม checked ใหม่
     console.log(checked);
@@ -707,6 +710,45 @@ const Process = () => {
       // toast.error(error);
     }
   };
+
+  const handleClearUser = async (userData) => {
+    try {
+      const data = {
+        id: userId,
+        process_id: dataProcessStore?.id,
+        price: userData?.price,
+        count_day: userData?.count_day,
+      };
+      const response = await clearUser(data);
+      console.log(response?.status);
+      if (response?.status == 200) {
+        fetchStatus();
+        fetchUpdateAll();
+        handleModalClearUser();
+        toast.success("ลบข้อมูลสำเร็จ");
+
+        // reset Status
+        setSelectDisable(0),
+          setSelectedValue(null),
+          setStatusValue(null),
+          setAmount(0),
+          setAmountDate(0),
+          setSearchQueryStart(new Date()),
+          setSearchQueryEnd(new Date()),
+          setUserListData([]);
+        setUserListSum([]);
+        setSumUser([]);
+        setActiveRow("");
+      }
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  // console.log(dataProcessStore.id);
+  // console.log(listDataCustomer)
+  // console.log(sumUser);
+  // console.log(price)
 
   return (
     <Card>
@@ -932,7 +974,7 @@ const Process = () => {
             <div className="flex w-full flex-col  gap-3  lg:w-8/12 xl:w-9/12 ">
               <div className=" flex flex-col xl:flex-row  items-center sm:items-start  w-full justify-center md:justify-start   gap-5  ">
                 {/* <div className="flex flex-col  xl:flex-row gap-5"> */}
-                  {/* <div className="flex gap-5 lg:ml-5 ">
+                {/* <div className="flex gap-5 lg:ml-5 ">
                     <div className=" justify-center">
                       <Button
                         size="sm"
@@ -954,70 +996,70 @@ const Process = () => {
                       </Button>
                     </div>
                   </div> */}
-                  <div className="flex w-full flex-col justify-center lg:justify-start lg:ml-3 sm:mt-5 sm:flex-row md:mt-16 lg:mt-0   gap-5">
-                    <div className=" flex justify-center">
-                      <Button
-                        size="sm"
-                        variant="outlined"
-                        className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  text-white text-sm `}
-                        style={{
-                          backgroundColor:
-                            activeCustomerMenu === "menu2"
-                              ? "#ff9800"
-                              : "#fdaf3d",
-                        }}
-                        onClick={() => [
-                          setActiveCustomerMenu("menu2"),
-                          fetchStatus(0),
-                          setDisableButton(true),
-                          setSumUser([]),
-                          setActiveRow(),
-                        ]}
-                      >
-                        กำลังจ่าย
-                      </Button>
-                    </div>
-                    <div className=" flex justify-center">
-                      <Button
-                        size="sm"
-                        variant="outlined"
-                        className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  ${
-                          activeCustomerMenu === "menu3"
-                            ? " bg-green-500 text-white text-sm"
-                            : "bg-green-300 text-white text-sm"
-                        }`}
-                        onClick={() => [
-                          setActiveCustomerMenu("menu3"),
-                          fetchStatus(1),
-                          setDisableButton(false),
-                          setSumUser([]),
-                          setActiveRow(),
-                        ]}
-                      >
-                        จ่ายครบแล้ว
-                      </Button>
-                    </div>
-                    <div className=" flex justify-center">
-                      <Button
-                        size="sm"
-                        variant="outlined"
-                        className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  ${
-                          activeCustomerMenu === "menu4"
-                            ? " bg-red-500 text-white text-sm"
-                            : "bg-red-300 text-white text-sm"
-                        }`}
-                        onClick={() => [
-                          setActiveCustomerMenu("menu4"),
-                          fetchStatus(2),
-                          setDisableButton(false),
-                          setSumUser([]),
-                          setActiveRow(),
-                        ]}
-                      >
-                        ลูกค้าเสีย
-                      </Button>
-                    </div>
+                <div className="flex w-full flex-col justify-center lg:justify-start lg:ml-3 sm:mt-5 sm:flex-row md:mt-16 lg:mt-0   gap-5">
+                  <div className=" flex justify-center">
+                    <Button
+                      size="sm"
+                      variant="outlined"
+                      className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  text-white text-sm `}
+                      style={{
+                        backgroundColor:
+                          activeCustomerMenu === "menu2"
+                            ? "#ff9800"
+                            : "#fdaf3d",
+                      }}
+                      onClick={() => [
+                        setActiveCustomerMenu("menu2"),
+                        fetchStatus(0),
+                        setDisableButton(true),
+                        setSumUser([]),
+                        setActiveRow(),
+                      ]}
+                    >
+                      กำลังจ่าย
+                    </Button>
                   </div>
+                  <div className=" flex justify-center">
+                    <Button
+                      size="sm"
+                      variant="outlined"
+                      className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  ${
+                        activeCustomerMenu === "menu3"
+                          ? " bg-green-500 text-white text-sm"
+                          : "bg-green-300 text-white text-sm"
+                      }`}
+                      onClick={() => [
+                        setActiveCustomerMenu("menu3"),
+                        fetchStatus(1),
+                        setDisableButton(false),
+                        setSumUser([]),
+                        setActiveRow(),
+                      ]}
+                    >
+                      จ่ายครบแล้ว
+                    </Button>
+                  </div>
+                  <div className=" flex justify-center">
+                    <Button
+                      size="sm"
+                      variant="outlined"
+                      className={`w-[150px] rounded-md py-2  px-4 shadow-lg border border-gray-400  ${
+                        activeCustomerMenu === "menu4"
+                          ? " bg-red-500 text-white text-sm"
+                          : "bg-red-300 text-white text-sm"
+                      }`}
+                      onClick={() => [
+                        setActiveCustomerMenu("menu4"),
+                        fetchStatus(2),
+                        setDisableButton(false),
+                        setSumUser([]),
+                        setActiveRow(),
+                      ]}
+                    >
+                      ลูกค้าเสีย
+                    </Button>
+                  </div>
+                </div>
                 {/* </div> */}
               </div>
               <div>
@@ -1103,7 +1145,7 @@ const Process = () => {
                               color="blue-gray"
                               className="font-bold leading-none opacity-70"
                             >
-                              เครียร์ค่า
+                              ลบ
                             </Typography>
                           </th>
                         </tr>
@@ -1327,9 +1369,13 @@ const Process = () => {
                                       variant="outlined"
                                       color="blue"
                                       size="sm"
-                                      onClick={() => [setActiveRow(index)]}
+                                      onClick={() => [
+                                        setActiveRow(index),
+                                        handleModalClearUser(data),
+                                        setUserId(data.id),
+                                      ]}
                                     >
-                                      <LuTimerReset className="h-5 w-5  text-red-500 " />
+                                      <RiDeleteBin6Fill className="h-5 w-5  text-red-500 " />
                                     </IconButton>
                                   </div>
                                 </td>
@@ -1899,6 +1945,55 @@ const Process = () => {
               <CiLogout />
             </span>
             ปิด
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      {/* modal Clear User  */}
+      <Dialog
+        open={openModalClearUser}
+        handler={handleModalClearUser}
+        size="xs"
+        className="h-[35vh] "
+      >
+        <DialogHeader className="bg-red-700 py-3  px-3  justify-center text-lg text-white opacity-80">
+          <Typography variant="h5">ยืนยันการลบข้อมูล</Typography>
+        </DialogHeader>
+        <DialogBody divider className=" h-[15vh]">
+          <div className=" w-full  flex flex-col text-center justify-center mt-3 gap-3 ">
+            <Typography className=" text-xl font-bold">
+              ข้อมูลจะถูกเริ่มต้นใหม่ทั้งหมด{" "}
+              <span className="text-red-500 underline">{`(เฉพาะคุณ ${userData?.name})`}</span>{" "}
+            </Typography>
+            <Typography className=" text-xl font-bold">
+              ข้อมูลรายงานรียอดจะถูกลบ{" "}
+            </Typography>
+          </div>
+        </DialogBody>
+        <DialogFooter className="flex justify-center gap-5">
+          <Button
+            size="md"
+            variant="gradient"
+            color="gray"
+            onClick={handleModalClearUser}
+            className="flex text-base mr-1 w-[130px] items-center justify-center"
+          >
+            <span className="mr-2 text-xl">
+              <CiLogout />
+            </span>
+            ปิด
+          </Button>
+          <Button
+            size="sm"
+            variant="gradient"
+            color="red"
+            onClick={() => handleClearUser(userData)}
+            className="flex text-base mr-1"
+          >
+            <span className="mr-2 text-xl">
+              <FaRegSave />
+            </span>
+            รีเซทข้อมูล
           </Button>
         </DialogFooter>
       </Dialog>
