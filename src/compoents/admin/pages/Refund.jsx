@@ -27,6 +27,7 @@ import { useRecoilValue } from "recoil";
 import { processStore } from "../../../store/Store";
 
 import ReportPdf from "./ReportPdf";
+import { BsNutFill } from "react-icons/bs";
 
 const Refund = () => {
   const [listData, setListData] = useState([]);
@@ -44,7 +45,7 @@ const Refund = () => {
       };
 
       const respone = await getRefund(data);
-      console.log(respone);
+      // console.log(respone);
       setListData(respone);
     } catch (error) {
       toast.error(error);
@@ -60,7 +61,7 @@ const Refund = () => {
   const fecthRefundDetail = async (id) => {
     try {
       const respone = await getRefundTable(id);
-      console.log(respone);
+      // console.log(respone);
       setTableView(respone.data);
     } catch (error) {
       toast.error(error);
@@ -79,7 +80,7 @@ const Refund = () => {
 
   const totalPages = Math.ceil(listData?.length / itemsPerPage);
 
-  console.log(listData)
+  // console.log(listData)
 
   //------------- modal View -----------------------//
   const [openModalView, setOpenModalView] = useState(false);
@@ -119,8 +120,8 @@ const Refund = () => {
   // }, [searchQuery, searchQuery1]);
 
   // console.log(dataPdf)
-  console.log(totalPages)
-  console.log(tableView)
+  // console.log(totalPages)
+  // console.log(tableView)
 
   return (
     <div>
@@ -599,9 +600,9 @@ const Refund = () => {
                               <Typography
                                 variant="small"
                                 color="blue-gray"
-                                className={`font-normal ${data?.date == "0000-00-00" ? "bg-purple-500 px-2 py-1 text-purple-500  rounded-md bg-opacity-20" : '' } `}
+                                className={`font-normal ${data?.date == null ? "bg-purple-500 px-2 py-1 text-purple-500  rounded-md bg-opacity-20" : '' } `}
                               >
-                                {data?.date == "0000-00-00"
+                                {data?.date == null
                                   ? "จ่ายล่วงหน้า"
                                   : moment(data?.date)
                                       .add(543, "years")
